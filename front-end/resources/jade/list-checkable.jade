@@ -1,0 +1,11 @@
+extends list
+
+block headings-pre
+  th.checkbox-col
+    list-check-all
+
+block columns-pre
+  td.checkbox-col
+    list-check-item(
+      checked="row.checked"
+    )
