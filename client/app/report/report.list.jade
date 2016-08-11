@@ -1,0 +1,39 @@
+extends /resources/jade/list-checkable
+
+block headings
+  th.relative Date
+    sort(col="date")
+  th.relative IP 
+    sort(col="addr")
+  th.relative Server
+    sort(col="server")
+  th.relative Client
+    sort(col="client")
+  th.relative Latest Activity
+    sort(col="updated")
+  th Actions
+
+block columns
+  td {{ row.date }}
+  td {{ row.addr }}
+  td
+    a(
+      ng-if="row.server"
+      ui-sref="app.hardware.server.view({id: row.server.id})"
+      ng-bind="row.server.name"
+    )
+    span(ng-if="!row.server") -
+  td 
+    a(
+      ng-if="row.client"
+      ui-sref="app.users.clients.view({id: row.client.id})"
+      ng-bind="row.client.name"
+    )
+    span(ng-if="!row.client") -
+  td
+    strong(ng-bind="row.excerpt.from")
+    div.excerpt(ng-bind="row.excerpt.body")
+  td
+    .btn-report.btn-report-xs
+      a.btn.btn-default(ui-sref="app.pkg.abuse.report.view({id: row.id})")
+        | {{ 'app.action.VIEW' | translate }}

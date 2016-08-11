@@ -26,8 +26,8 @@ var ignored_files = '!' + hidden_files;
 
 // MAIN PATHS
 var paths = {
-  app: '../public/',
-  public: '../public/',
+  app: '../public/client/',
+  public: '../public/client/',
   markup: 'app/',
   scripts: 'app/',
   assets: 'assets/',
