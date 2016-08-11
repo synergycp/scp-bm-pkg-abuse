@@ -1,36 +1,28 @@
 include /resources/jade/mixins/panel
 
 h1(
-  translate='pkg.abuse.report.view.title.PAGE'
+  translate='pkg.abuse.client.report.view.title.PAGE'
   translate-value-date='{{vm.report.date}}'
 )
 
-div(style="margin-bottom: 10px")
-  a.btn(
-    ng-class="vm.report.date_resolved ? 'btn-danger' : 'btn-success'"
-    ng-click="vm.toggleResolve()"
-    data-translate="pkg.abuse.report.view.resolve.TOGGLE"
-    data-translate-value-resolved="{{ vm.report.date_resolved }}"
-  )
-
 .row
   .col-md-4
-    +panel("{{ 'pkg.abuse.report.view.overview.TITLE' | translate }}")
+    +panel("{{ 'pkg.abuse.client.report.view.overview.TITLE' | translate }}")
       table.table
         thead
           tr
             th.border-only(colspan="2")
         tbody
           tr
-            th(data-translate="pkg.abuse.report.view.overview.DATE")
+            th(data-translate="pkg.abuse.client.report.view.overview.DATE")
             td(ng-bind="vm.report.date")
           tr
-            th(data-translate="pkg.abuse.report.view.overview.ADDR") 
+            th(data-translate="pkg.abuse.client.report.view.overview.ADDR") 
             td(ng-bind="vm.report.addr")
           tr
-            th(data-translate="pkg.abuse.report.view.overview.status.TITLE")
+            th(data-translate="pkg.abuse.client.report.view.overview.status.TITLE")
             td(
-              data-translate="pkg.abuse.report.view.overview.status.RESOLVED"
+              data-translate="pkg.abuse.client.report.view.overview.status.RESOLVED"
               data-translate-value-resolved="{{ vm.report.date_resolved | date }}"
             )
 
@@ -39,7 +31,7 @@ div(style="margin-bottom: 10px")
       on-added="vm.logs.refresh()"
     )
   .col-md-8
-    +panel("{{ 'pkg.abuse.report.view.body.TITLE' | translate }}")
+    +panel("{{ 'pkg.abuse.client.report.view.body.TITLE' | translate }}")
       .scroller 
         pre.fill-panel(ng-bind="vm.report.body")
 

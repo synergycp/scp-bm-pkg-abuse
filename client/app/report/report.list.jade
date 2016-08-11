@@ -1,4 +1,4 @@
-extends /resources/jade/list-checkable
+extends /resources/jade/list
 
 block headings
   th.relative Date
@@ -14,19 +14,19 @@ block headings
   th Actions
 
 block columns
-  td {{ row.date }}
-  td {{ row.addr }}
+  td(ng-bind="row.date")
+  td(ng-bind="row.addr")
   td
     a(
       ng-if="row.server"
-      ui-sref="app.hardware.server.view({id: row.server.id})"
+      ui-sref="app.hardware.server.view({ id: row.server.id })"
       ng-bind="row.server.name"
     )
     span(ng-if="!row.server") -
   td 
     a(
       ng-if="row.client"
-      ui-sref="app.users.clients.view({id: row.client.id})"
+      ui-sref="app.users.clients.view({ id: row.client.id })"
       ng-bind="row.client.name"
     )
     span(ng-if="!row.client") -
@@ -35,5 +35,7 @@ block columns
     div.excerpt(ng-bind="row.excerpt.body")
   td
     .btn-report.btn-report-xs
-      a.btn.btn-default(ui-sref="app.pkg.abuse.report.view({id: row.id})")
-        | {{ 'app.action.VIEW' | translate }}
+      a.btn.btn-default(
+        ui-sref="app.pkg.abuse.report.view({id: row.id})"
+        translate="app.action.VIEW"
+      )

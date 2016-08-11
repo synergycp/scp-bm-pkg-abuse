@@ -7,15 +7,15 @@ form(ng-submit="modal.submit()")
       ng-click="modal.$dismiss()"
     ) &times;
 
-    h4.modal-title(data-translate="pkg.abuse.report.modal.assign.TITLE")
+    h4.modal-title(data-translate="pkg.abuse.client.report.modal.assign.TITLE")
 
   .modal-body.form-horizontal
-    +label("{{ 'pkg.abuse.report.modal.assign.client.LABEL' | translate }}")
+    +label("{{ 'pkg.abuse.client.report.modal.assign.client.LABEL' | translate }}")
       +input-with-btn("fa fa-times-circle")(
         ng-click="modal.client.selected = null;modal.client.fireChangeEvent()"
       )
         ui-select(ng-model="modal.client.selected", ng-change="modal.client.fireChangeEvent()")
-          ui-select-match(placeholder="{{ 'pkg.abuse.report.modal.assign.client.PLACEHOLDER' | translate }}")
+          ui-select-match(placeholder="{{ 'pkg.abuse.client.report.modal.assign.client.PLACEHOLDER' | translate }}")
             | {{ $select.selected.name }}
 
           ui-select-choices(
@@ -26,12 +26,12 @@ form(ng-submit="modal.submit()")
             span(ng-bind-html="client.name | highlight: $select.search")
             small <{{client.email}}>
 
-    +label("{{ 'pkg.abuse.report.modal.assign.server.LABEL' | translate }}")
+    +label("{{ 'pkg.abuse.client.report.modal.assign.server.LABEL' | translate }}")
       +input-with-btn("fa fa-times-circle")(
         ng-click="modal.server.selected = null;modal.server.fireChangeEvent()"
       )
         ui-select(ng-model="modal.server.selected", ng-change="modal.server.fireChangeEvent()")
-          ui-select-match(placeholder="{{ 'pkg.abuse.report.modal.assign.server.PLACEHOLDER' | translate }}")
+          ui-select-match(placeholder="{{ 'pkg.abuse.client.report.modal.assign.server.PLACEHOLDER' | translate }}")
             | {{ $select.selected.srv_id }}
 
           ui-select-choices(
@@ -46,9 +46,9 @@ form(ng-submit="modal.submit()")
     button.btn.btn-secondary(
       type="button"
       ng-click="modal.$dismiss()"
-      data-translate="pkg.abuse.report.modal.assign.CANCEL"
+      data-translate="pkg.abuse.client.report.modal.assign.CANCEL"
     )
     button.btn.btn-primary(
       type="submit"
-      data-translate="pkg.abuse.report.modal.assign.SUBMIT"
+      data-translate="pkg.abuse.client.report.modal.assign.SUBMIT"
     )

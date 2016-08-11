@@ -2,8 +2,7 @@
   "list": {
     "TITLE": "Abuse Reports",
     "tab": {
-      "ADMIN": "Waiting on ADMIN",
-      "CLIENT": "Waiting on CLIENT",
+      "OPEN": "Open",
       "ARCHIVE": "Archive"
     }
   },

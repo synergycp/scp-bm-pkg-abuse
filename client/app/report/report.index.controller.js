@@ -16,13 +16,8 @@
     vm.tabs = {
       active: parseInt($stateParams.tab) || 0,
       items: [
-        new Tab('pkg.abuse.report.list.tab.ADMIN', {
-          pending_admin: true,
-        }),
-        new Tab('pkg.abuse.report.list.tab.CLIENT', {
-          pending_client: true,
-        }),
-        new Tab('pkg.abuse.report.list.tab.ARCHIVE', {
+        new Tab('pkg.abuse.client.report.list.tab.OPEN'),
+        new Tab('pkg.abuse.client.report.list.tab.ARCHIVE', {
           archive: true,
         }),
       ],
@@ -54,7 +49,7 @@
     function assignClientServerModal(items) {
       var modal = $uibModal.open({
         templateUrl: RouteHelpers.trusted(
-          pkg.asset('report/modal/modal.assign.html')
+          pkg.asset('client/report/modal/modal.assign.html')
         ),
         controller: 'PkgAbuseReportModalAssignCtrl',
         bindToController: true,
@@ -98,19 +93,12 @@
     function setupList(isArchive) {
       var list = List('abuse');
 
-      list.bulk.add(
-        isArchive ? 'Mark Unresolved' : 'Mark Resolved',
-        list.patch.bind(null, {
-          is_resolved: !isArchive,
-        })
-      );
-      list.bulk.add('Assign Client/Server', assignClientServerModal);
-
       return list;
     }
 
     function Tab(trans, filters) {
       var tab = this;
+      filters = filters || {};
 
       tab.text = trans;
       tab.list = setupList(filters.archive).filter(filters);
