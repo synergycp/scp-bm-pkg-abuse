@@ -16,13 +16,13 @@
     vm.tabs = {
       active: parseInt($stateParams.tab) || 0,
       items: [
-        new Tab('pkg.abuse.report.list.tab.ADMIN', {
+        new Tab('pkg.abuse.admin.report.list.tab.ADMIN', {
           pending_admin: true,
         }),
-        new Tab('pkg.abuse.report.list.tab.CLIENT', {
+        new Tab('pkg.abuse.admin.report.list.tab.CLIENT', {
           pending_client: true,
         }),
-        new Tab('pkg.abuse.report.list.tab.ARCHIVE', {
+        new Tab('pkg.abuse.admin.report.list.tab.ARCHIVE', {
           archive: true,
         }),
       ],

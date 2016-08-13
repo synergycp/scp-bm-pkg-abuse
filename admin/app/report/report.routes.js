@@ -13,20 +13,20 @@
         url: '/report',
         abstract: true,
         template: helper.dummyTemplate,
-        resolve: helper.resolveFor(pkg.lang('report')),
+        resolve: helper.resolveFor(pkg.lang('admin:report')),
       })
       .state('app.pkg.abuse.report.list', {
         url: '?tab&search',
         title: 'Reports',
         controller: 'ReportIndexCtrl as vm',
-        templateUrl: pkg.asset('report/report.index.html'),
+        templateUrl: pkg.asset('admin/report/report.index.html'),
         reloadOnSearch: false,
       })
       .state('app.pkg.abuse.report.view', {
         url: '/:id',
         title: 'View Report',
         controller: 'ReportViewCtrl as vm',
-        templateUrl: pkg.asset('report/report.view.html'),
+        templateUrl: pkg.asset('admin/report/report.view.html'),
       })
       ;
   }
