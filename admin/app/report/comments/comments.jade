@@ -1,6 +1,6 @@
 include /resources/jade/mixins/panel
 
-+panel("{{ 'pkg.abuse.report.view.comments.TITLE' | translate }}")
++panel("{{ 'pkg.abuse.admin.report.view.comments.TITLE' | translate }}")
   .panel-body
     .comments
       .comment.panel.panel-default(
@@ -12,7 +12,7 @@ include /resources/jade/mixins/panel
         .panel-body(ng-bind="comment.body")
     .text-center(
       ng-if="!comments.list.items.length"
-      data-translate="pkg.abuse.report.view.comments.EMPTY"
+      data-translate="pkg.abuse.admin.report.view.comments.EMPTY"
     )
 
   .panel-footer(ng-if="comments.list.pages.max > 1")
@@ -21,12 +21,12 @@ include /resources/jade/mixins/panel
     )
 
 form(ng-submit="comments.submit()")
-  +panel("{{ 'pkg.abuse.report.view.comments.post.TITLE' | translate }}")
+  +panel("{{ 'pkg.abuse.admin.report.view.comments.post.TITLE' | translate }}")
     .panel-body
       textarea.form-control(ng-model="comments.body")
     .panel-footer.clearfix 
       .pull-right 
         button.btn.btn-info(
           type="submit"
-          data-translate="pkg.abuse.report.view.comments.post.SUBMIT"
+          data-translate="pkg.abuse.admin.report.view.comments.post.SUBMIT"
         )
