@@ -3,25 +3,27 @@
 DIR=$(pwd)
 MAIN_DIR=$1
 MODE=$2
+REL_DIR=${DIR:${#MAIN_DIR}+1}
 
 case $MODE in
 1)
     composer install
     ;;
 2)
-    php $MAIN_DIR/artisan migrate --path=$DIR/database/migrations
+    cd $MAIN_DIR
+    php artisan migrate --path=$REL_DIR
 
-    cd admin
+    cd $DIR/admin
     npm install
     bower install
-    gulp
+    gulp prod build --nocache
 
-    cd ../client
+    cd $DIR/client
     npm install
     bower install
-    gulp
+    gulp prod build --nocache
 
-    cd ..
+    cd $DIR
     ;;
 esac
 
