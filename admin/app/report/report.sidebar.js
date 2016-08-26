@@ -3,14 +3,14 @@
 
   angular
     .module('pkg.abuse.report')
-    .config(SidebarConfig)
+    .config(NavConfig)
     ;
 
   /**
    * @ngInject
    */
-  function SidebarConfig(SidebarProvider) {
-    SidebarProvider.group('network').item({
+  function NavConfig(NavProvider) {
+    NavProvider.group('network').item({
       text: "Abuse Reports",
       sref: "app.pkg.abuse.report",
     });
