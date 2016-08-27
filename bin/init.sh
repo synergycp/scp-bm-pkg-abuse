@@ -11,7 +11,7 @@ case $MODE in
     ;;
 2)
     cd $MAIN_DIR
-    php artisan migrate --path=$REL_DIR
+    php artisan migrate -f --path=$REL_DIR
 
     cd $DIR/admin
     npm install
@@ -26,4 +26,3 @@ case $MODE in
     cd $DIR
     ;;
 esac
-
