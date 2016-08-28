@@ -1,9 +1,16 @@
 {
   "list": {
     "TITLE": "Abuse Reports",
+    "NONE": "There have been no reports of abuse on your servers yet.",
     "tab": {
-      "OPEN": "Open",
-      "ARCHIVE": "Archive"
+      "open": {
+        "TITLE": "Open",
+        "EMPTY": "No open abuse reports."
+      },
+      "archive": {
+        "TITLE": "Archive",
+        "EMPTY": "No Abuse Reports are currently archived."
+      }
     }
   },
   "modal": {

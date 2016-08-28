@@ -19,7 +19,7 @@
         "ngInject";
         return RouteHelpers.trusted(
           RouteHelpers.package('abuse').asset(
-            'report/comments/comments.html'
+            'admin/report/comments/comments.html'
           )
         );
       }

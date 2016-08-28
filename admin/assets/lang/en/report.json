@@ -1,10 +1,20 @@
 {
   "list": {
     "TITLE": "Abuse Reports",
+    "NONE": "There have been no reports of abuse on your servers yet.",
     "tab": {
-      "ADMIN": "Waiting on ADMIN",
-      "CLIENT": "Waiting on CLIENT",
-      "ARCHIVE": "Archive"
+      "admin": {
+        "TITLE": "Waiting on ADMIN",
+        "EMPTY": "No Abuse Reports are currently waiting on admin."
+      },
+      "client": {
+        "TITLE": "Waiting on CLIENT",
+        "EMPTY": "No Abuse Reports are currently waiting on client."
+      },
+      "archive": {
+        "TITLE": "Archive",
+        "EMPTY": "No Abuse Reports are currently archived."
+      }
     }
   },
   "modal": {
