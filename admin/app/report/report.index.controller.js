@@ -1,6 +1,8 @@
 (function () {
   'use strict';
 
+  var LANG = 'pkg.abuse.admin.report.list';
+
   angular
     .module('pkg.abuse.report')
     .controller('ReportIndexCtrl', ReportIndexCtrl);
@@ -8,7 +10,15 @@
   /**
    * @ngInject
    */
-  function ReportIndexCtrl(List, $uibModal, _, $state, $stateParams, RouteHelpers) {
+  function ReportIndexCtrl(
+    _,
+    $q,
+    List,
+    $state,
+    $uibModal,
+    $stateParams,
+    RouteHelpers
+  ) {
     var vm = this;
     var pkg = RouteHelpers.package('abuse');
 
@@ -16,16 +26,17 @@
     vm.tabs = {
       active: parseInt($stateParams.tab) || 0,
       items: [
-        new Tab('pkg.abuse.admin.report.list.tab.ADMIN', {
+        new Tab(LANG+'.tab.admin', {
           pending_admin: true,
         }),
-        new Tab('pkg.abuse.admin.report.list.tab.CLIENT', {
+        new Tab(LANG+'.tab.client', {
           pending_client: true,
         }),
-        new Tab('pkg.abuse.admin.report.list.tab.ARCHIVE', {
+        new Tab(LANG+'.tab.archive', {
           archive: true,
         }),
       ],
+      couldHaveResults: true,
       change: changeTab,
     };
 
@@ -43,7 +54,14 @@
     ////////////
 
     function activate() {
-      onSearchChange();
+      onSearchChange()
+        .then(function() {
+          vm.tabs.couldHaveResults = !!_.some(vm.tabs.items, hasResults);
+        });
+
+      function hasResults(tab) {
+        return tab.list.pages.total;
+      }
     }
 
     function changeTab(active) {
@@ -54,16 +72,14 @@
     function assignClientServerModal(items) {
       var modal = $uibModal.open({
         templateUrl: RouteHelpers.trusted(
-          pkg.asset('report/modal/modal.assign.html')
+          pkg.asset('admin/report/modal/modal.assign.html')
         ),
         controller: 'PkgAbuseReportModalAssignCtrl',
         bindToController: true,
         controllerAs: 'modal',
-        resolve: {
-          items: function () {
-            return items;
-          }
-        }
+          resolve: {
+            items: _.return(items),
+        },
       });
 
       return modal.result.then(function (result) {
@@ -77,14 +93,17 @@
     function onSearchChange() {
       $stateParams.search = vm.search;
       $state.go('app.pkg.abuse.report.list', $stateParams);
-      loadAllTabs();
+
+      return loadAllTabs();
     }
 
     function loadAllTabs() {
-      _(vm.tabs.items)
-        .map(syncFilters)
-        .map(load)
-        .value();
+      return $q.all(
+        _(vm.tabs.items)
+          .map(syncFilters)
+          .map(load)
+          .value()
+      );
 
       function syncFilters(tab) {
         tab.list.filter({
@@ -115,15 +134,17 @@
       tab.text = trans;
       tab.list = setupList(filters.archive).filter(filters);
       tab.list.on('change', function () {
-        _(vm.tabs.items).without(tab).map(load).value();
+        _(vm.tabs.items)
+          .without(tab)
+          .map(load)
+          .value()
+          ;
       });
       tab.active = false;
     }
 
     function load(tab) {
-      tab.list.load();
-
-      return tab;
+      return tab.list.load();
     }
   }
 })();
