@@ -11,7 +11,7 @@ case $MODE in
     ;;
 2)
     cd $MAIN_DIR
-    php artisan migrate -f --path=$REL_DIR
+    php artisan migrate --force --path=$REL_DIR
 
     cd $DIR/admin
     npm install
