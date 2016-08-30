@@ -8,6 +8,7 @@
       sref: "app.pkg.abuse.report.list",
       alertType: 'danger',
       propagateAlerts: true,
+      refreshInterval: 10000,
     })
     .config(NavConfig)
     .run(NavRun)
@@ -26,13 +27,28 @@
   /**
    * @ngInject
    */
-  function NavRun($rootScope, PkgAbuseReportNav, $interval, Api) {
+  function NavRun(PkgAbuseReportNav, $interval, Api, Auth) {
     var $reports = Api.all('abuse');
+    var interval;
 
-    $interval(loadReports, 10000);
-    loadReports();
+    Auth.whileLoggedIn(startChecking, stopChecking);
 
-    function loadReports() {
+    ///////////
+
+    function startChecking() {
+      stopChecking();
+      load();
+
+      interval = $interval(load, PkgAbuseReportNav.refreshInterval);
+    }
+
+    function stopChecking() {
+      if (interval) {
+        $interval.cancel(interval);
+      }
+    }
+
+    function load() {
       return $reports
         .getList({
           per_page: 1,
@@ -44,5 +60,4 @@
         });
     }
   }
-
 })();
