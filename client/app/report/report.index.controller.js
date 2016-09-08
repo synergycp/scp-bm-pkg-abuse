@@ -37,11 +37,6 @@
 
     vm.tabs.items[vm.tabs.active].active = true;
 
-    vm.logs = {
-      filter: {
-        target_type: 'abuse-report',
-      },
-    };
     vm.searchChange = onSearchChange;
 
     activate();

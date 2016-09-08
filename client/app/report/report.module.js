@@ -3,8 +3,8 @@
 
   angular
     .module('pkg.abuse.report', [
-      'app.layout.list',
-      'app.core.api',
+      'scp.angle.layout.list',
+      'scp.core.api',
       'pkg.abuse.report.comments',
     ]);
 })();

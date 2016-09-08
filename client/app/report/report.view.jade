@@ -17,7 +17,7 @@ h1(
             th(data-translate="pkg.abuse.client.report.view.overview.DATE")
             td(ng-bind="vm.report.date")
           tr
-            th(data-translate="pkg.abuse.client.report.view.overview.ADDR") 
+            th(data-translate="pkg.abuse.client.report.view.overview.ADDR")
             td(ng-bind="vm.report.addr")
           tr
             th(data-translate="pkg.abuse.client.report.view.overview.status.TITLE")
@@ -28,15 +28,8 @@ h1(
 
     pkg-abuse-report-comments(
       report-id="vm.report.id"
-      on-added="vm.logs.refresh()"
     )
   .col-md-8
     +panel("{{ 'pkg.abuse.client.report.view.body.TITLE' | translate }}")
-      .scroller 
+      .scroller
         pre.fill-panel(ng-bind="vm.report.body")
-
-    logs(
-      title="Abuse Report Logs"
-      filter="vm.logs.filter"
-      listen-to="vm.event"
-    )
