@@ -1,0 +1,63 @@
+{
+  "list": {
+    "TITLE": "Abuse Reports",
+    "NONE": "There have been no reports of abuse on your servers yet.",
+    "tab": {
+      "admin": {
+        "TITLE": "Waiting on ADMIN",
+        "EMPTY": "No Abuse Reports are currently waiting on admin."
+      },
+      "client": {
+        "TITLE": "Waiting on CLIENT",
+        "EMPTY": "No Abuse Reports are currently waiting on client."
+      },
+      "archive": {
+        "TITLE": "Archive",
+        "EMPTY": "No Abuse Reports are currently archived."
+      }
+    }
+  },
+  "modal": {
+    "assign": {
+      "TITLE": "Assign Abuse Report",
+      "SUBMIT": "Assign",
+      "CANCEL": "Cancel",
+      "client": {
+        "LABEL": "Client",
+        "PLACEHOLDER": "Type to search..."
+      },
+      "server": {
+        "LABEL": "Server",
+        "PLACEHOLDER": "Type to search..."
+      }
+    }
+  },
+  "view": {
+    "title": {
+      "PAGE": "View Abuse Report from {{ date }}"
+    },
+    "overview": {
+      "TITLE": "Overview",
+      "DATE": "Date",
+      "ADDR": "IP Address",
+      "status": {
+        "TITLE": "Current Status",
+        "RESOLVED": "{{ resolved ? 'Resolved on '+resolved : 'Unresolved'}}"
+      }
+    },
+    "resolve": {
+      "TOGGLE": "{{ resolved ? 'Mark Unresolved' : 'Mark Resolved' }}"
+    },
+    "body": {
+      "TITLE": "Report Body"
+    },
+    "comments": {
+      "EMPTY": "There are no comments on this report yet.",
+      "TITLE": "Comments",
+      "post": {
+        "TITLE": "Leave a Comment",
+        "SUBMIT": "Post Comment"
+      }
+    }
+  }
+}

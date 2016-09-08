@@ -1,0 +1,32 @@
+include /resources/jade/mixins/panel
+
++panel("{{ 'pkg.abuse.client.report.view.comments.TITLE' | translate }}")
+  .panel-body
+    .comments
+      .comment.panel.panel-default(
+        ng-repeat="comment in comments.list.items track by comment.id"
+      )
+        .panel-heading
+          strong(ng-bind="comment.author.name")
+          span.text-muted(ng-bind="comment.date")
+        .panel-body(ng-bind="comment.body")
+    .text-center(
+      ng-if="!comments.list.items.length"
+      data-translate="pkg.abuse.client.report.view.comments.EMPTY"
+    )
+
+  .panel-footer(ng-if="comments.list.pages.max > 1")
+    pagination(
+      pages="comments.list.pages"
+    )
+
+form(ng-submit="comments.submit()")
+  +panel("{{ 'pkg.abuse.client.report.view.comments.post.TITLE' | translate }}")
+    .panel-body
+      textarea.form-control(ng-model="comments.body")
+    .panel-footer.clearfix 
+      .pull-right 
+        button.btn.btn-info(
+          type="submit"
+          data-translate="pkg.abuse.client.report.view.comments.post.SUBMIT"
+        )
