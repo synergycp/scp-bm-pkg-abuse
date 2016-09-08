@@ -29,14 +29,3 @@
           include report.list.jade
         .alert.alert-success(ng-if="!list.pages.total")
           span(translate="{{ tab.text }}.EMPTY")
-
-br
-br
-
-.row
-  .col-md-6
-    logs(
-      title="Report Logs"
-      filter="vm.logs.filter"
-      listen-to="vm.list"
-    )

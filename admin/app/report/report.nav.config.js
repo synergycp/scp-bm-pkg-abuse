@@ -7,7 +7,6 @@
       text: "Abuse Reports",
       sref: "app.pkg.abuse.report.list",
       alertType: 'danger',
-      propagateAlerts: true,
       refreshInterval: 10000,
     })
     .config(NavConfig)
