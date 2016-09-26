@@ -29,5 +29,9 @@
         templateUrl: pkg.asset('admin/report/report.view.html'),
       })
       ;
+
+    helper.url('abuse/?([0-9]*)', function (id) {
+      return 'pkg/abuse/report'+(id && '/'+id);
+    });
   }
 })();
