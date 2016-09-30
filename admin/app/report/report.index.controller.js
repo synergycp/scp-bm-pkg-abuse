@@ -115,7 +115,7 @@
     }
 
     function setupList(isArchive) {
-      var list = List('abuse');
+      var list = List(pkg.api().all('report'));
 
       list.bulk.add(
         isArchive ? 'Mark Unresolved' : 'Mark Resolved',

@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var URL = 'abuse/{{reportId}}/comment';
+  var URL = 'report/{{reportId}}/comment';
 
   angular
     .module('pkg.abuse.report.comments')
@@ -30,8 +30,9 @@
   /**
    * @ngInject
    */
-  function ReportCommentsCtrl(List) {
+  function ReportCommentsCtrl(List, RouteHelpers) {
     var comments = this;
+    var pkg = RouteHelpers.package('abuse');
 
     comments.body = '';
 
@@ -41,7 +42,11 @@
     //////////
 
     function init() {
-      comments.list = List(URL.replace('{{reportId}}', comments.reportId));
+      comments.list = List(
+        pkg.api().all(
+          URL.replace('{{reportId}}', comments.reportId)
+        )
+      );
       comments.list.load();
     }
 

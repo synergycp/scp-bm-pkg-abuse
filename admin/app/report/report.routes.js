@@ -30,7 +30,7 @@
       })
       ;
 
-    helper.url('abuse/?([0-9]*)', function (id) {
+    helper.url('pkg/abuse/report/?([0-9]*)', function (id) {
       return 'pkg/abuse/report'+(id && '/'+id);
     });
   }
