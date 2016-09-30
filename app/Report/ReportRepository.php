@@ -2,7 +2,7 @@
 
 namespace Packages\Abuse\App\Report;
 
-use App\Services\Database\ModelRepository;
+use App\Database\ModelRepository;
 
 /**
  * Database logic for Abuse Reports.

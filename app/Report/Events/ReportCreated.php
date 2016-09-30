@@ -1,7 +1,7 @@
 <?php
 
 namespace Packages\Abuse\App\Report\Events;
-use App\Services\Log\Log;
+use App\Log\Log;
 
 class ReportCreated extends ReportLoggableEvent
 {

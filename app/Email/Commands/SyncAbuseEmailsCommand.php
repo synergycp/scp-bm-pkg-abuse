@@ -2,7 +2,7 @@
 
 namespace Packages\Abuse\App\Email\Commands;
 
-use App\Services\Console\Commands\Command;
+use App\Console\Commands\Command;
 use Packages\Abuse\App\Email;
 
 class SyncAbuseEmailsCommand

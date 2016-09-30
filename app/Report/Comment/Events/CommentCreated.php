@@ -2,7 +2,7 @@
 
 namespace Packages\Abuse\App\Report\Comment\Events;
 
-use App\Services\Log\Log;
+use App\Log\Log;
 
 class CommentCreated extends CommentLoggableEvent
 {

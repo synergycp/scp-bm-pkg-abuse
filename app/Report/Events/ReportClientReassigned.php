@@ -2,7 +2,7 @@
 
 namespace Packages\Abuse\App\Report\Events;
 
-use App\Services\Log\Log;
+use App\Log\Log;
 use Carbon\Carbon;
 
 class ReportClientReassigned extends ReportLoggableEvent

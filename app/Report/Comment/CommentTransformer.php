@@ -2,7 +2,7 @@
 
 namespace Packages\Abuse\App\Report\Comment;
 
-use App\Services\Api\Transformer;
+use App\Api\Transformer;
 
 class CommentTransformer
 extends Transformer

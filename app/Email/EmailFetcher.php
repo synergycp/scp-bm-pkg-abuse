@@ -4,9 +4,9 @@ namespace Packages\Abuse\App\Email;
 
 use Ddeboer\Imap\SearchExpression;
 use Ddeboer\Imap\Search\Date\After;
-use App\Services\Mail\Imap\Server;
-use App\Services\Mail\Imap\Connection;
-use App\Services\Mail\Imap\MessageIterator;
+use App\Mail\Imap\Server;
+use App\Mail\Imap\Connection;
+use App\Mail\Imap\MessageIterator;
 use Carbon\Carbon;
 
 class EmailFetcher

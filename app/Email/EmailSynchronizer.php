@@ -2,9 +2,9 @@
 
 namespace Packages\Abuse\App\Email;
 
-use App\Services\Ip\IpService;
-use App\Services\Ip\IpAddressRangeContract;
-use App\Services\Mail\Imap\MessageIterator;
+use App\Ip\IpService;
+use App\Ip\IpAddressRangeContract;
+use App\Mail\Imap\MessageIterator;
 use Packages\Abuse\App\Report\ReportService;
 use Illuminate\Support\Collection;
 use Ddeboer\Imap\Message;

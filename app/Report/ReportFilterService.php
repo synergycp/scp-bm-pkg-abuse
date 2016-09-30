@@ -2,8 +2,8 @@
 
 namespace Packages\Abuse\App\Report;
 
-use App\Services\Api\ApiAuthService;
-use App\Services\Server\ServerRepository;
+use App\Api\ApiAuthService;
+use App\Server\ServerRepository;
 use App\Support\Http\FilterService;
 use Illuminate\Database\Eloquent\Builder;
 

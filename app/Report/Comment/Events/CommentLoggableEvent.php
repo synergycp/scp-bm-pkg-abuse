@@ -3,8 +3,8 @@
 namespace Packages\Abuse\App\Report\Comment\Events;
 
 use App\Support\Event;
-use App\Services\Log\Log;
-use App\Services\Log\LoggableEvent;
+use App\Log\Log;
+use App\Log\LoggableEvent;
 use Packages\Abuse\App\Report\Comment\Comment;
 
 abstract class CommentLoggableEvent

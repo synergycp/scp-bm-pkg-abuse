@@ -3,7 +3,7 @@
 namespace Packages\Abuse\App\Report\Listeners;
 
 use Packages\Abuse\App\Report\ReportRepository;
-use App\Services\Entity\Events\EntityDeleted;
+use App\Entity\Events\EntityDeleted;
 
 /**
  * When an Entity is deleted, update the associated Reports.

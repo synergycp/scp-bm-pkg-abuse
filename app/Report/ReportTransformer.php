@@ -2,7 +2,7 @@
 
 namespace Packages\Abuse\App\Report;
 
-use App\Services\Api\Transformer;
+use App\Api\Transformer;
 use App\Models\Entity;
 use App\Models\Client;
 use Illuminate\Support\Collection;
