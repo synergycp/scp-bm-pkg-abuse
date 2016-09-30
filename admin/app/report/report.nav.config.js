@@ -26,8 +26,12 @@
   /**
    * @ngInject
    */
-  function NavRun(PkgAbuseReportNav, $interval, Api, Auth) {
-    var $reports = Api.all('abuse');
+  function NavRun(PkgAbuseReportNav, $interval, Auth, RouteHelpers) {
+    var $reports = RouteHelpers
+      .package('abuse')
+      .api()
+      .all('report')
+      ;
     var interval;
 
     Auth.whileLoggedIn(startChecking, stopChecking);
