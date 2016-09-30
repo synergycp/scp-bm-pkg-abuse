@@ -4,7 +4,7 @@ namespace Packages\Abuse\App\Report\Listeners;
 
 use Packages\Abuse\App\Report\ReportService;
 use Packages\Abuse\App\Report\ReportRepository;
-use App\Services\Client\Server\Events;
+use App\Client\Server\Events;
 
 /**
  * Resolve any related abuse reports for a Client's Server access.

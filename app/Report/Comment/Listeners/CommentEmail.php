@@ -4,7 +4,7 @@ namespace Packages\Abuse\App\Report\Comment\Listeners;
 
 use Packages\Abuse\App\Report\Comment\Events;
 use Packages\Abuse\App\Report\Comment\Comment;
-use App\Services\Mail\EmailListener;
+use App\Mail\EmailListener;
 
 /**
  * Send out an Email when a Comment is created on a Report.

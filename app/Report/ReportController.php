@@ -2,7 +2,7 @@
 
 namespace Packages\Abuse\App\Report;
 
-use App\Services\Api;
+use App\Api;
 
 /**
  * Routing for Abuse Report API Requests.

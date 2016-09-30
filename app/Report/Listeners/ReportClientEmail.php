@@ -5,7 +5,7 @@ namespace Packages\Abuse\App\Report\Listeners;
 use Packages\Abuse\App\Report\Events\ReportClientReassigned;
 use Packages\Abuse\App\Report\Report;
 use Packages\Abuse\App\Report\ReportTransformer;
-use App\Services\Mail\EmailListener;
+use App\Mail\EmailListener;
 
 class ReportClientEmail extends EmailListener
 {

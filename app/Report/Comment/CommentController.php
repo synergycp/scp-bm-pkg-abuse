@@ -2,7 +2,7 @@
 
 namespace Packages\Abuse\App\Report\Comment;
 
-use App\Services\Api;
+use App\Api;
 use App\Support\ApiResponse;
 use Packages\Abuse\App\Report\Report;
 use Packages\Abuse\App\Report\ReportRepository;

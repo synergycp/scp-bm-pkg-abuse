@@ -2,16 +2,16 @@
 
 namespace Packages\Abuse\App\Report;
 
-use App\Services\Log\EventLogger;
+use App\Log\EventLogger;
 
 return [
-    \App\Services\Client\Server\Events\ClientServerCreated::class => [
+    \App\Client\Server\Events\ClientServerCreated::class => [
         Listeners\ClientServerDeleteReports::class,
     ],
-    \App\Services\Client\Server\Events\ClientServerDeleted::class => [
+    \App\Client\Server\Events\ClientServerDeleted::class => [
         Listeners\ClientServerDeleteReports::class,
     ],
-    \App\Services\Entity\Events\EntityDeleted::class => [
+    \App\Entity\Events\EntityDeleted::class => [
         Listeners\EntityDeleteReports::class,
     ],
 
