@@ -7,11 +7,25 @@ use App\Models\Entity;
 use App\Models\Client;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Packages\Abuse\App\Report\Comment\CommentTransformer;
 
 class ReportTransformer
 extends Transformer
 {
-    # List
+    /**
+     * @var CommentTransformer
+     */
+    protected $comment;
+
+    /**
+     * @param CommentTransformer $comment
+     */
+    public function boot(
+        CommentTransformer $comment
+    ) {
+        $this->comment = $comment;
+    }
+
     /**
      * Transform an Report into an array for the Abuse Report List.
      *
@@ -50,24 +64,26 @@ extends Transformer
         $preload = collect([
             'client',
             'server',
-            'lastComment',
+            'lastComment.author',
             $this->viewerIsAdmin() ? 'entity' : null,
         ])->filter()->all();
 
         return $items->load($preload);
     }
 
+    /**
+     * @param Report $item
+     *
+     * @return array
+     */
     private function excerpt(Report $item)
     {
         if ($comment = $item->lastComment) {
-            return [
-                'from' => $comment->author->name,
-                'body' => str_limit($comment->body, 100),
-            ];
+            return $this->comment->excerpt($comment);
         }
 
-        $body = strip_tags($item->body);
-        $body = str_replace("=\r\n", '', $body);
+        $body = str_replace("=\r\n", '', $item->body);
+        $body = strip_tags($body);
         $body = str_limit($body, 100);
 
         return [

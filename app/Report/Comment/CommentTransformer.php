@@ -3,7 +3,11 @@
 namespace Packages\Abuse\App\Report\Comment;
 
 use App\Api\Transformer;
+use Illuminate\Database\Eloquent;
 
+/**
+ * Transform Abuse Report Comments for the API.
+ */
 class CommentTransformer
 extends Transformer
 {
@@ -22,8 +26,50 @@ extends Transformer
         ];
     }
 
+    /**
+     * @param Eloquent\Collection $items
+     */
+    public function itemPreload($items)
+    {
+        $items->load('author');
+    }
+
+    /**
+     * @param Comment $item
+     *
+     * @return array
+     */
     public function author(Comment $item)
     {
-        return $item->author->expose('id', 'name');
+        return $item->author->expose('id') + [
+            'name' => $this->authorName($item),
+        ];
+    }
+
+    /**
+     * @param Comment $item
+     *
+     * @return string
+     */
+    public function authorName(Comment $item)
+    {
+        return $this->viewerIsAdmin()
+            || !$item->author->isAdmin()
+             ? $item->author->name
+             : 'Administrator'
+             ;
+    }
+
+    /**
+     * @param Comment $item
+     *
+     * @return array
+     */
+    public function excerpt(Comment $item)
+    {
+        return [
+            'from' => $this->author($item)['name'],
+            'body' => str_limit($item->body, 100),
+        ];
     }
 }
