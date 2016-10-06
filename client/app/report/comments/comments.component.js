@@ -10,8 +10,8 @@
       },
       bindings: {
         reportId: '=',
-        onSubmit: '&',
-        onAdded: '&',
+        onSubmit: '&?',
+        onAdded: '&?',
       },
       controller: 'PkgAbuseReportCommentsCtrl as comments',
       transclude: true,
@@ -53,14 +53,15 @@
     function submit() {
       var data = formComment();
 
-      comments.onSubmit(data);
-      comments.list.create(data)
+      (comments.onSubmit || angular.noop)(data);
+      comments.list
+        .create(data)
         .then(clearBody)
         .then(notifySubscribers)
         ;
 
       function notifySubscribers(data) {
-        comments.onAdded(data);
+        (comments.onAdded || angular.noop)(data);
       }
     }
 
@@ -70,7 +71,7 @@
 
     function formComment() {
       return {
-        body: comments.body
+        body: comments.body,
       };
     }
   }

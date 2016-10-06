@@ -44,7 +44,7 @@
 
     vm.logs = {
       filter: {
-        target_type: 'abuse-report',
+        target_type: 'pkg.abuse.report',
       },
     };
     vm.searchChange = onSearchChange;

@@ -9,29 +9,35 @@
     var helper = RouteHelpersProvider;
     var pkg = helper.package('abuse');
     pkg
-      .state('app.pkg.abuse.report', {
+      .state('report', {
         url: '/report',
         abstract: true,
         template: helper.dummyTemplate,
         resolve: helper.resolveFor(pkg.lang('admin:report')),
       })
-      .state('app.pkg.abuse.report.list', {
+      .state('report.list', {
         url: '?tab&search',
         title: 'Reports',
         controller: 'ReportIndexCtrl as vm',
         templateUrl: pkg.asset('admin/report/report.index.html'),
         reloadOnSearch: false,
       })
-      .state('app.pkg.abuse.report.view', {
+      .state('report.view', {
         url: '/:id',
         title: 'View Report',
         controller: 'ReportViewCtrl as vm',
         templateUrl: pkg.asset('admin/report/report.view.html'),
       })
+      .url('report/?([0-9]*)', mapReportUrl)
+      .sso('report', function($state, options) {
+        return mapReportUrl($state, options.id);
+      })
       ;
 
-    helper.url('pkg/abuse/report/?([0-9]*)', function (id) {
-      return 'pkg/abuse/report'+(id && '/'+id);
-    });
+    function mapReportUrl($state, id) {
+      return $state.href('report.' + (id ? 'view' : 'list'), {
+        id: id,
+      });
+    }
   }
 })();

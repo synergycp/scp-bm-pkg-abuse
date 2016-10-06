@@ -7,7 +7,7 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 /**
  * Setup Abuse Report Event Listeners.
  */
-class ReportEventServiceProvider extends EventServiceProvider
+class ReportEventProvider extends EventServiceProvider
 {
     public function listens()
     {
