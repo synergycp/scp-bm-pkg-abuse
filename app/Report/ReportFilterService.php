@@ -46,14 +46,12 @@ extends FilterService
      */
     public function viewable(Builder $query)
     {
+        $client = function ($clientId) use ($query) {
+            $this->clientHasAccess($query, $clientId);
+        };
+
         $this->auth->only([
-            'client' => function ($clientId) use ($query) {
-                $this->clientHasAccess($query, $clientId);
-                $query->where(function ($query) use ($clientId) {
-                    $query->where('abuse_reports.client_id', $clientId)
-                        ->orWhere(_call('open'));
-                });
-            },
+            'client' => $client,
             'admin',
             'integration',
         ]);
@@ -62,26 +60,35 @@ extends FilterService
     /**
      * @param Builder $query
      * @param int     $clientId
-     * @param string  $joinType
-     * @param string  $alias
-     *
-     * @return Builder
      */
-    public function clientHasAccess(
-        Builder $query,
-        $clientId,
-        $joinType = 'inner',
-        $alias = 'access'
-    ) {
+    private function clientHasAccess(Builder $query, $clientId)
+    {
+        $access = 'access';
+        $serverAlias = $access.'_server';
+        $visible = function (Builder $query) use ($clientId, $access) {
+            $hasServerAccess = function (Builder $query) use ($access, $clientId) {
+                $query
+                    ->open()
+                    ->where($access.'.client_id', '=', $clientId)
+                    ;
+            };
+            $query
+                ->where('abuse_reports.client_id', $clientId)
+                ->orWhere($hasServerAccess)
+                ;
+        };
+
         $query
             ->groupBy('abuse_reports.id')
             ->select('abuse_reports.*')
-            ->joinServer($joinType, $serverAlias = $alias.'_server')
+            ->joinServer('left', $serverAlias)
+            ->where($visible)
             ;
-
         $this->servers
             ->make()
-            ->scopeJoinClientAccess($query, $clientId, $joinType, $alias, $serverAlias)
+            ->scopeJoinAccess(
+                $query, 'left', $access, $serverAlias
+            )
             ;
     }
 
