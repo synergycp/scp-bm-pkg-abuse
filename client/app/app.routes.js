@@ -7,14 +7,10 @@
   /**
    * @ngInject
    */
-  function routeConfig($stateProvider, RouteHelpersProvider) {
+  function routeConfig(RouteHelpersProvider) {
     var helper = RouteHelpersProvider;
-    $stateProvider
-      .state('app.pkg.abuse', {
-        url: '/abuse',
-        abstract: true,
-        template: helper.dummyTemplate,
-      })
-      ;
+    var pkg = helper.package('abuse');
+
+    pkg.state('');
   }
 })();

@@ -6,6 +6,7 @@ use App\Ip\IpService;
 use App\Ip\IpAddressRangeContract;
 use App\Mail\Imap\MessageIterator;
 use Packages\Abuse\App\Report\ReportService;
+use Packages\Abuse\App\Report\Events;
 use Illuminate\Support\Collection;
 use Ddeboer\Imap\Message;
 use Ddeboer\Transcoder\Exception\UndetectableEncodingException;
@@ -60,6 +61,11 @@ class EmailSynchronizer
         $this->resolve();
     }
 
+    /**
+     * @param IpService     $ips
+     * @param EmailFetcher  $emails
+     * @param ReportService $report
+     */
     public function boot(
         IpService $ips,
         EmailFetcher $emails,
@@ -72,6 +78,9 @@ class EmailSynchronizer
         $this->filterAfterLastSeen();
     }
 
+    /**
+     * Run the Synchronizer.
+     */
     public function start()
     {
         foreach ($this->getMessages() as $item) {
@@ -79,6 +88,9 @@ class EmailSynchronizer
         }
     }
 
+    /**
+     * @param Message $mail
+     */
     private function reportIpsIn(Message $mail)
     {
         $mail->keepUnseen();
@@ -117,7 +129,7 @@ class EmailSynchronizer
     /**
      * Filter the Messages.
      *
-     * @return MessageIterator of Message
+     * @return MessageIterator <Message>
      */
     private function getMessages()
     {

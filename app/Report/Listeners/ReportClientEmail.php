@@ -5,18 +5,35 @@ namespace Packages\Abuse\App\Report\Listeners;
 use Packages\Abuse\App\Report\Events\ReportClientReassigned;
 use Packages\Abuse\App\Report\Report;
 use Packages\Abuse\App\Report\ReportTransformer;
-use App\Mail\EmailListener;
+use App\Auth\Sso;
+use App\Mail;
 
-class ReportClientEmail extends EmailListener
+class ReportClientEmail
+extends Mail\EmailListener
 {
     /**
      * @var ReportTransformer
      */
     protected $transform;
 
-    public function boot(
+    /**
+     * @var Sso\SsoUrlService
+     */
+    protected $sso;
+
+    /**
+     * @param Mail\Mailer       $mail
+     * @param Sso\SsoUrlService $sso
+     * @param ReportTransformer $transform
+     */
+    public function __construct(
+        Mail\Mailer $mail,
+        Sso\SsoUrlService $sso,
         ReportTransformer $transform
     ) {
+        parent::__construct($mail);
+
+        $this->sso = $sso;
         $this->transform = $transform;
     }
 
@@ -38,12 +55,17 @@ class ReportClientEmail extends EmailListener
             'client' => $client->expose('name'),
             'server' => $this->server($event->report),
             'report' => $this->report($event->report),
+            'urls' => [
+                'view' => $this->sso->view($event->report, $client),
+            ],
         ];
 
-        $this->create('abuse_report.tpl')
+        $this
+            ->create('abuse_report.tpl')
             ->setData($context)
             ->toUser($client)
-            ->send();
+            ->send()
+            ;
     }
 
     /**

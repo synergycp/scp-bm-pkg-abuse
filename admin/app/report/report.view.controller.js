@@ -26,7 +26,7 @@
     };
     vm.logs = {
       filter: {
-        target_type: 'abuse-report',
+        target_type: 'pkg.abuse.report',
         target_id: $stateParams.id,
       },
       refresh: refreshLogs,

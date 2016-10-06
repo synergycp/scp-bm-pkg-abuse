@@ -7,9 +7,6 @@ namespace Packages\Abuse\App;
  */
 
 return [
-
     Email\EmailServiceProvider::class,
-
-    Report\ReportEventServiceProvider::class,
-
+    Report\ReportServiceProvider::class,
 ];

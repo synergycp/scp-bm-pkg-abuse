@@ -22,8 +22,7 @@
 </tr>
 <tr>
 	<td class="content-block">
-		<a href="{action('client.abuse.show', $report.id)}"
-      class="btn-primary">
+		<a href="{$urls.view}" class="btn-primary">
       View Report
     </a>
 	</td>
