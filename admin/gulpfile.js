@@ -13,7 +13,7 @@ var args = require('yargs').argv,
 var isProduction = false;
 // styles sourcemaps
 var useSourceMaps = false;
-var isReloading = true;
+var isReloading = args.reload;
 
 // Angular template cache
 // Example:

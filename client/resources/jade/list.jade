@@ -1,17 +1,16 @@
+include mixins/table
+
 list(
   list="list"
   panel="false"
 )
-  table.table.table-bordered.table-striped.table-condensed.table-hover
+  +table()
     thead
       tr
-        block headings-pre
         block headings
     tbody
       tr(
         ng-repeat="row in list.items track by row.id"
-        ng-click="row.checked = !row.checked"
       )
-        block columns-pre
         block columns
   list-footer

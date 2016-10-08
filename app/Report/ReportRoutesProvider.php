@@ -11,6 +11,9 @@ use Illuminate\Routing\Router;
 class ReportRoutesProvider
 extends RouteServiceProvider
 {
+    /**
+     * @var string
+     */
     protected $package = 'abuse';
 
     /**
@@ -18,7 +21,7 @@ extends RouteServiceProvider
      */
     public function bootRoutes()
     {
-        $base = implode('.', ['pkg',$this->package,'']);
+        $base = implode('.', ['pkg', $this->package, '']);
         $this->sso->map(Report::class, $base.'report');
     }
 
