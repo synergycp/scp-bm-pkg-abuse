@@ -2,8 +2,8 @@
 
 namespace Packages\Abuse\App\Report\Comment;
 
-use App\Models\Administrator;
-use App\Models\Model;
+use App\Admin\Admin;
+use App\Database\Models\Model;
 use Packages\Abuse\App\Report\Report;
 use Illuminate\Database\Eloquent\Relations;
 
@@ -32,7 +32,7 @@ extends Model
     {
         $authorType = $this->author()->getMorphType();
 
-        return $this->$authorType == Administrator::class;
+        return $this->$authorType == Admin::class;
     }
 
     # Methods

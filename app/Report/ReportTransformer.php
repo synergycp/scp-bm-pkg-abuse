@@ -3,8 +3,8 @@
 namespace Packages\Abuse\App\Report;
 
 use App\Api\Transformer;
-use App\Models\Entity;
-use App\Models\Client;
+use App\Client\Client;
+use App\Entity\Entity;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Packages\Abuse\App\Report\Comment\CommentTransformer;

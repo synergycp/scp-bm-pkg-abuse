@@ -2,10 +2,11 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
-use App\Models\AbuseReportComment;
-use App\Models\AbuseReport;
+use Packages\Abuse\App\Report\Comment\Comment;
+use Packages\Abuse\App\Report\Report;
 
-class AddAbuseReportMsgNum extends Migration
+class AddAbuseReportMsgNum
+extends Migration
 {
     /**
      * Run the migrations.
@@ -14,8 +15,8 @@ class AddAbuseReportMsgNum extends Migration
      */
     public function up()
     {
-        AbuseReportComment::query()->delete();
-        AbuseReport::query()->delete();
+        Comment::query()->delete();
+        Report::query()->delete();
 
         Schema::table('abuse_reports', function (Blueprint $table) {
             $table->integer('msg_num')->unsigned();

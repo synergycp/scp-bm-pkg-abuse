@@ -2,9 +2,9 @@
 
 namespace Packages\Abuse\App\Report;
 
-use App\Models\Client;
-use App\Models\Entity;
-use App\Models\Server;
+use App\Client\Client;
+use App\Entity\Entity;
+use App\Server\Server;
 use App\Entity\LookupService;
 use App\Ip\IpAddressRangeContract;
 use Illuminate\Support\Collection;
