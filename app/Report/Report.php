@@ -2,7 +2,10 @@
 
 namespace Packages\Abuse\App\Report;
 
-use App\Models;
+use App\Database\Models\Model;
+use App\Client\Client;
+use App\Entity\Entity;
+use App\Server\Server;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,7 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
  * Database representation of an Abuse Report.
  */
 class Report
-extends Models\Model
+extends Model
 {
     /**
      * @var int
@@ -160,7 +163,7 @@ extends Models\Model
      */
     public function entity()
     {
-        return $this->belongsTo(Models\Entity::class);
+        return $this->belongsTo(Entity::class);
     }
 
     /**
@@ -170,7 +173,7 @@ extends Models\Model
      */
     public function server()
     {
-        return $this->belongsTo(Models\Server::class);
+        return $this->belongsTo(Server::class);
     }
 
     /**
@@ -180,7 +183,7 @@ extends Models\Model
      */
     public function client()
     {
-        return $this->belongsTo(Models\Client::class);
+        return $this->belongsTo(Client::class);
     }
 
     /**

@@ -1,10 +1,12 @@
 <?php
 
 use App\Support\Database\Migration;
-use App\Models\Log;
+use App\Log\LogTarget;
 use Packages\Abuse\App\Report\Report;
+use Packages\Abuse\App\Report\Comment\Comment;
 
-class MoveAbuseReports extends Migration
+class MoveAbuseReports
+extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +15,24 @@ class MoveAbuseReports extends Migration
      */
     public function up()
     {
-        Log::query()
+        LogTarget::query()
             ->where('target_type', 'App\Models\AbuseReport')
             ->update([
                 'target_type' => Report::class,
             ])
             ;
+
+        Comment::query()
+            ->where('author_type', 'App\Models\Administrator')
+            ->update([
+                'author_type' => \App\Admin\Admin::class,
+            ]);
+
+        Comment::query()
+            ->where('author_type', 'App\Models\Client')
+            ->update([
+                'author_type' => \App\Client\Client::class,
+            ]);
     }
 
     /**
@@ -28,11 +42,23 @@ class MoveAbuseReports extends Migration
      */
     public function down()
     {
-        Log::query()
+        LogTarget::query()
             ->where('target_type', Report::class)
             ->update([
                 'target_type' => 'App\Models\AbuseReport',
             ])
             ;
+
+        Comment::query()
+            ->where('author_type', \App\Admin\Admin::class)
+            ->update([
+                'author_type' => 'App\Models\Administrator',
+            ]);
+
+        Comment::query()
+            ->where('author_type', \App\Client\Client::class)
+            ->update([
+                'author_type' => 'App\Models\Client',
+            ]);
     }
 }
