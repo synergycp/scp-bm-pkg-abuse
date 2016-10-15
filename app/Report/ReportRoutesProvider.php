@@ -25,7 +25,7 @@ extends RouteServiceProvider
         $this->sso->map(Report::class, $base.'report');
     }
 
-    protected function routes(Router $router)
+    protected function api(Router $router)
     {
         $router->resource(
             'report',
