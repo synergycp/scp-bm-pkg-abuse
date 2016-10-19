@@ -9,59 +9,57 @@ var PATH = {
   SCRIPTS: 'app/',
   ASSETS: 'resources/assets/',
 };
-var scss = {
-  img: 'assets/img/',
-  src: 'resources/sass/',
-};
 var js = {
   src: PATH.SCRIPTS,
   app: 'app.js',
 };
+var scss = {
+  img: 'assets/img/',
+  src: 'app/',
+};
 var appStyles = {
-  src: [scss.src + '*.scss'],
-  dest: PATH.PUBLIC+'css',
+  src: [scss.src + '**/*.scss'],
+  dest: PATH.PUBLIC,
   base: scss.src,
   image: scss.image,
 };
-var themeStyles = _.assign({}, appStyles, {
-  src: [scss.src + 'themes/*.scss'],
-  sourceMaps: false,
-});
 
-var copy = gulp.require('copy');
+/*
+// CSS
 var styles = gulp.require('styles');
-var scripts = gulp.require('scripts');
-var templates = gulp.require('templates');
-var production = gulp.require('production');
-
 gulp.task('styles', [
   'styles:app',
   'styles:app:rtl',
-  'styles:themes',
 ]);
 gulp.task('styles:app', styles.add(appStyles));
 gulp.task('styles:app:rtl', styles.rtl(appStyles));
-gulp.task('styles:themes', styles.add(themeStyles));
+*/
+gulp.task('styles', gulp.noop);
 
+var scripts = gulp.require('scripts');
 gulp.task('scripts', scripts.app({
   dest: PATH.PUBLIC + js.app,
   src: [
-    PATH.SCRIPTS + '*.module.js',
     PATH.SCRIPTS + '**/*.module.js',
     PATH.SCRIPTS + '**/*.js'
   ],
 }));
 
+var templates = gulp.require('templates');
 gulp.task('templates', templates({
   src: [PATH.MARKUP + '**/*.pug'],
   dest: PATH.PUBLIC,
 }));
 
+var copy = gulp.require('copy');
 gulp.task('copy', copy({
   src: PATH.ASSETS+'**/*.*',
   dest: PATH.PUBLIC,
   base: 'resources',
 }));
+
+var production = gulp.require('production');
+gulp.task('prod', production());
 
 gulp.task('default', [
   'copy',
@@ -69,6 +67,4 @@ gulp.task('default', [
   'templates',
   'scripts',
 ]);
-
 gulp.task('build', ['default']);
-gulp.task('prod', production());
