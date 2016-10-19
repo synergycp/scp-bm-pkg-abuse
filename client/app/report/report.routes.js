@@ -15,13 +15,6 @@
         template: helper.dummyTemplate,
         resolve: helper.resolveFor(pkg.lang('client:report')),
       })
-      .state('report.list', {
-        url: '?tab&search',
-        title: 'Reports',
-        controller: 'ReportIndexCtrl as vm',
-        templateUrl: pkg.asset('client/report/report.index.html'),
-        reloadOnSearch: false,
-      })
       .state('report.view', {
         url: '/:id',
         title: 'View Report',

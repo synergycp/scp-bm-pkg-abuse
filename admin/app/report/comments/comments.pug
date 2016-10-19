@@ -1,18 +1,18 @@
-include /resources/jade/mixins/panel
-
-+panel("{{ 'pkg.abuse.client.report.view.comments.TITLE' | translate }}")
+.panel.panel-default
+  .panel-heading
+    h3.panel-title(translate="pkg.abuse.admin.report.view.comments.TITLE")
   .panel-body
     .comments
       .comment.panel.panel-default(
         ng-repeat="comment in comments.list.items track by comment.id"
       )
         .panel-heading
+          span.pull-right.text-muted(ng-bind="comment.date")
           strong(ng-bind="comment.author.name")
-          span.text-muted(ng-bind="comment.date")
         .panel-body(ng-bind="comment.body")
     .text-center(
       ng-if="!comments.list.items.length"
-      data-translate="pkg.abuse.client.report.view.comments.EMPTY"
+      data-translate="pkg.abuse.admin.report.view.comments.EMPTY"
     )
 
   .panel-footer(ng-if="comments.list.pages.max > 1")
@@ -21,12 +21,14 @@ include /resources/jade/mixins/panel
     )
 
 form(ng-submit="comments.submit()")
-  +panel("{{ 'pkg.abuse.client.report.view.comments.post.TITLE' | translate }}")
+  .panel.panel-default
+    .panel-heading
+      h3.panel-title(translate="pkg.abuse.admin.report.view.comments.post.TITLE")
     .panel-body
       textarea.form-control(ng-model="comments.body")
-    .panel-footer.clearfix 
-      .pull-right 
+    .panel-footer.clearfix
+      .pull-right
         button.btn.btn-info(
           type="submit"
-          data-translate="pkg.abuse.client.report.view.comments.post.SUBMIT"
+          data-translate="pkg.abuse.admin.report.view.comments.post.SUBMIT"
         )

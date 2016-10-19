@@ -4,5 +4,5 @@
  * JS files to load on Angular Admin front-ends.
  */
 return [
-    'admin/js/app.js',
+    'admin/app.js',
 ];

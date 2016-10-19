@@ -25,7 +25,11 @@
         uib-tab-heading
           span(data-translate="{{ tab.text }}.TITLE")
           span.badge(ng-if="list.pages.total", ng-bind="list.pages.total")
-        div(ng-if="list.pages.total")
-          include report.list.jade
+        list(
+          list="list"
+          ng-if="list.pages.total"
+        )
+          pkg-abuse-report-table
+          list-footer
         .alert.alert-success(ng-if="!list.pages.total")
           span(translate="{{ tab.text }}.EMPTY")

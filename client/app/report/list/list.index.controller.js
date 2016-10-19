@@ -5,12 +5,12 @@
 
   angular
     .module('pkg.abuse.report')
-    .controller('ReportIndexCtrl', ReportIndexCtrl);
+    .controller('PkgAbuseReportIndexCtrl', PkgAbuseReportIndexCtrl);
 
   /**
    * @ngInject
    */
-  function ReportIndexCtrl(
+  function PkgAbuseReportIndexCtrl(
     _,
     $q,
     List,

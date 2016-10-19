@@ -1,6 +1,8 @@
 (function () {
-  angular.module('pkg.abuse.report')
-    .config(routeConfig);
+  angular
+    .module('pkg.abuse.report')
+    .config(routeConfig)
+    ;
 
   /**
    * @ngInject
@@ -14,13 +16,6 @@
         abstract: true,
         template: helper.dummyTemplate,
         resolve: helper.resolveFor(pkg.lang('admin:report')),
-      })
-      .state('report.list', {
-        url: '?tab&search',
-        title: 'Reports',
-        controller: 'ReportIndexCtrl as vm',
-        templateUrl: pkg.asset('admin/report/report.index.html'),
-        reloadOnSearch: false,
       })
       .state('report.view', {
         url: '/:id',
