@@ -1,4 +1,4 @@
-include /resources/jade/mixins/form
+include /node_modules/scp-ng-gulp/resources/pug/mixins/form
 
 form(ng-submit="modal.submit()")
   .modal-header
@@ -24,7 +24,7 @@ form(ng-submit="modal.submit()")
             refresh-delay="400"
           )
             span(ng-bind-html="client.name | highlight: $select.search")
-            small <{{client.email}}>
+            small &lt;{{client.email}}&gt;
 
     +label("{{ 'pkg.abuse.admin.report.modal.assign.server.LABEL' | translate }}")
       +input-with-btn("fa fa-times-circle")(
@@ -40,7 +40,7 @@ form(ng-submit="modal.submit()")
             refresh-delay="400"
           )
             span(ng-bind-html="server.srv_id | highlight: $select.search")
-            small <{{server.nickname}}>
+            small &lt;{{server.nickname}}&gt;
 
   .modal-footer
     button.btn.btn-secondary(
