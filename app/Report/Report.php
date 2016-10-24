@@ -39,7 +39,7 @@ extends Model
     /**
      * @var string
      */
-    public static $controller = 'api.pkg.abuse.report';
+    public static $controller = 'pkg.abuse.report';
 
     protected $table = 'abuse_reports';
 

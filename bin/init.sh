@@ -11,18 +11,15 @@ case $MODE in
     ;;
 2)
     cd $MAIN_DIR
-    php artisan migrate --force --path=$REL_DIR
-
+    php artisan migrate --force --path=$REL_DIR/database/migrations
+    ;;
+5)
     cd $DIR/admin
-    npm install
-    bower install
-    gulp prod build --nocache
+    npm install && gulp prod build
 
     cd $DIR/client
-    npm install
-    bower install
-    gulp prod build --nocache
-
-    cd $DIR
+    npm install && gulp prod build
     ;;
 esac
+
+cd $DIR
