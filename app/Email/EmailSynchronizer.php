@@ -142,7 +142,7 @@ class EmailSynchronizer
         $this->report
             ->matching(collect($items->keys()))
             ->distinct('msg_num')
-            ->lists('msg_num')
+            ->pluck('msg_num')
             ->each($forget)
             ;
 
