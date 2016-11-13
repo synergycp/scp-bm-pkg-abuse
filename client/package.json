@@ -10,5 +10,8 @@
     "prestart": "",
     "start": "npm install",
     "poststart": "gulp"
+  },
+  "dependencies": {
+    "gulp": "^3.9.1"
   }
 }
