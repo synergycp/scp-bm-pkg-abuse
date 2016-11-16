@@ -21,6 +21,8 @@ extends ServiceProvider
     public function boot()
     {
         $this->commands($this->commands);
+
+        parent::boot();
     }
 
     protected function schedule(Schedule $schedule)
