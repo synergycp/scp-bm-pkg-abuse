@@ -2,7 +2,7 @@
 
 namespace Packages\Abuse\App\Report;
 
-use App\Log\LogTypeService;
+use App\Support\ClassMap;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -29,9 +29,9 @@ extends ServiceProvider
     /**
      * Boot the Report Service Feature.
      */
-    public function boot(LogTypeService $logType)
+    public function boot(ClassMap $classMap)
     {
-        $logType->map(
+        $classMap->map(
             'pkg.abuse.report',
             Report::class
         );
