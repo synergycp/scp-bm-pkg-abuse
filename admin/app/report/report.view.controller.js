@@ -11,9 +11,14 @@
    *
    * @ngInject
    */
-  function ReportViewCtrl(Api, $stateParams, _, EventEmitter) {
+  function ReportViewCtrl(RouteHelpers, $stateParams, _, EventEmitter) {
     var vm = this;
-    var $api = Api.one('abuse/'+$stateParams.id);
+    var $api = RouteHelpers
+      .package('abuse')
+      .api()
+      .all('report')
+      .one(''+$stateParams.id)
+      ;
 
     vm.event = EventEmitter();
     vm.report = {
@@ -21,7 +26,7 @@
     };
     vm.logs = {
       filter: {
-        target_type: 'abuse-report',
+        target_type: 'pkg.abuse.report',
         target_id: $stateParams.id,
       },
       refresh: refreshLogs,

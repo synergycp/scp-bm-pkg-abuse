@@ -1,0 +1,37 @@
+h1(
+  translate='pkg.abuse.client.report.view.title.PAGE'
+  translate-value-date='{{vm.report.date}}'
+)
+
+.row
+  .col-md-4
+    .panel.panel-default
+      .panel-heading
+        h3.panel-title(translate="pkg.abuse.client.report.view.overview.TITLE")
+      table.table
+        thead
+          tr
+            th.border-only(colspan="2")
+        tbody
+          tr
+            th(data-translate="pkg.abuse.client.report.view.overview.DATE")
+            td(ng-bind="vm.report.date")
+          tr
+            th(data-translate="pkg.abuse.client.report.view.overview.ADDR")
+            td(ng-bind="vm.report.addr")
+          tr
+            th(data-translate="pkg.abuse.client.report.view.overview.status.TITLE")
+            td(
+              data-translate="pkg.abuse.client.report.view.overview.status.RESOLVED"
+              data-translate-value-resolved="{{ vm.report.date_resolved | date }}"
+            )
+
+    pkg-abuse-report-comments(
+      report-id="vm.report.id"
+    )
+  .col-md-8
+    .panel.panel-default
+      .panel-heading
+        h3.panel-title(translate="pkg.abuse.client.report.view.body.TITLE")
+      .scroller
+        pre.fill-panel(ng-bind="vm.report.body")

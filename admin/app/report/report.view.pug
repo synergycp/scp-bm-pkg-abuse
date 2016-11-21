@@ -1,0 +1,53 @@
+h1(
+  translate='pkg.abuse.admin.report.view.title.PAGE'
+  translate-value-date='{{vm.report.date}}'
+)
+
+div(style="margin-bottom: 10px")
+  a.btn(
+    ng-class="vm.report.date_resolved ? 'btn-danger' : 'btn-success'"
+    ng-click="vm.toggleResolve()"
+    data-translate="pkg.abuse.admin.report.view.resolve.TOGGLE"
+    data-translate-value-resolved="{{ vm.report.date_resolved }}"
+  )
+
+.row
+  .col-md-4
+    .panel.panel-default
+      .panel-heading
+        h3.panel-title(translate="pkg.abuse.admin.report.view.overview.TITLE")
+      table.table
+        thead
+          tr
+            th.border-only(colspan="2")
+        tbody
+          tr
+            th(data-translate="pkg.abuse.admin.report.view.overview.DATE")
+            td(ng-bind="vm.report.date")
+          tr
+            th(data-translate="pkg.abuse.admin.report.view.overview.ADDR")
+            td(ng-bind="vm.report.addr")
+          tr
+            th(data-translate="pkg.abuse.admin.report.view.overview.status.TITLE")
+            td(
+              data-translate="pkg.abuse.admin.report.view.overview.status.RESOLVED"
+              data-translate-value-resolved="{{ vm.report.date_resolved | date }}"
+            )
+
+    pkg-abuse-report-comments(
+      report-id="vm.report.id"
+      on-added="vm.logs.refresh()"
+    )
+  .col-md-8
+    .panel.panel-default
+      .panel-heading
+        h3.panel-title(translate="pkg.abuse.admin.report.view.body.TITLE")
+      .scroller
+        pre.fill-panel(ng-bind="vm.report.body")
+
+    logs(
+      title="Abuse Report Logs"
+      filter="vm.logs.filter"
+      listen-to="vm.event"
+      show-type="false"
+    )

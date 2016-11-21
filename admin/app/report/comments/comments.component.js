@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var URL = 'abuse/{{reportId}}/comment';
+  var URL = 'report/{{reportId}}/comment';
 
   angular
     .module('pkg.abuse.report.comments')
@@ -10,8 +10,8 @@
       },
       bindings: {
         reportId: '=',
-        onSubmit: '&',
-        onAdded: '&',
+        onSubmit: '&?',
+        onAdded: '&?',
       },
       controller: 'PkgAbuseReportCommentsCtrl as comments',
       transclude: true,
@@ -30,8 +30,9 @@
   /**
    * @ngInject
    */
-  function ReportCommentsCtrl(List) {
+  function ReportCommentsCtrl(List, RouteHelpers) {
     var comments = this;
+    var pkg = RouteHelpers.package('abuse');
 
     comments.body = '';
 
@@ -41,21 +42,25 @@
     //////////
 
     function init() {
-      comments.list = List(URL.replace('{{reportId}}', comments.reportId));
+      comments.list = List(
+        pkg.api().all(
+          URL.replace('{{reportId}}', comments.reportId)
+        )
+      );
       comments.list.load();
     }
 
     function submit() {
       var data = formComment();
 
-      comments.onSubmit(data);
+      (comments.onSubmit || angular.noop)(data);
       comments.list.create(data)
         .then(clearBody)
         .then(notifySubscribers)
         ;
 
       function notifySubscribers(data) {
-        comments.onAdded(data);
+        (comments.onAdded || angular.noop)(data);
       }
     }
 
@@ -65,7 +70,7 @@
 
     function formComment() {
       return {
-        body: comments.body
+        body: comments.body,
       };
     }
   }
