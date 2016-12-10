@@ -15,11 +15,6 @@ class ReportController extends Api\Controller
     use Api\Traits\UpdateResource;
 
     /**
-     * @var ReportService
-     */
-    protected $report;
-
-    /**
      * @var ReportFilterService
      */
     protected $filter;
@@ -40,21 +35,18 @@ class ReportController extends Api\Controller
     protected $transform;
 
     /**
-     * @param ReportService       $report
      * @param ReportRepository    $items
      * @param ReportTransformer   $transform
      * @param ReportUpdateService $update
      * @param ReportFilterService $filter
      */
     public function boot(
-        ReportService $report,
         ReportRepository $items,
         ReportTransformer $transform,
         ReportUpdateService $update,
         ReportFilterService $filter
     ) {
         $this->items = $items;
-        $this->report = $report;
         $this->update = $update;
         $this->filter = $filter;
         $this->transform = $transform;
