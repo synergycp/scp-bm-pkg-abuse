@@ -69,11 +69,21 @@ extends FilterService
             $hasServerAccess = function (Builder $query) use ($access, $clientId) {
                 $query
                     ->open()
-                    ->where($access.'.client_id', '=', $clientId)
+                    ->where(function (Builder $query) use ($access, $clientId) {
+                        $query
+                            ->where($access.'.client_id', '=', $clientId)
+                            ->orWhere('access_super.grantee_id', $clientId)
+                        ;
+                    })
                     ;
             };
             $query
-                ->where('abuse_reports.client_id', $clientId)
+                ->where(function (Builder $query) use ($clientId) {
+                    $query
+                        ->where('abuse_reports.client_id', $clientId)
+                        ->orWhere('super.grantee_id', $clientId)
+                    ;
+                })
                 ->orWhere($hasServerAccess)
                 ;
         };
@@ -82,14 +92,19 @@ extends FilterService
             ->groupBy('abuse_reports.id')
             ->select('abuse_reports.*')
             ->joinServer('left', $serverAlias)
-            ->where($visible)
-            ;
+        ;
         $this->servers
             ->make()
             ->scopeJoinAccess(
                 $query, 'left', $access, $serverAlias
             )
             ;
+
+        $query
+            ->leftJoin('client_supers as super', 'super.granter_id', '=', 'abuse_reports.client_id')
+            ->leftJoin('client_supers as access_super', 'access_super.granter_id', '=', "$access.client_id")
+            ->where($visible)
+        ;
     }
 
     /**
