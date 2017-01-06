@@ -39,6 +39,8 @@ class EmailFetcher
     }
 
     /**
+     * @param string $box
+     *
      * @return MessageIterator
      */
     public function get($box = 'INBOX')
