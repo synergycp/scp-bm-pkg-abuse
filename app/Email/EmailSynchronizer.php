@@ -4,11 +4,13 @@ namespace Packages\Abuse\App\Email;
 
 use App\Ip\IpService;
 use App\Ip\IpAddressRangeContract;
+use App\Log;
 use App\Mail\Imap\MessageIterator;
 use Packages\Abuse\App\Report\ReportService;
 use Packages\Abuse\App\Report\Events;
 use Illuminate\Support\Collection;
 use Ddeboer\Imap\Message;
+use Ddeboer\Imap\Exception\MessageDoesNotExistException;
 use Ddeboer\Transcoder\Exception\UndetectableEncodingException;
 
 class EmailSynchronizer
@@ -31,6 +33,11 @@ class EmailSynchronizer
      * @var EmailFetcher
      */
     protected $emails;
+
+    /**
+     * @var Log\Factory
+     */
+    protected $log;
 
     /**
      * @var Collection
@@ -63,15 +70,18 @@ class EmailSynchronizer
 
     /**
      * @param IpService     $ips
+     * @param Log\Factory   $log
      * @param EmailFetcher  $emails
      * @param ReportService $report
      */
     public function boot(
         IpService $ips,
+        Log\Factory $log,
         EmailFetcher $emails,
         ReportService $report
     ) {
         $this->ips = $ips;
+        $this->log = $log;
         $this->report = $report;
         $this->emails = $emails;
 
@@ -83,9 +93,29 @@ class EmailSynchronizer
      */
     public function start()
     {
-        foreach ($this->getMessages() as $item) {
-            $this->reportIpsIn($item);
+        $iterator = $this->getMessages();
+
+        while ($iterator->valid()) {
+            $iterator->next();
+            try {
+                $this->reportIpsIn(
+                    $iterator->current()
+                );
+            } catch (MessageDoesNotExistException $exc) {
+                continue;
+            } catch (\Exception $exc) {
+                $this->logException($exc);
+            }
         }
+    }
+
+    private function logException(\Exception $exc)
+    {
+        $this->log
+            ->create('Abuse error while saving report')
+            ->setException($exc)
+            ->save()
+            ;
     }
 
     /**
