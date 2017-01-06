@@ -39,11 +39,14 @@ class EmailFetcher
     }
 
     /**
+     * @param string $box
+     *
      * @return MessageIterator
      */
     public function get($box = 'INBOX')
     {
-        return $this->connect()
+        return $this
+            ->connect()
             ->getMailbox($box)
             ->getMessages($this->search)
             ;
