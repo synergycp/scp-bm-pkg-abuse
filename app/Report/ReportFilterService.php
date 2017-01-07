@@ -43,6 +43,8 @@ extends FilterService
 
     /**
      * @param Builder $query
+     *
+     * @throws \App\Api\Exceptions\ApiKeyNotFound
      */
     public function viewable(Builder $query)
     {
@@ -61,7 +63,7 @@ extends FilterService
      * @param Builder $query
      * @param int     $clientId
      */
-    private function clientHasAccess(Builder $query, $clientId)
+    public function clientHasAccess(Builder $query, $clientId)
     {
         $access = 'access';
         $serverAlias = $access.'_server';
