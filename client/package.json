@@ -4,7 +4,7 @@
   "description": "Synergy Control Panel Abuse Reports Package Front End",
   "author": "synergycontrolpanel",
   "devDependencies": {
-    "scp-ng-gulp": "git+ssh://git@github.com/cabloo/scp-ng-gulp.git"
+    "scp-ng-gulp": "git+ssh://git@github.com/synergycp/scp-ng-gulp.git"
   },
   "scripts": {
     "prestart": "",
