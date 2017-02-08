@@ -3,17 +3,17 @@ table(panel-table)
     tr
       th.checkbox-col
         list-check-all
-      th.relative Date
+      th.relative(ng-if="table.showDate") Date
         sort(col="date")
-      th.relative IP
+      th.relative(ng-if="table.showIp") IP
         sort(col="addr")
-      th.relative Server
+      th.relative(ng-if="table.showServer") Server
         sort(col="server")
-      th.relative Client
+      th.relative(ng-if="table.showClient") Client
         sort(col="client")
-      th.relative Latest Activity
+      th.relative(ng-if="table.showUpdated") Latest Activity
         sort(col="updated")
-      th Actions
+      th(ng-if="table.showActions") Actions
 
   tr(
     ng-repeat="row in table.list.list.items track by row.id"
@@ -21,26 +21,28 @@ table(panel-table)
   )
     td.checkbox-col
       list-check-item(checked="row.checked")
-    td(ng-bind="row.date")
-    td(ng-bind="row.addr")
-    td
+    td(ng-if="table.showDate")
+      span(ng-bind="row.date")
+    td(ng-if="table.showIp")
+      span(ng-bind="row.addr")
+    td(ng-if="table.showServer")
       a(
         ng-if="row.server"
         ui-sref="app.hardware.server.view.manage({ id: row.server.id })"
         ng-bind="row.server.name"
       )
       span(ng-if="!row.server") -
-    td
+    td(ng-if="table.showClient")
       a(
         ng-if="row.client"
         ui-sref="app.user.client.view({ id: row.client.id })"
         ng-bind="row.client.name"
       )
       span(ng-if="!row.client") -
-    td
+    td(ng-if="table.showUpdated")
       strong(ng-bind="row.excerpt.from")
       div.excerpt(ng-bind="row.excerpt.body")
-    td
+    td(ng-if="table.showActions")
       .btn-report.btn-report-xs
         a.btn.btn-default(
           translate="app.action.VIEW"

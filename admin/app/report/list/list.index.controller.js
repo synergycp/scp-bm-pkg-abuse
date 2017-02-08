@@ -5,7 +5,8 @@
 
   angular
     .module('pkg.abuse.report')
-    .controller('PkgAbuseReportIndexCtrl', PkgAbuseReportIndexCtrl);
+    .controller('PkgAbuseReportIndexCtrl', PkgAbuseReportIndexCtrl)
+  ;
 
   /**
    * @ngInject
@@ -13,9 +14,8 @@
   function PkgAbuseReportIndexCtrl(
     _,
     $q,
-    List,
+    PkgAbuseReportList,
     $state,
-    $uibModal,
     $stateParams,
     RouteHelpers
   ) {
@@ -69,27 +69,6 @@
       $state.go('app.pkg.abuse.report.list', $stateParams);
     }
 
-    function assignClientServerModal(items) {
-      var modal = $uibModal.open({
-        templateUrl: RouteHelpers.trusted(
-          pkg.asset('admin/report/modal/modal.assign.html')
-        ),
-        controller: 'PkgAbuseReportModalAssignCtrl',
-        bindToController: true,
-        controllerAs: 'modal',
-          resolve: {
-            items: _.return(items),
-        },
-      });
-
-      return modal.result.then(function (result) {
-        return vm.tabs.items[$stateParams.tab].list.patch({
-          client_id: result.client ? result.client.id : null,
-          server_id: result.server ? result.server.id : null,
-        }, items);
-      });
-    }
-
     function onSearchChange() {
       $stateParams.search = vm.search;
       $state.go('app.pkg.abuse.report.list', $stateParams);
@@ -114,25 +93,11 @@
       }
     }
 
-    function setupList(isArchive) {
-      var list = List(pkg.api().all('report'));
-
-      list.bulk.add(
-        isArchive ? 'Mark Unresolved' : 'Mark Resolved',
-        list.patch.bind(null, {
-          is_resolved: !isArchive,
-        })
-      );
-      list.bulk.add('Assign Client/Server', assignClientServerModal);
-
-      return list;
-    }
-
     function Tab(trans, filters) {
       var tab = this;
 
       tab.text = trans;
-      tab.list = setupList(filters.archive).filter(filters);
+      tab.list = PkgAbuseReportList(filters.archive).filter(filters);
       tab.list.on('change', function () {
         _(vm.tabs.items)
           .without(tab)

@@ -42,8 +42,9 @@ class ReportUpdateService extends UpdateService
         );
 
         $this->successItems(
-            'abuse.admin.report.client-reassigned',
-            $items->filter($this->changed($inputs))
+            'One Abuse Report\'s client has been changed.|:count Abuse Reports\' clients have been changed.',
+            $items
+                ->filter($this->changed($inputs))
                 ->reject([$this, 'isCreating'])
                 ->each($createEvent)
         );
@@ -62,8 +63,9 @@ class ReportUpdateService extends UpdateService
         );
 
         $this->successItems(
-            'abuse.admin.report.server-reassigned',
-            $items->filter($this->changed($inputs))
+            'One Abuse Report\'s server has been changed.|:count Abuse Reports\' servers have been changed.',
+            $items
+                ->filter($this->changed($inputs))
                 ->reject([$this, 'isCreating'])
                 ->each($createEvent)
         );
@@ -80,10 +82,16 @@ class ReportUpdateService extends UpdateService
         $createEvent = $this->queueHandler(
             Events\ReportStatusChanged::class
         );
+        $status = $inputs['is_resolved'] ? 'resolved' : 'unresolved';
+        $lang = sprintf(
+            'One Abuse Report marked as %1$s.|:count Abuse Reports marked as %1$s.',
+            $status, $status
+        );
 
         $this->successItems(
-            'abuse.'.($inputs['is_resolved'] ? 'resolved' : 'unresolved'),
-            $items->filter($this->changed($inputs))
+            $lang,
+            $items
+                ->filter($this->changed($inputs))
                 ->reject([$this, 'isCreating'])
                 ->each($createEvent)
         );
