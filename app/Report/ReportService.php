@@ -97,9 +97,10 @@ class ReportService
      */
     public function countOpen(Client $client)
     {
-        $query = $this->reports->query();
-
-        $this->filter->clientHasAccess($query, $client->id);
+        $this->filter->clientHasAccess(
+            $query = $this->reports->query(),
+            $client->getKey()
+        );
 
         return $query
             ->open()
@@ -149,7 +150,7 @@ class ReportService
      */
     public function setEntity(Report $report, $entity)
     {
-        $this->setServer($report, dot_get($entity, 'server'));
+        $this->setServer($report, dot_get($entity, 'owner.server'));
 
         if (!$entity) {
             $report->entity()->dissociate();

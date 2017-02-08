@@ -1,5 +1,5 @@
 {
-    "name": "cabloo/scp-package-abuse",
+    "name": "synergycp/scp-package-abuse",
     "description": "Synergy Control Panel - Abuse Report Integration",
     "keywords": ["Synergy", "Server", "Control", "Panel", "Dedicated", "Abuse", "Reports", "Email"],
     "license": "none",
@@ -27,6 +27,9 @@
         "psr-4": {
         },
         "classmap": [
+        ],
+        "files": [
+            "bootstrap/dev.php"
         ]
     },
     "scripts": {

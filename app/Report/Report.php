@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Database representation of an Abuse Report.
+ * @property bool is_resolved
  */
 class Report
 extends Model
@@ -273,7 +274,7 @@ extends Model
         return $query
             ->select('abuse_reports.*')
             ->leftJoin('entities', 'entities.id', '=', 'abuse_reports.entity_id')
-            ->leftJoin('servers', 'servers.id', '=', 'entities.server_id')
+            ->leftJoin('servers', 'servers.id', '=', 'abuse_reports.server_id')
             ->leftJoin('clients', 'clients.id', '=', 'abuse_reports.client_id')
             ;
     }

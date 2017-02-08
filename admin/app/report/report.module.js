@@ -7,5 +7,6 @@
       'scp.core.api',
       'pkg.abuse.report.comments',
       'pkg.abuse.report.list',
+      'pkg.abuse.report.manage',
     ]);
 })();
