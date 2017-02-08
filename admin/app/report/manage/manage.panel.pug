@@ -1,1 +1,9 @@
-| Test
+list.panel.panel-default(
+  ng-show="list.items.length"
+  list="list"
+)
+  list-header(text="Server Abuse")
+    a.btn.btn-default(ng-click="list.refresh.now()")
+      i.fa.fa-refresh
+  pkg-abuse-report-table.border-top-table
+  list-footer
