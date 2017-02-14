@@ -60,12 +60,14 @@ class EmailFetcher
         if ($this->connection) {
             return $this->connection;
         }
-
-        $server = new Server('imap.gmail.com');
+        $smtpHost = 'smtp_host';
+        $smtpUser = 'smtp_user';
+        $smtpPassword = 'smtp_pass';
+        $server = new Server(app('Settings')->{$smtpHost});
 
         return $this->connection = $server->authenticate(
-            'admin@losangelesdedicated.net',
-            '#Abuse123!'
+            app('Settings')->{$smtpUser},
+            app('Settings')->{$smtpPassword}
         );
     }
 }
