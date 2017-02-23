@@ -4,9 +4,15 @@ namespace Packages\Abuse\App\Report;
 
 use App\Support\Http\UpdateService;
 use Illuminate\Support\Collection;
+use App\Api\ApiAuthService;
 
 class ReportUpdateService extends UpdateService
 {
+    /**
+     * @var ApiAuthService
+     */
+    protected $auth;
+
     /**
      * @var ReportPatchRequest
      */
@@ -16,6 +22,11 @@ class ReportUpdateService extends UpdateService
      * @var string
      */
     protected $requestClass = ReportPatchRequest::class;
+
+    public function boot(ApiAuthService $auth)
+    {
+        $this->auth = $auth;
+    }
 
     /**
      * Update all Abuse Reports using the given request.
@@ -74,18 +85,21 @@ class ReportUpdateService extends UpdateService
      */
     private function setResolved(Collection $items)
     {
-        $inputs = [
-            'is_resolved' => $this->input('is_resolved', 'bool'),
-        ];
-        $createEvent = $this->queueHandler(
-            Events\ReportStatusChanged::class
-        );
+        if ($this->auth->is('admin', 'integration')) {
+            $inputs = [
+                'is_resolved' => $this->input('is_resolved', 'bool'),
+            ];
+            $createEvent = $this->queueHandler(
+                Events\ReportStatusChanged::class
+            );
 
-        $this->successItems(
-            'abuse.'.($inputs['is_resolved'] ? 'resolved' : 'unresolved'),
-            $items->filter($this->changed($inputs))
-                ->reject([$this, 'isCreating'])
-                ->each($createEvent)
-        );
+            $this->successItems(
+                'abuse.'.($inputs['is_resolved'] ? 'resolved' : 'unresolved'),
+                $items->filter($this->changed($inputs))
+                    ->reject([$this, 'isCreating'])
+                    ->each($createEvent)
+            );
+        }
+
     }
 }
