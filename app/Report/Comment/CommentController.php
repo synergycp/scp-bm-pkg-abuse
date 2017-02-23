@@ -21,7 +21,7 @@ class CommentController extends Api\Controller
     /**
      * @var ReportFilterService
      */
-    protected $filter;
+    protected $filterReports;
 
     /**
      * @var ReportRepository
@@ -59,7 +59,9 @@ class CommentController extends Api\Controller
     public function index($reportId)
     {
         $report = $this->getReport($reportId);
-        $comments = $report->comments()
+        $comments = $report
+            ->comments()
+            ->getQuery()
             ->orderBy('created_at', 'desc')
             ->paginate(30)
             ;
@@ -73,6 +75,7 @@ class CommentController extends Api\Controller
      * @param int|string         $reportId
      *
      * @return ApiResponse
+     * @throws \App\Auth\Exceptions\InvalidIpAddress
      */
     public function store(CommentFormRequest $request, $reportId)
     {
