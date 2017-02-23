@@ -45,17 +45,23 @@ extends FilterService
      * @param Builder $query
      *
      * @throws \App\Api\Exceptions\ApiKeyNotFound
+     * @throws \App\Auth\Exceptions\InvalidIpAddress
      */
     public function viewable(Builder $query)
     {
         $client = function ($clientId) use ($query) {
             $this->clientHasAccess($query, $clientId);
         };
+        $checkPerms = function () {
+            if (!$this->permission->has('pkg.abuse.report.read')) {
+                abort(403, 'You do not have permission to access Abuse Reports!');
+            }
+        };
 
         $this->auth->only([
             'client' => $client,
-            'admin',
-            'integration',
+            'admin' => $checkPerms,
+            'integration' => $checkPerms,
         ]);
     }
 
