@@ -17,23 +17,19 @@
   /**
    * @ngInject
    */
-  function ManagePanel(RouteHelpers, ServerManage, PkgAbuseReportList, Permission) {
-    var context = {
-      list: PkgAbuseReportList()
-        .filter({
-          server: ServerManage.getServer().id,
-        }),
-    };
-    Permission
-      .ifHas('pkg.abuse.report.read')
-      .then(context.list.load)
-    ;
+  function ManagePanel(RouteHelpers, ServerManage, PkgAbuseReportList) {
+    var list = PkgAbuseReportList().filter({
+      server: ServerManage.getServer().id,
+    });
+    list.load();
 
     return {
       templateUrl: RouteHelpers.trusted(
         RouteHelpers.package('abuse').asset('admin/report/manage/manage.panel.html')
       ),
-      context: context,
+      context: {
+        list: list,
+      },
     };
   }
 })();
