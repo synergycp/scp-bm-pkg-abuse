@@ -19,6 +19,18 @@ class CreateSettingsAbuseThreshold extends Migration
             'validator' => Setting::VALID_INT,
             'value' => 7,
         ]);
+
+        $this->addSetting($group, Setting::TYPE_TEXT, 'pkg.abuse.auth.host', [
+            'value' => 'imap.gmail.com',
+        ]);
+        $this->addSetting($group, Setting::TYPE_TEXT, 'pkg.abuse.auth.user', [
+            'validator' => Setting::VALID_EMAIL,
+            'value' => 'abuse.test.usd@gmail.com',
+        ]);
+        $this->addSetting($group, Setting::TYPE_TEXT, 'pkg.abuse.auth.pass', [
+            'value' => '#Abuse123!',
+        ]);
+
     }
 
     /**
