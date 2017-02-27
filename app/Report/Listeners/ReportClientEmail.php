@@ -59,7 +59,6 @@ class ReportClientEmail
     public function handle(ReportClientReassigned $event)
     {
         $report = $event->report;
-
         if (!$report->resolved_at) {
             $sendEmail = function (Client\Client $client) use ($report) {
                 // TODO: way for Client to opt out of these emails.
