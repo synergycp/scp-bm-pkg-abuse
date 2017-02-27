@@ -26,7 +26,12 @@
     vm.tabs = {
       active: parseInt($stateParams.tab) || 0,
       items: [
-        new Tab(LANG+'.tab.open'),
+        new Tab(LANG+'.tab.answered', {
+          answer: true,
+        }),
+        new Tab(LANG+'.tab.unanswered', {
+          answer: false,
+        }),
         new Tab(LANG+'.tab.archive', {
           archive: true,
         }),
