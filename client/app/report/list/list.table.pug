@@ -9,6 +9,8 @@ table(panel-table)
         sort(col="server")
       th.relative Latest Activity
         sort(col="updated")
+      th.relative From
+        sort(col="from")
       th Actions
 
   tr(
@@ -27,6 +29,8 @@ table(panel-table)
     td
       strong(ng-bind="row.excerpt.from")
       div.excerpt(ng-bind="row.excerpt.body")
+    td
+      div.excerpt(ng-bind="row.excerpt.sender")
     td
       .btn-report.btn-report-xs
         a.btn.btn-default(
