@@ -63,6 +63,7 @@ extends FilterService
             'admin' => $checkPerms,
             'integration' => $checkPerms,
         ]);
+
     }
 
     /**
@@ -137,13 +138,11 @@ extends FilterService
             $query->search($search);
         }
 
-//        $archiveType = $request->bool('archive') ? 'archived' : 'open';
-
         if ($request->has('archive')) {
             $archiveType = 'archived';
 
         } else if ($request->has('answer')) {
-            $archiveType = $request->bool('answer') ? 'answered' : 'unanswered';
+            $archiveType = $request->bool('answer') ? 'pendingAdmin' : 'pendingClient';
 
         } else {
             $archiveType = 'open';

@@ -324,29 +324,4 @@ extends Model
         );
     }
 
-    /**
-     * Filter the query by abuse reports that have status Answered.
-     *
-     * @param Builder $query
-     *
-     * @return Builder
-     */
-    public function scopeAnswered(Builder $query)
-    {
-        return $query
-            ->open();
-    }
-
-    /**
-     * Filter the query by abuse reports that have status Unanswered.
-     *
-     * @param Builder $query
-     *
-     * @return Builder
-     */
-    public function scopeUnanswered(Builder $query)
-    {
-        return $query
-            ->open();
-    }
 }
