@@ -302,6 +302,7 @@ extends Model
         return $query
             ->open()
             ->where('pending_type', static::PENDING_ADMIN)
+            ->whereNotNull($this->table.'.client_id')
             ;
     }
 
@@ -322,5 +323,21 @@ extends Model
             "$alias.id", '=', 'abuse_reports.server_id',
             $joinType
         );
+    }
+
+     /**
+     * Filter the query by abuse reports that have status open.
+     *
+     * @param Builder $query
+     *
+     * @return Builder
+     */
+    public function scopePendingUnknown(Builder $query)
+    {
+        return $query
+            ->open()
+            ->whereNull($this->table.'.resolved_at')
+            ->whereNull($this->table.'.client_id')
+            ;
     }
 }
