@@ -32,6 +32,9 @@
         new Tab(LANG+'.tab.client', {
           pending_client: true,
         }),
+        new Tab(LANG+'.tab.unknown', {
+          pending_unknown: true,
+        }),
         new Tab(LANG+'.tab.archive', {
           archive: true,
         }),

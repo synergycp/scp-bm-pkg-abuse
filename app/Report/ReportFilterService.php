@@ -58,11 +58,17 @@ extends FilterService
             }
         };
 
+//        $this->auth->only([
+//            'client' => $client,
+//            'admin' => $checkPerms,
+//            'integration' => $checkPerms,
+//        ]);
         $this->auth->only([
             'client' => $client,
-            'admin' => $checkPerms,
-            'integration' => $checkPerms,
+            'admin',
+            'integration',
         ]);
+
     }
 
     /**
