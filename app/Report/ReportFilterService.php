@@ -138,15 +138,7 @@ extends FilterService
             $query->search($search);
         }
 
-        if ($request->has('archive')) {
-            $archiveType = 'archived';
-
-        } else if ($request->has('answer')) {
-            $archiveType = $request->bool('answer') ? 'pendingAdmin' : 'pendingClient';
-
-        } else {
-            $archiveType = 'open';
-        }
+        $archiveType = $request->bool('archive') ? 'archived' : 'open';
 
         $query->$archiveType();
 
