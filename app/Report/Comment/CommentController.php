@@ -21,7 +21,7 @@ class CommentController extends Api\Controller
     /**
      * @var ReportFilterService
      */
-    protected $filterReports;
+    protected $filter;
 
     /**
      * @var ReportRepository
@@ -59,9 +59,7 @@ class CommentController extends Api\Controller
     public function index($reportId)
     {
         $report = $this->getReport($reportId);
-        $comments = $report
-            ->comments()
-            ->getQuery()
+        $comments = $report->comments()
             ->orderBy('created_at', 'desc')
             ->paginate(30)
             ;
