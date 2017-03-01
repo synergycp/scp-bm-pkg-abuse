@@ -73,6 +73,8 @@ class CommentController extends Api\Controller
      * @param int|string         $reportId
      *
      * @return ApiResponse
+     * @throws Api\Exceptions\ApiKeyNotFound
+     * @throws \App\Auth\Exceptions\InvalidIpAddress
      */
     public function store(CommentFormRequest $request, $reportId)
     {
@@ -88,7 +90,7 @@ class CommentController extends Api\Controller
 
         event(new Events\CommentCreated($comment));
 
-        $msg = trans('abuse.admin.comment.saved');
+        $msg = trans('pkg.abuse::comment.created.'.$this->auth->type());
 
         return response()->success($msg);
     }
@@ -102,6 +104,7 @@ class CommentController extends Api\Controller
     {
         return $this->reports
             ->filter([$this->filterReports, 'viewable'])
-            ->findOrFail($reportId);
+            ->findOrFail($reportId)
+            ;
     }
 }

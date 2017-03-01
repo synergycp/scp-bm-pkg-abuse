@@ -17,11 +17,12 @@ extends Transformer
      * @param  Comment $item
      *
      * @return array
+     * @throws \App\Api\Exceptions\ApiKeyNotFound
      */
     public function item(Comment $item)
     {
         return $item->expose(['id', 'body']) + [
-            'date' => $this->dateForViewer($item->created_at),
+            'date' => $this->dateArr($item->created_at),
             'author' => $this->author($item),
         ];
     }
@@ -38,6 +39,7 @@ extends Transformer
      * @param Comment $item
      *
      * @return array
+     * @throws \App\Api\Exceptions\ApiKeyNotFound
      */
     public function author(Comment $item)
     {
@@ -50,6 +52,7 @@ extends Transformer
      * @param Comment $item
      *
      * @return string
+     * @throws \App\Api\Exceptions\ApiKeyNotFound
      */
     public function authorName(Comment $item)
     {
@@ -64,6 +67,7 @@ extends Transformer
      * @param Comment $item
      *
      * @return array
+     * @throws \App\Api\Exceptions\ApiKeyNotFound
      */
     public function excerpt(Comment $item)
     {

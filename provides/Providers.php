@@ -9,4 +9,5 @@ namespace Packages\Abuse\App;
 return [
     Email\EmailServiceProvider::class,
     Report\ReportServiceProvider::class,
+    Module\ModuleServiceProvider::class,
 ];
