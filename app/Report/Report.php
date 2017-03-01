@@ -2,20 +2,29 @@
 
 namespace Packages\Abuse\App\Report;
 
-use App\Database\Models\Model;
 use App\Client\Client;
+use App\Database\Models\Model;
 use App\Entity\Entity;
 use App\Server\Server;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations;
 
 /**
  * Database representation of an Abuse Report.
- * @property bool is_resolved
+ * @property bool                 is_resolved
+ * @property string               addr
+ * @property string               body
+ * @property Carbon               reported_at
+ * @property Carbon               resolved_at
+ * @property int                  pending_type
+ * @property Client               client
+ * @property Entity               entity
+ * @property Server               server
+ * @property Comment\Comment|null lastComment
  */
 class Report
-extends Model
+    extends Model
 {
     /**
      * @var int
@@ -89,6 +98,18 @@ extends Model
     }
 
     /**
+     * Determine whether or not the Abuse Report is resolved.
+     *
+     * @return bool
+     */
+    public function isResolved()
+    {
+        return (bool)$this->resolved_at;
+    }
+
+    # Methods
+
+    /**
      * Syntax for ->is_resolved = true || false.
      *
      * @param bool $value
@@ -99,7 +120,6 @@ extends Model
         $this->{$method}();
     }
 
-    # Methods
     /**
      * Mark this abuse report as resolved.
      * Does not save the change to the database.
@@ -146,17 +166,8 @@ extends Model
         return $this;
     }
 
-    /**
-     * Determine whether or not the Abuse Report is resolved.
-     *
-     * @return bool
-     */
-    public function isResolved()
-    {
-        return (bool) $this->resolved_at;
-    }
-
     # Relationships
+
     /**
      * The Entity that the reported IP Address is in.
      *
@@ -220,7 +231,7 @@ extends Model
      */
     public function scopeArchived(Builder $query)
     {
-        return $query->whereNotNull($this->table.'.resolved_at');
+        return $query->whereNotNull($this->table . '.resolved_at');
     }
 
     /**
@@ -232,7 +243,7 @@ extends Model
      */
     public function scopeOpen(Builder $query)
     {
-        return $query->whereNull($this->table.'.resolved_at');
+        return $query->whereNull($this->table . '.resolved_at');
     }
 
     /**
@@ -267,7 +278,7 @@ extends Model
      *
      * @param Builder $query
      *
-     * @return Builder
+     * @return \Illuminate\Database\Query\Builder
      */
     private function joinSearchTables(Builder $query)
     {
@@ -317,10 +328,12 @@ extends Model
         $joinType = 'inner',
         $alias = 'servers'
     ) {
-        $query->select('abuse_reports.*')->join(
-            "servers as $alias",
-            "$alias.id", '=', 'abuse_reports.server_id',
-            $joinType
-        );
+        $query->select('abuse_reports.*')
+              ->join(
+                  "servers as $alias",
+                  "$alias.id", '=', 'abuse_reports.server_id',
+                  $joinType
+              )
+        ;
     }
 }
