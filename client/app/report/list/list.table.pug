@@ -15,7 +15,7 @@ table(panel-table)
     ng-repeat="row in table.list.list.items track by row.id"
     list-row-checkable="row"
   )
-    td(ng-bind="row.date")
+    td(date="row.date")
     td(ng-bind="row.addr")
     td
       a(

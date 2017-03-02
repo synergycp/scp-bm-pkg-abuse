@@ -7,7 +7,7 @@
         ng-repeat="comment in comments.list.items track by comment.id"
       )
         .panel-heading
-          span.pull-right.text-muted(ng-bind="comment.date")
+          span.pull-right.text-muted(date="comment.date")
           strong(ng-bind="comment.author.name")
         .panel-body(ng-bind="comment.body")
     .text-center(
