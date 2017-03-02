@@ -17,7 +17,7 @@ class EmailFetcher
     protected $search;
 
     /**
-     * @var Connection
+     * @var Connection|null
      */
     protected $connection;
 
@@ -53,7 +53,7 @@ class EmailFetcher
     }
 
     /**
-     * @return Connection
+     * @return Connection|void
      */
     private function connect()
     {
@@ -63,8 +63,9 @@ class EmailFetcher
 
         $settings = app('Settings');
         // if any of the settings are empty then the Fetcher should do nothing.
-        if(empty($settings->pkg_abuse_auth_host) || empty($settings->pkg_abuse_auth_user) || empty($settings->pkg_abuse_auth_pass))
-            return null;
+        if(empty($settings->pkg_abuse_auth_host) || empty($settings->pkg_abuse_auth_user) || empty($settings->pkg_abuse_auth_pass)) {
+            return;
+        }
 
         $server = new Server($settings->pkg_abuse_auth_host);
 
