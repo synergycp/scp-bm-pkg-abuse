@@ -13,6 +13,7 @@
         showServer: '=?',
         showClient: '=?',
         showUpdated: '=?',
+        showFrom: '=?',
         showActions: '=?',
       },
       controller: 'PkgAbuseReportTableCtrl as table',
@@ -49,6 +50,7 @@
         showServer: true,
         showClient: true,
         showUpdated: true,
+        showFrom: true,
         showActions: true,
       });
     }

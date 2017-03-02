@@ -13,6 +13,8 @@ table(panel-table)
         sort(col="client")
       th.relative(ng-if="table.showUpdated") Latest Activity
         sort(col="updated")
+      th.relative(ng-if="table.showFrom") From
+        sort(col="from")
       th(ng-if="table.showActions") Actions
 
   tr(
@@ -42,6 +44,8 @@ table(panel-table)
     td(ng-if="table.showUpdated")
       strong(ng-bind="row.excerpt.from")
       div.excerpt(ng-bind="row.excerpt.body")
+    td(ng-if="table.showFrom")
+      div.excerpt(ng-bind="row.excerpt.sender")
     td(ng-if="table.showActions")
       .btn-report.btn-report-xs
         a.btn.btn-default(

@@ -92,6 +92,7 @@ extends Transformer
         return [
             'from' => 'Original Email',
             'body' => $body,
+            'sender' => $item->from,
         ];
     }
 
