@@ -17,10 +17,15 @@ extends Transformer
      * @var CommentTransformer
      */
     protected $comment;
+    
+    /**
+     * @var ServerFilterService
+     */
     protected $serverFilter;
 
     /**
      * @param CommentTransformer $comment
+     * @param ServerFilterService $serverFilter
      */
     public function boot(
         CommentTransformer $comment,
