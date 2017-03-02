@@ -11,6 +11,10 @@
         "TITLE": "Waiting on CLIENT",
         "EMPTY": "No Abuse Reports are currently waiting on client."
       },
+      "unknown": {
+        "TITLE": "UNKNOWN",
+        "EMPTY": "No Abuse Reports are currently unknown."
+      },
       "archive": {
         "TITLE": "Archive",
         "EMPTY": "No Abuse Reports are currently archived."

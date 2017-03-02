@@ -143,6 +143,10 @@ extends FilterService
             $query->pendingAdmin();
         }
 
+        if ($request->has('pending_unknown')) {
+            $query->pendingUnknown();
+        }
+
         $query->orderBy('updated_at', 'desc');
 
         return $query;

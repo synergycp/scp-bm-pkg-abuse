@@ -313,6 +313,7 @@ class Report
         return $query
             ->open()
             ->where('pending_type', static::PENDING_ADMIN)
+            ->whereNotNull($this->table.'.client_id')
             ;
     }
 
@@ -335,5 +336,20 @@ class Report
                   $joinType
               )
         ;
+    }
+
+     /**
+     * Filter the query by abuse reports that have status open.
+     *
+     * @param Builder $query
+     *
+     * @return Builder
+     */
+    public function scopePendingUnknown(Builder $query)
+    {
+        return $query
+            ->open()
+            ->whereNull($this->table.'.client_id')
+            ;
     }
 }
