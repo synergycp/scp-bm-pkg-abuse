@@ -63,7 +63,6 @@ extends FilterService
             'admin' => $checkPerms,
             'integration' => $checkPerms,
         ]);
-
     }
 
     /**
