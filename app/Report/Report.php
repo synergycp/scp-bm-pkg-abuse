@@ -352,4 +352,5 @@ class Report
             ->whereNull($this->table.'.client_id')
             ;
     }
+
 }
