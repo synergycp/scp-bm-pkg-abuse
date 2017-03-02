@@ -10,12 +10,12 @@
     <orderEntry type="module-library">
       <library name="PHP">
         <CLASSES>
-          <root url="file://$USER_HOME$/../../app" />
-          <root url="file://$USER_HOME$/../../vendor" />
+          <root url="file://$MODULE_DIR$/../../app" />
+          <root url="file://$MODULE_DIR$/../../vendor" />
         </CLASSES>
         <SOURCES>
-          <root url="file://$USER_HOME$/../../app" />
-          <root url="file://$USER_HOME$/../../vendor" />
+          <root url="file://$MODULE_DIR$/../../app" />
+          <root url="file://$MODULE_DIR$/../../vendor" />
         </SOURCES>
       </library>
     </orderEntry>
