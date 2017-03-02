@@ -336,7 +336,6 @@ extends Model
     {
         return $query
             ->open()
-            ->whereNull($this->table.'.resolved_at')
             ->whereNull($this->table.'.client_id')
             ;
     }
