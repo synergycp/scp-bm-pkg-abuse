@@ -17,6 +17,7 @@ class CreateSettingsAbuseThreshold extends Migration
         $group = $this->addSettingGroup('Abuse Reports');
         $this->addSetting($group, Setting::TYPE_TEXT, 'pkg.abuse.report.threshold', [
             'validator' => Setting::VALID_INT,
+            'value' => '7',
         ]);
 
         $this->addSetting($group, Setting::TYPE_TEXT, 'pkg.abuse.auth.host');

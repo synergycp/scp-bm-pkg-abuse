@@ -61,11 +61,16 @@ class EmailFetcher
             return $this->connection;
         }
 
-        $server = new Server('imap.gmail.com');
+        $settings = app('Settings');
+        // if any of the settings are empty then the Fetcher should do nothing.
+        if(empty($settings->pkg_abuse_auth_host) || empty($settings->pkg_abuse_auth_user) || empty($settings->pkg_abuse_auth_pass))
+            return null;
+
+        $server = new Server($settings->pkg_abuse_auth_host);
 
         return $this->connection = $server->authenticate(
-            'admin@losangelesdedicated.net',
-            '#Abuse123!'
+            $settings->pkg_abuse_auth_user,
+            $settings->pkg_abuse_auth_pass
         );
     }
 }
