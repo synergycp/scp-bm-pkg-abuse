@@ -1,6 +1,6 @@
 h1(
   translate='pkg.abuse.admin.report.view.title.PAGE'
-  translate-value-date='{{vm.report.date}}'
+  translate-value-date='{{ vm.report.date | apiDate }}'
 )
 
 div(style="margin-bottom: 10px")
@@ -23,7 +23,7 @@ div(style="margin-bottom: 10px")
         tbody
           tr
             th(data-translate="pkg.abuse.admin.report.view.overview.DATE")
-            td(ng-bind="vm.report.date")
+            td(date="vm.report.date")
           tr
             th(data-translate="pkg.abuse.admin.report.view.overview.ADDR")
             td(ng-bind="vm.report.addr")
@@ -31,7 +31,7 @@ div(style="margin-bottom: 10px")
             th(data-translate="pkg.abuse.admin.report.view.overview.status.TITLE")
             td(
               data-translate="pkg.abuse.admin.report.view.overview.status.RESOLVED"
-              data-translate-value-resolved="{{ vm.report.date_resolved | date }}"
+              data-translate-value-resolved="{{ vm.report.date_resolved | apiDate }}"
             )
 
     pkg-abuse-report-comments(
