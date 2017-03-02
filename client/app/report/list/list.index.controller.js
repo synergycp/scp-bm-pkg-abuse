@@ -26,11 +26,11 @@
     vm.tabs = {
       active: parseInt($stateParams.tab) || 0,
       items: [
+        new Tab(LANG+'.tab.unanswered', {
+            pending_client: true,
+        }),
         new Tab(LANG+'.tab.answered', {
           pending_admin: true,
-        }),
-        new Tab(LANG+'.tab.unanswered', {
-          pending_client: true,
         }),
         new Tab(LANG+'.tab.archive', {
           archive: true,
