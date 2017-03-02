@@ -59,28 +59,31 @@ class ReportClientEmail
     public function handle(ReportClientReassigned $event)
     {
         $report = $event->report;
-        $sendEmail = function (Client\Client $client) use ($report) {
-            // TODO: way for Client to opt out of these emails.
-            $context = [
-                'client' => $client->expose('name'),
-                'server' => $this->server($report),
-                'report' => $this->report($report),
-                'urls' => [
-                    'view' => $this->sso->view($report, $client),
-                ],
-            ];
+        if (!$report->resolved_at) {
+            $sendEmail = function (Client\Client $client) use ($report) {
+                // TODO: way for Client to opt out of these emails.
+                $context = [
+                    'client' => $client->expose('name'),
+                    'server' => $this->server($report),
+                    'report' => $this->report($report),
+                    'urls' => [
+                        'view' => $this->sso->view($report, $client),
+                    ],
+                ];
 
-            $this
-                ->create('abuse_report.tpl')
-                ->setData($context)
-                ->toUser($client)
-                ->send()
+                $this
+                    ->create('abuse_report.tpl')
+                    ->setData($context)
+                    ->toUser($client)
+                    ->send()
+                ;
+            };
+
+            $this->clients($report)
+                ->each($sendEmail)
             ;
-        };
+        }
 
-        $this->clients($report)
-             ->each($sendEmail)
-        ;
     }
 
     /**
