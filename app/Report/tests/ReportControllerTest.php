@@ -22,9 +22,9 @@ class ReportControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->server = $this->package_factory('abuse', Server::class)->create();
-        $this->client = $this->package_factory('abuse', Client::class)->create();
-        $this->report = $this->package_factory('abuse', AbuseReport::class)->create(['client_id' => $this->client->id, 'server_id' => $this->server->id]);
+        $this->server = $this->packageFactory('abuse', Server::class)->create();
+        $this->client = $this->packageFactory('abuse', Client::class)->create();
+        $this->report = $this->packageFactory('abuse', AbuseReport::class)->create(['client_id' => $this->client->id, 'server_id' => $this->server->id]);
         $this->apiKey = new Key\Key();
         $this->apiKey->owner()->associate($this->client);
         $this->apiKey->save();
@@ -78,7 +78,7 @@ class ReportControllerTest extends TestCase
         $this->client->delete();
     }
 
-    private function package_factory()
+    private function packageFactory()
     {
         $arguments = func_get_args();
         $arguments[0] = __DIR__ . '/../../../../' . $arguments[0] . '/database/factories/';
