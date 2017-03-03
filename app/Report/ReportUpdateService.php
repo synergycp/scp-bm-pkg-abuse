@@ -4,6 +4,8 @@ namespace Packages\Abuse\App\Report;
 
 use App\Support\Http\UpdateService;
 use Illuminate\Support\Collection;
+use Packages\Abuse\App\Report\Comment\Comment;
+use Packages\Abuse\App\Report\Comment\Events as ReportEvents;
 
 class ReportUpdateService extends UpdateService
 {
@@ -100,10 +102,22 @@ class ReportUpdateService extends UpdateService
 
     private function bulkReply(Collection $items)
     {
-        $inputs = [
-            'comment' => $this->input('comment'),
-        ];
+        if ( $comment = $this->input('comment') )
+        {
+            $items->each(function($report) use ($comment) {
 
-        var_dump($inputs); die();
+                $comment = new Comment(['body'=>$comment]);
+                $comment->report()->associate($report);
+                $comment->author()->associate(
+                    $this->auth->user()
+                );
+
+                $comment->save();
+
+                event(new ReportEvents\CommentCreated($comment));
+
+                return trans('pkg.abuse::comment.created.'.$this->auth->type());
+            });
+        }
     }
 }
