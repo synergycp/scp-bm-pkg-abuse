@@ -30,6 +30,11 @@
         "LABEL": "Server",
         "PLACEHOLDER": "Type to search..."
       }
+    },
+    "reply": {
+      "TITLE": "Reply Abuse Report",
+      "SUBMIT": "Send",
+      "CANCEL": "Cancel"
     }
   },
   "view": {

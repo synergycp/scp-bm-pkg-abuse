@@ -21,7 +21,7 @@
         })
       );
       list.bulk.add('Assign Client/Server', assignClientServerModal);
-      list.bulk.add('Bulk Reply', bulkReplyModal);
+
       /**
        * @ngInject
        */
@@ -44,28 +44,6 @@
           return list.patch({
             client_id: result.client ? result.client.id : null,
             server_id: result.server ? result.server.id : null,
-          }, items);
-        });
-      }
-
-      function bulkReplyModal(items) {
-        RouteHelpers.loadLang('pkg:abuse:admin:report');
-
-        var modal = $uibModal.open({
-          templateUrl: RouteHelpers.trusted(
-            pkg.asset('admin/report/modal/modal.reply.html')
-          ),
-          controller: 'PkgAbuseReportModalReplyCtrl',
-          bindToController: true,
-          controllerAs: 'modal',
-          resolve: {
-            items: _.return(items),
-          },
-        });
-
-        return modal.result.then(function (result) {
-          return list.patch({
-            message: result.message ? result.message : null,
           }, items);
         });
       }
