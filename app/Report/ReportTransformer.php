@@ -36,15 +36,17 @@ extends Transformer
      * @param Report $item
      *
      * @return array
+     * @throws \App\Api\Exceptions\ApiKeyNotFound
      */
     public function item(Report $item)
     {
         $data = $item->expose('id', 'addr', 'subject') + [
-            'date' => $this->dateForViewer($item->date),
-            'date_resolved' => $this->dateForViewer($item->resolved_at),
+            'date' => $this->dateArr($item->reported_at),
+            'date_resolved' => $this->dateArr($item->resolved_at),
             'server' => $this->itemServer($item),
             'client' => $this->itemClient($item),
             'excerpt' => $this->excerpt($item),
+            'sender' => $item->from,
         ];
 
         if (!$this->viewerIsAdmin()) {
@@ -62,6 +64,7 @@ extends Transformer
      * @param Collection|LengthAwarePaginator $items
      *
      * @return array
+     * @throws \App\Api\Exceptions\ApiKeyNotFound
      */
 
     protected function itemPreload($items)
@@ -81,6 +84,7 @@ extends Transformer
      * @param Report $item
      *
      * @return array
+     * @throws \App\Api\Exceptions\ApiKeyNotFound
      */
     private function excerpt(Report $item)
     {
@@ -119,6 +123,7 @@ extends Transformer
      * @param Report $item
      *
      * @return array
+     * @throws \App\Api\Exceptions\ApiKeyNotFound
      */
     public function resource(Report $item)
     {
@@ -126,9 +131,9 @@ extends Transformer
     }
 
     /**
-     * Transform an IP Entity into an array for the Abuse Report List.
+     * Transform a Report's IP Entity into an array for the Abuse Report List.
      *
-     * @param Entity $item
+     * @param Report $item
      *
      * @return array
      */
@@ -143,7 +148,7 @@ extends Transformer
     /**
      * Transform a Client into an array for the Abuse Report List.
      *
-     * @param Client $item
+     * @param Report $item
      *
      * @return array
      */
@@ -162,6 +167,7 @@ extends Transformer
      * @param Report $item
      *
      * @return array
+     * @throws \App\Api\Exceptions\ApiKeyNotFound
      */
     public function view(Report $item)
     {

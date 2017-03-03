@@ -4,14 +4,21 @@ namespace Packages\Abuse\App\Report\Comment;
 
 use App\Admin\Admin;
 use App\Database\Models\Model;
-use Packages\Abuse\App\Report\Report;
+use App\Database\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations;
+use Packages\Abuse\App\Report\Report;
 
 /**
  * Database representation of Abuse Report Comments.
+ *
+ * @property Carbon created_at
+ * @property User   author
+ * @property Report report
+ * @property string body
  */
 class Comment
-extends Model
+    extends Model
 {
     public static $singular = 'Abuse Report Comment';
     public static $plural = 'Abuse Report Comments';
@@ -30,7 +37,9 @@ extends Model
      */
     public function isByAdmin()
     {
-        $authorType = $this->author()->getMorphType();
+        $authorType = $this->author()
+                           ->getMorphType()
+        ;
 
         return $this->$authorType == Admin::class;
     }

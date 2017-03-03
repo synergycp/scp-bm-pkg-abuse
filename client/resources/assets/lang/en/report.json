@@ -3,9 +3,13 @@
     "TITLE": "Abuse Reports",
     "NONE": "There have been no reports of abuse on your servers yet.",
     "tab": {
-      "open": {
-        "TITLE": "Open",
-        "EMPTY": "No open abuse reports."
+      "answered": {
+        "TITLE": "Answered",
+        "EMPTY": "No answered abuse reports."
+      },
+      "unanswered": {
+        "TITLE": "Unanswered",
+        "EMPTY": "No unanswered abuse reports."
       },
       "archive": {
         "TITLE": "Archive",

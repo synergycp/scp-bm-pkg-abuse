@@ -4,9 +4,15 @@ namespace Packages\Abuse\App\Report;
 
 use App\Support\Http\UpdateService;
 use Illuminate\Support\Collection;
+use App\Api\ApiAuthService;
 
 class ReportUpdateService extends UpdateService
 {
+    /**
+     * @var ApiAuthService
+     */
+    protected $auth;
+
     /**
      * @var ReportPatchRequest
      */
@@ -16,6 +22,11 @@ class ReportUpdateService extends UpdateService
      * @var string
      */
     protected $requestClass = ReportPatchRequest::class;
+
+    public function boot(ApiAuthService $auth)
+    {
+        $this->auth = $auth;
+    }
 
     /**
      * Update all Abuse Reports using the given request.
@@ -42,8 +53,9 @@ class ReportUpdateService extends UpdateService
         );
 
         $this->successItems(
-            'abuse.admin.report.client-reassigned',
-            $items->filter($this->changed($inputs))
+            'One Abuse Report\'s client has been changed.|:count Abuse Reports\' clients have been changed.',
+            $items
+                ->filter($this->changed($inputs))
                 ->reject([$this, 'isCreating'])
                 ->each($createEvent)
         );
@@ -62,8 +74,9 @@ class ReportUpdateService extends UpdateService
         );
 
         $this->successItems(
-            'abuse.admin.report.server-reassigned',
-            $items->filter($this->changed($inputs))
+            'One Abuse Report\'s server has been changed.|:count Abuse Reports\' servers have been changed.',
+            $items
+                ->filter($this->changed($inputs))
                 ->reject([$this, 'isCreating'])
                 ->each($createEvent)
         );
@@ -74,18 +87,26 @@ class ReportUpdateService extends UpdateService
      */
     private function setResolved(Collection $items)
     {
-        $inputs = [
-            'is_resolved' => $this->input('is_resolved', 'bool'),
-        ];
-        $createEvent = $this->queueHandler(
-            Events\ReportStatusChanged::class
-        );
+        if ($this->auth->is('admin', 'integration')) {
+            $inputs = [
+                'is_resolved' => $this->input('is_resolved', 'bool'),
+            ];
+            $createEvent = $this->queueHandler(
+                Events\ReportStatusChanged::class
+            );
+            $status = $inputs['is_resolved'] ? 'resolved' : 'unresolved';
+            $lang = sprintf(
+                'One Abuse Report marked as %1$s.|:count Abuse Reports marked as %1$s.',
+                $status, $status
+            );
 
-        $this->successItems(
-            'abuse.'.($inputs['is_resolved'] ? 'resolved' : 'unresolved'),
-            $items->filter($this->changed($inputs))
-                ->reject([$this, 'isCreating'])
-                ->each($createEvent)
-        );
+            $this->successItems(
+                $lang,
+                $items
+                    ->filter($this->changed($inputs))
+                    ->reject([$this, 'isCreating'])
+                    ->each($createEvent)
+            );
+        }
     }
 }

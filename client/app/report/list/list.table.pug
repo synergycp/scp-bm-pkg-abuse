@@ -9,13 +9,15 @@ table(panel-table)
         sort(col="server")
       th.relative Latest Activity
         sort(col="updated")
+      th.relative Abuse Authority
+        sort(col="from")
       th Actions
 
   tr(
     ng-repeat="row in table.list.list.items track by row.id"
     list-row-checkable="row"
   )
-    td(ng-bind="row.date")
+    td(date="row.date")
     td(ng-bind="row.addr")
     td
       a(
@@ -27,6 +29,7 @@ table(panel-table)
     td
       strong(ng-bind="row.excerpt.from")
       div.excerpt(ng-bind="row.excerpt.body")
+    td(ng-bind="row.sender")
     td
       .btn-report.btn-report-xs
         a.btn.btn-default(

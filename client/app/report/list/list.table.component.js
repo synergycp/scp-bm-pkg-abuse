@@ -12,6 +12,7 @@
         showReserved: '=?',
         showIpEntities: '=?',
         showServers: '=?',
+        showFrom: '=?',
         showActions: '=?',
       },
       controller: 'PkgAbuseReportTableCtrl as table',
@@ -47,6 +48,7 @@
         showReserved: true,
         showIpEntities: true,
         showServers: true,
+        showFrom: true,
         showActions: true,
       });
     }

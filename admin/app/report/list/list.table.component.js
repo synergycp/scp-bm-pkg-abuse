@@ -8,10 +8,12 @@
         list: '\^list',
       },
       bindings: {
-        showName: '=?',
-        showReserved: '=?',
-        showIpEntities: '=?',
-        showServers: '=?',
+        showDate: '=?',
+        showIp: '=?',
+        showServer: '=?',
+        showClient: '=?',
+        showUpdated: '=?',
+        showFrom: '=?',
         showActions: '=?',
       },
       controller: 'PkgAbuseReportTableCtrl as table',
@@ -43,10 +45,12 @@
 
     function init() {
       _.defaults(table, {
-        showName: true,
-        showReserved: true,
-        showIpEntities: true,
-        showServers: true,
+        showDate: true,
+        showIp: true,
+        showServer: true,
+        showClient: true,
+        showUpdated: true,
+        showFrom: true,
         showActions: true,
       });
     }
