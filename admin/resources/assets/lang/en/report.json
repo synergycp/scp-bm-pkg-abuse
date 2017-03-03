@@ -12,7 +12,7 @@
         "EMPTY": "No Abuse Reports are currently waiting on client."
       },
       "unknown": {
-        "TITLE": "UNKNOWN",
+        "TITLE": "Unknown",
         "EMPTY": "No Abuse Reports are currently unknown."
       },
       "archive": {

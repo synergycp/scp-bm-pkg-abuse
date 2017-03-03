@@ -42,6 +42,7 @@ extends Transformer
             'server' => $this->itemServer($item),
             'client' => $this->itemClient($item),
             'excerpt' => $this->excerpt($item),
+            'sender' => $item->from,
         ];
 
         if (!$this->viewerIsAdmin()) {
@@ -92,7 +93,6 @@ extends Transformer
         return [
             'from' => 'Original Email',
             'body' => $body,
-            'sender' => $item->from,
         ];
     }
 
