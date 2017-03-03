@@ -27,6 +27,7 @@ class ReportUpdateService extends UpdateService
         $this->setResolved($items);
         $this->setClient($items);
         $this->setServer($items);
+        $this->bulkReply($items);
     }
 
     /**
@@ -95,5 +96,14 @@ class ReportUpdateService extends UpdateService
                 ->reject([$this, 'isCreating'])
                 ->each($createEvent)
         );
+    }
+
+    private function bulkReply(Collection $items)
+    {
+        $inputs = [
+            'comment' => $this->input('comment'),
+        ];
+
+        var_dump($inputs); die();
     }
 }
