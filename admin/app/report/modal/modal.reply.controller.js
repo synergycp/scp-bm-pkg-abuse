@@ -14,9 +14,6 @@
   function PkgAbuseReportModalReplyCtrl(Select, items) {
     var modal = this;
 
-    console.log('select', Select);
-    console.log('items', items);
-
     modal.comment = '';
     modal.submit = submit;
 

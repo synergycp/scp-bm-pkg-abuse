@@ -65,7 +65,9 @@
 
         return modal.result.then(function (result) {
           return list.patch({
-            message: result.message ? result.message : null,
+              client_id: null,
+              server_id: null,
+              comment: result.comment ? result.comment : null,
           }, items);
         });
       }
