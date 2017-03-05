@@ -33,6 +33,7 @@
     },
     "reply": {
       "TITLE": "Reply Abuse Report",
+      "LABEL": "Reply Message",
       "SUBMIT": "Send",
       "CANCEL": "Cancel"
     }

@@ -7,10 +7,10 @@ form(ng-submit="modal.submit()")
       ng-click="modal.$dismiss()"
     ) &times;
 
-    h4.modal-title(data-translate="pkg.abuse.admin.report.modal.reply.TITLE")
+    h4.modal-title(data-translate="pkg.abuse.client.report.modal.reply.TITLE")
 
   .modal-body.form-horizontal
-    +label("{{ 'pkg.abuse.admin.report.modal.reply.LABEL' | translate }}")
+    +label("{{ 'pkg.abuse.client.report.modal.reply.LABEL' | translate }}")
       +textarea.form-control(ng-model="modal.comment")
 
   .modal-footer

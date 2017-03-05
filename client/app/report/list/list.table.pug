@@ -1,6 +1,8 @@
 table(panel-table)
   thead
     tr
+      th.checkbox-col
+        list-check-all
       th.relative Date
         sort(col="date")
       th.relative IP
@@ -15,6 +17,8 @@ table(panel-table)
     ng-repeat="row in table.list.list.items track by row.id"
     list-row-checkable="row"
   )
+    td.checkbox-col
+      list-check-item(checked="row.checked")
     td(date="row.date")
     td(ng-bind="row.addr")
     td
