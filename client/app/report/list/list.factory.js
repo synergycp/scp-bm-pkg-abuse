@@ -20,7 +20,7 @@
        * @ngInject
        */
       function bulkReplyModal(items) {
-        RouteHelpers.loadLang('pkg:abuse:admin:report');
+        RouteHelpers.loadLang('pkg:abuse:client:report');
 
         var modal = $uibModal.open({
           templateUrl: RouteHelpers.trusted(
