@@ -12,6 +12,9 @@ use Illuminate\Support\Collection;
 use Ddeboer\Imap\Message;
 use Ddeboer\Imap\Exception\MessageDoesNotExistException;
 use Ddeboer\Transcoder\Exception\UndetectableEncodingException;
+use App\Entity\LookupService;
+use Carbon\Carbon;
+
 
 class EmailSynchronizer
 {
@@ -49,6 +52,11 @@ class EmailSynchronizer
      */
     protected $ignoreIps;
 
+    /**
+     * @var LookupService
+     */
+    protected $lookup;
+
     public function __construct(Email $email)
     {
         $this->email = $email;
@@ -78,12 +86,14 @@ class EmailSynchronizer
         IpService $ips,
         Log\Factory $log,
         EmailFetcher $emails,
-        ReportService $report
+        ReportService $report,
+        LookupService $lookup
     ) {
         $this->ips = $ips;
         $this->log = $log;
         $this->report = $report;
         $this->emails = $emails;
+        $this->lookup = $lookup;
 
         $this->filterAfterLastSeen();
     }
@@ -187,17 +197,19 @@ class EmailSynchronizer
      */
     private function report(IpAddressRangeContract $addr, Message $mail)
     {
-        $report = $this->report->make($addr);
-        $report->from = (string) $mail->getFrom();
-        $report->body = $mail->getBodyText();
-        $report->msg_id = $mail->getId();
-        $report->msg_num = $mail->getNumber();
-        $report->subject = $mail->getSubject();
-        $report->reported_at = $mail->getDate();
+        if ($this->lookup->addr($addr)) {
+            $report = $this->report->make($addr);
+            $report->from = (string) $mail->getFrom();
+            $report->body = $mail->getBodyText();
+            $report->msg_id = $mail->getId();
+            $report->msg_num = $mail->getNumber();
+            $report->subject = $mail->getSubject();
+            $report->reported_at = $mail->getDate();
 
-        $report->save();
+            $report->save();
 
-        event(new Events\ReportCreated($report));
+            event(new Events\ReportCreated($report));
+        }        
     }
 
     /**
@@ -237,7 +249,7 @@ class EmailSynchronizer
         $latestReport = $this->report->latest();
 
         if ($latestReport) {
-            $this->emails->after($latestReport->date->subSeconds(1));
+            $this->emails->after($latestReport->date->subSeconds(1)->toDateString() < 0 ? Carbon::minValue() : $latestReport->date->subSeconds(1));
         }
     }
 }
