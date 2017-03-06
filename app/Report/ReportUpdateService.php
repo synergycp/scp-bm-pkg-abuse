@@ -4,7 +4,6 @@ namespace Packages\Abuse\App\Report;
 
 use App\Support\Http\UpdateService;
 use Illuminate\Support\Collection;
-use Packages\Abuse\App\Report\Comment\Comment;
 
 class ReportUpdateService extends UpdateService
 {
