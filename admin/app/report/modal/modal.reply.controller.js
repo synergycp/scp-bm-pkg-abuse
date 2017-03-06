@@ -26,7 +26,6 @@
     }
 
     function submit() {
-      console.log('comment', modal.comment)
       return modal.$close({
         comment: modal.comment,
       });

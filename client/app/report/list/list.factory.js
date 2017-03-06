@@ -20,30 +20,43 @@
        * @ngInject
        */
       function bulkReplyModal(items) {
-          RouteHelpers.loadLang('pkg:abuse:admin:report');
+        RouteHelpers.loadLang('pkg:abuse:admin:report');
 
-          var modal = $uibModal.open({
-              templateUrl: RouteHelpers.trusted(
-                  pkg.asset('client/report/modal/modal.reply.html')
-              ),
-              controller: 'PkgAbuseReportModalReplyCtrl',
-              bindToController: true,
-              controllerAs: 'modal',
-              resolve: {
-                  items: _.return(items),
-              },
-          });
+        var modal = $uibModal.open({
+          templateUrl: RouteHelpers.trusted(
+            pkg.asset('client/report/modal/modal.reply.html')
+          ),
+          controller: 'PkgAbuseReportModalReplyCtrl',
+          bindToController: true,
+          controllerAs: 'modal',
+          resolve: {
+            items: _.return(items),
+          },
+        });
 
-          return modal.result.then(function (result) {
-              return list.patch({
-                  client_id: null,
-                  server_id: null,
-                  comment: result.comment ? result.comment : null,
-              }, items);
+        return modal.result.then(function (result) {
+
+          angular.forEach(items, function(item, key) {
+            var comment = RouteHelpers
+              .package('abuse')
+              .api()
+              .all('report')
+              .one(''+item.id)
+              ;
+            comment.post('comment', formComment(result.comment));
           });
+          return true;
+        });
+      }
+
+      function formComment(comment) {
+        return {
+          body: comment,
+        };
       }
 
       return list;
     };
   }
+
 })();

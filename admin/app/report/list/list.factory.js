@@ -64,15 +64,28 @@
         });
 
         return modal.result.then(function (result) {
-          return list.patch({
-              client_id: null,
-              server_id: null,
-              comment: result.comment ? result.comment : null,
-          }, items);
+
+          angular.forEach(items, function(item, key) {
+            var comment = RouteHelpers
+              .package('abuse')
+              .api()
+              .all('report')
+              .one(''+item.id)
+              ;
+            comment.post('comment', formComment(result.comment));
+          });
+          return true;
         });
+      }
+
+      function formComment(comment) {
+        return {
+          body: comment,
+        };
       }
 
       return list;
     };
   }
+
 })();
