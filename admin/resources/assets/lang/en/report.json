@@ -34,6 +34,12 @@
         "LABEL": "Server",
         "PLACEHOLDER": "Type to search..."
       }
+    },
+    "reply": {
+      "TITLE": "Reply To Abuse Report(s)",
+      "LABEL": "Comment",
+      "SUBMIT": "Send",
+      "CANCEL": "Cancel"
     }
   },
   "view": {

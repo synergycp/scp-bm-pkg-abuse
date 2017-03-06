@@ -1,0 +1,25 @@
+include /node_modules/scp-ng-gulp/resources/pug/mixins/form
+
+form(ng-submit="modal.submit()")
+  .modal-header
+    button.close(
+      type="button"
+      ng-click="modal.$dismiss()"
+    ) &times;
+
+    h4.modal-title(data-translate="pkg.abuse.client.report.modal.reply.TITLE")
+
+  .modal-body.form-horizontal
+    +label("{{ 'pkg.abuse.client.report.modal.reply.LABEL' | translate }}")
+      +textarea.form-control(ng-model="modal.comment")
+
+  .modal-footer
+    button.btn.btn-secondary(
+      type="button"
+      ng-click="modal.$dismiss()"
+      data-translate="pkg.abuse.admin.report.modal.reply.CANCEL"
+    )
+    button.btn.btn-primary(
+      type="submit"
+      data-translate="pkg.abuse.admin.report.modal.reply.SUBMIT"
+    )
