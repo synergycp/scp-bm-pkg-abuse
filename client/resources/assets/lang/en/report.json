@@ -28,8 +28,8 @@
       }
     },
     "reply": {
-      "TITLE": "Reply Abuse Report",
-      "LABEL": "Reply Message",
+      "TITLE": "Reply To Abuse Report(s)",
+      "LABEL": "Comment",
       "SUBMIT": "Send",
       "CANCEL": "Cancel"
     }
