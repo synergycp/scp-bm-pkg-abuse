@@ -12,6 +12,9 @@ use Illuminate\Support\Collection;
 use Ddeboer\Imap\Message;
 use Ddeboer\Imap\Exception\MessageDoesNotExistException;
 use Ddeboer\Transcoder\Exception\UndetectableEncodingException;
+use App\Entity\LookupService;
+use Carbon\Carbon;
+
 
 class EmailSynchronizer
 {
@@ -49,6 +52,11 @@ class EmailSynchronizer
      */
     protected $ignoreIps;
 
+    /**
+     * @var LookupService
+     */
+    protected $lookup;
+
     public function __construct(Email $email)
     {
         $this->email = $email;
@@ -78,12 +86,14 @@ class EmailSynchronizer
         IpService $ips,
         Log\Factory $log,
         EmailFetcher $emails,
-        ReportService $report
+        ReportService $report,
+        LookupService $lookup
     ) {
         $this->ips = $ips;
         $this->log = $log;
         $this->report = $report;
         $this->emails = $emails;
+        $this->lookup = $lookup;
 
         $this->filterAfterLastSeen();
     }
@@ -132,6 +142,7 @@ class EmailSynchronizer
         }
 
         $ips = $this->findIpsIn($mail);
+
         $report = function (IpAddressRangeContract $addr) use ($mail) {
             $this->report($addr, $mail);
         };
@@ -151,7 +162,27 @@ class EmailSynchronizer
             return true;
         };
 
-        if ($ips->filter($shouldReport)->each($report)->count()) {
+        $findEnteties = function(IpAddressRangeContract $addr) {
+            if ($this->lookup->addr($addr)) {
+                return true;
+            }
+            return false;
+        };
+
+        $onlyIpAdress = function(IpAddressRangeContract $addr) {
+            return (string) $addr;
+        };
+
+        $ipWithEnteties = $ips->filter($findEnteties)->map($onlyIpAdress);
+
+
+        $shouldEnteties = function(IpAddressRangeContract $addr) use ($ipWithEnteties) {
+            if ($ipWithEnteties->count()) {
+                return $ipWithEnteties->contains((string) $addr) ? true : false; 
+            } else return true;
+        };
+        
+        if ($ips->filter($shouldReport)->filter($shouldEnteties)->each($report)->count()) {
             $this->whenIpFound($mail);
         }
     }
@@ -187,7 +218,7 @@ class EmailSynchronizer
      */
     private function report(IpAddressRangeContract $addr, Message $mail)
     {
-        $report = $this->report->make($addr);
+        $report = $this->report->makeWithEntity($addr, $this->lookup->addr($addr));
         $report->from = (string) $mail->getFrom();
         $report->body = $mail->getBodyText();
         $report->msg_id = $mail->getId();
@@ -237,7 +268,7 @@ class EmailSynchronizer
         $latestReport = $this->report->latest();
 
         if ($latestReport) {
-            $this->emails->after($latestReport->date->subSeconds(1));
+            $this->emails->after($latestReport->date->subSeconds(1)->toDateString() < 0 ? Carbon::minValue() : $latestReport->date->subSeconds(1));
         }
     }
 }
