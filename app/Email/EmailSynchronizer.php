@@ -142,6 +142,7 @@ class EmailSynchronizer
         }
 
         $ips = $this->findIpsIn($mail);
+
         $report = function (IpAddressRangeContract $addr) use ($mail) {
             $this->report($addr, $mail);
         };
@@ -161,7 +162,27 @@ class EmailSynchronizer
             return true;
         };
 
-        if ($ips->filter($shouldReport)->each($report)->count()) {
+        $findEnteties = function(IpAddressRangeContract $addr) {
+            if ($this->lookup->addr($addr)) {
+                return true;
+            }
+            return false;
+        };
+
+        $onlyIpAdress = function(IpAddressRangeContract $addr) {
+            return (string) $addr;
+        };
+
+        $ipWithEnteties = $ips->filter($findEnteties)->map($onlyIpAdress);
+
+
+        $shouldEnteties = function(IpAddressRangeContract $addr) use ($ipWithEnteties) {
+            if ($ipWithEnteties->count()) {
+                return $ipWithEnteties->contains((string) $addr) ? true : false; 
+            } else return true;
+        };
+        
+        if ($ips->filter($shouldReport)->filter($shouldEnteties)->each($report)->count()) {
             $this->whenIpFound($mail);
         }
     }
@@ -197,19 +218,17 @@ class EmailSynchronizer
      */
     private function report(IpAddressRangeContract $addr, Message $mail)
     {
-        if ($this->lookup->addr($addr)) {
-            $report = $this->report->make($addr);
-            $report->from = (string) $mail->getFrom();
-            $report->body = $mail->getBodyText();
-            $report->msg_id = $mail->getId();
-            $report->msg_num = $mail->getNumber();
-            $report->subject = $mail->getSubject();
-            $report->reported_at = $mail->getDate();
+        $report = $this->report->makeWithEntity($addr, $this->lookup->addr($addr));
+        $report->from = (string) $mail->getFrom();
+        $report->body = $mail->getBodyText();
+        $report->msg_id = $mail->getId();
+        $report->msg_num = $mail->getNumber();
+        $report->subject = $mail->getSubject();
+        $report->reported_at = $mail->getDate();
 
-            $report->save();
+        $report->save();
 
-            event(new Events\ReportCreated($report));
-        }        
+        event(new Events\ReportCreated($report));
     }
 
     /**
