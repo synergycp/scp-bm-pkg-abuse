@@ -7,7 +7,7 @@ use App\Client\Server\Models\ClientServer;
 use App\Server\Server;
 use App\Api\Key;
 use Packages\Abuse\App\Report\Report as AbuseReport;
-use App\Support\Test\TestCase;
+use Packages\Testing\App\Test\TestCase;
 
 class ReportControllerTest extends TestCase
 {
@@ -22,9 +22,9 @@ class ReportControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->server = $this->packageFactory('abuse', Server::class)->create();
-        $this->client = $this->packageFactory('abuse', Client::class)->create();
-        $this->report = $this->packageFactory('abuse', AbuseReport::class)->create(['client_id' => $this->client->id, 'server_id' => $this->server->id]);
+        $this->server = $this->factory('abuse', Server::class)->create();
+        $this->client = $this->factory('abuse', Client::class)->create();
+        $this->report = $this->factory('abuse', AbuseReport::class)->create(['client_id' => $this->client->id, 'server_id' => $this->server->id]);
         $this->apiKey = new Key\Key();
         $this->apiKey->owner()->associate($this->client);
         $this->apiKey->save();
@@ -77,28 +77,4 @@ class ReportControllerTest extends TestCase
         $this->server->delete();
         $this->client->delete();
     }
-
-    private function packageFactory()
-    {
-        $arguments = func_get_args();
-        $arguments[0] = __DIR__ . '/../../../../' . $arguments[0] . '/database/factories/';
-
-        if( ! is_dir($arguments[0]) ) {
-            throw new \InvalidArgumentException("Package name is invalid or \"/database/factories/\" is not created: \n");
-        }
-
-        $factory = \Illuminate\Database\Eloquent\Factory::construct(
-            \Faker\Factory::create(),
-            $arguments[0]
-        );
-
-        if( isset($arguments[2]) && is_string($arguments[2]) ) {
-            return $factory->of($arguments[1], $arguments[2])->times(isset($arguments[3]) ? $arguments[3] : 2);
-        } elseif( isset($arguments[2]) ) {
-            return $factory->of($arguments[1])->times($arguments[2]);
-        } else {
-            return $factory->of($arguments[1]);
-        }
-    }
-
 }
