@@ -62,6 +62,12 @@
         "TITLE": "Leave a Comment",
         "SUBMIT": "Post Comment"
       }
+    },
+    "client": {
+      "TOGGLE": "{{ assigned ? 'Reassign Client' : 'Assign Client' }}"
+    },
+    "server": {
+      "TOGGLE": "{{ assigned ? 'Reassign Server' : 'Assign Server' }}"
     }
   }
 }

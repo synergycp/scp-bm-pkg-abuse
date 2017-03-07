@@ -5,10 +5,24 @@ h1(
 
 div(style="margin-bottom: 10px")
   a.btn(
+    style="margin-right: 10px"
     ng-class="vm.report.date_resolved ? 'btn-danger' : 'btn-success'"
     ng-click="vm.toggleResolve()"
     data-translate="pkg.abuse.admin.report.view.resolve.TOGGLE"
     data-translate-value-resolved="{{ vm.report.date_resolved }}"
+  )
+  a.btn(
+    style="margin-right: 10px"
+    ng-class="vm.report.client ? 'btn-danger' : 'btn-success'"
+    ng-click="vm.assignClient()"
+    data-translate="pkg.abuse.admin.report.view.client.TOGGLE"
+    data-translate-value-assigned="{{ vm.report.client }}"
+  )
+  a.btn(
+    ng-class="vm.report.server ? 'btn-danger' : 'btn-success'"
+    ng-click="vm.assignServer()"
+    data-translate="pkg.abuse.admin.report.view.server.TOGGLE"
+    data-translate-value-assigned="{{ vm.report.server }}"
   )
 
 .row
