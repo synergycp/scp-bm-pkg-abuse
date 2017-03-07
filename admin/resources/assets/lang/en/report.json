@@ -44,6 +44,8 @@
       "TITLE": "Overview",
       "DATE": "Date",
       "ADDR": "IP Address",
+      "SERVER": "Server",
+      "CLIENT": "Client",
       "status": {
         "TITLE": "Current Status",
         "RESOLVED": "{{ resolved ? 'Resolved on '+resolved : 'Unresolved'}}"

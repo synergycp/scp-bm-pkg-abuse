@@ -33,6 +33,22 @@ div(style="margin-bottom: 10px")
               data-translate="pkg.abuse.admin.report.view.overview.status.RESOLVED"
               data-translate-value-resolved="{{ vm.report.date_resolved | apiDate }}"
             )
+          tr
+            th(data-translate="pkg.abuse.admin.report.view.overview.SERVER")
+            td
+              a(
+                ng-if="vm.report.server"
+                ui-sref="app.hardware.server.view.manage({ id: vm.report.server.id })"
+                ng-bind="vm.report.server.name"
+              )
+          tr
+            th(data-translate="pkg.abuse.admin.report.view.overview.CLIENT")
+            td
+              a(
+                ng-if="vm.report.client"
+                ui-sref="app.user.client.view({ id: vm.report.client.id })"
+                ng-bind="vm.report.client.name"
+              )
 
     pkg-abuse-report-comments(
       report-id="vm.report.id"
