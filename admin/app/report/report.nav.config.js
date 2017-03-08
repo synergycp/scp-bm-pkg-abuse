@@ -9,43 +9,42 @@
       alertType: 'danger',
       refreshInterval: 10000,
     })
-    .config(NavConfig)
     .run(NavRun)
     ;
 
   /**
    * @ngInject
    */
-  function NavConfig(NavProvider, PkgAbuseReportNav) {
-    NavProvider
-      .group('network')
-      .item(PkgAbuseReportNav)
-      ;
-  }
-
-  /**
-   * @ngInject
-   */
-  function NavRun(PkgAbuseReportNav, $interval, Auth, RouteHelpers) {
+  function NavRun(Nav, PkgAbuseReportNav, $interval, Auth, Permission, RouteHelpers) {
     var $reports = RouteHelpers
       .package('abuse')
       .api()
       .all('report')
       ;
+    var group = Nav.group('network');
     var interval;
 
-    Auth.whileLoggedIn(startChecking, stopChecking);
+    Auth.whileLoggedIn(checkPerms, stopChecking);
 
     ///////////
 
+    function checkPerms() {
+      Permission
+        .ifHas('pkg.abuse.report.read')
+        .then(startChecking)
+      ;
+    }
+
     function startChecking() {
       stopChecking();
+      group.item(PkgAbuseReportNav);
       load();
 
       interval = $interval(load, PkgAbuseReportNav.refreshInterval);
     }
 
     function stopChecking() {
+      group.remove(PkgAbuseReportNav);
       if (interval) {
         $interval.cancel(interval);
       }
