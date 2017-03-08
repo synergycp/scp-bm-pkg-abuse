@@ -194,4 +194,24 @@ class ReportService
         $report->client()->associate($client);
         $report->setPendingClient();
     }
+
+    /**
+     * @param 
+     *
+     *
+     */
+    public function makeWithEntity(IpAddressRangeContract $addr, $entity=null)
+    {
+         // Generate the report.
+        $report = $this->reports->make([
+            'addr' => (string) $addr,
+            'reported_at' => $this->now,
+        ])->setPendingAdmin();
+
+        if ($entity) {
+            $this->setEntity($report, $entity);
+        }
+
+        return $report;
+    }
 }
