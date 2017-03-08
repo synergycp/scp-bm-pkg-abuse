@@ -20,7 +20,7 @@
 
     function loadLang() {
       return RouteHelpers.loadLang(
-        'pkg:abuse:admin:report'
+        'pkg:abuse:client:report'
       );
     }
 
@@ -30,7 +30,7 @@
       return Modal
         .make({
           templateUrl: RouteHelpers.trusted(
-            pkg.asset('admin/report/modal/modal.reply.html')
+            pkg.asset('client/report/modal/modal.reply.html')
           ),
           controller: 'PkgAbuseReportModalReplyCtrl',
           bindToController: true,
@@ -96,7 +96,7 @@
       }];
 
       return Modal
-        .confirm(items, 'pkg.abuse.admin.report.modal.assign', {
+        .confirm(items, 'pkg.abuse.client.report.modal.assign', {
           submitClass: 'btn-info',
         })
         .inputs(inputs)
