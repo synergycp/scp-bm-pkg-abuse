@@ -63,15 +63,9 @@ class ReportService
      */
     public function make(IpAddressRangeContract $addr)
     {
-        // Generate the report.
-        $report = $this->reports->make([
-            'addr' => (string) $addr,
-            'reported_at' => $this->now,
-        ])->setPendingAdmin();
+        $entity = $this->lookup->addr($addr);
 
-        $this->makeRelations($report, $addr);
-
-        return $report;
+        return $this->makeWithEntity($addr, $entity);
     }
 
     /**
@@ -129,22 +123,6 @@ class ReportService
     }
 
     /**
-     * Create relationships on a newly generated Report.
-     * NOTE: Report is not in the database yet.
-     *
-     * @param Report                 $report
-     * @param IpAddressRangeContract $range
-     */
-    private function makeRelations(
-        Report $report,
-        IpAddressRangeContract $range
-    ) {
-        $entity = $this->lookup->addr($range);
-
-        $this->setEntity($report, $entity);
-    }
-
-    /**
      * @param Report      $report
      * @param Entity|null $entity
      */
@@ -196,11 +174,12 @@ class ReportService
     }
 
     /**
-     * @param 
+     * @param IpAddressRangeContract $addr
+     * @param Entity|null                   $entity
      *
-     *
+     * @return mixed
      */
-    public function makeWithEntity(IpAddressRangeContract $addr, $entity=null)
+    public function makeWithEntity(IpAddressRangeContract $addr, $entity = null)
     {
          // Generate the report.
         $report = $this->reports->make([
