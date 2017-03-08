@@ -1,15 +1,5 @@
-h1(
-  translate='pkg.abuse.admin.report.view.title.PAGE'
-  translate-value-date='{{ vm.report.date | apiDate }}'
-)
-
 div(style="margin-bottom: 10px")
-  a.btn(
-    ng-class="vm.report.date_resolved ? 'btn-danger' : 'btn-success'"
-    ng-click="vm.toggleResolve()"
-    data-translate="pkg.abuse.admin.report.view.resolve.TOGGLE"
-    data-translate-value-resolved="{{ vm.report.date_resolved }}"
-  )
+
 
 .row
   .col-md-4
@@ -29,26 +19,41 @@ div(style="margin-bottom: 10px")
             td(ng-bind="vm.report.addr")
           tr
             th(data-translate="pkg.abuse.admin.report.view.overview.status.TITLE")
-            td(
-              data-translate="pkg.abuse.admin.report.view.overview.status.RESOLVED"
-              data-translate-value-resolved="{{ vm.report.date_resolved | apiDate }}"
-            )
-          tr
-            th(data-translate="pkg.abuse.admin.report.view.overview.SERVER")
             td
-              a(
-                ng-if="vm.report.server"
-                ui-sref="app.hardware.server.view.manage({ id: vm.report.server.id })"
-                ng-bind="vm.report.server.name"
+              a.btn.btn-xs.pull-right(
+                ng-class="vm.report.date_resolved ? 'btn-danger' : 'btn-success'"
+                ng-click="vm.toggleResolve()"
+                data-translate="pkg.abuse.admin.report.view.resolve.TOGGLE"
+                data-translate-value-resolved="{{ vm.report.date_resolved }}"
+              )
+              span(
+                data-translate="pkg.abuse.admin.report.view.overview.status.RESOLVED"
+                data-translate-value-resolved="{{ vm.report.date_resolved | apiDate }}"
               )
           tr
             th(data-translate="pkg.abuse.admin.report.view.overview.CLIENT")
-            td
+            td.editable
               a(
                 ng-if="vm.report.client"
                 ui-sref="app.user.client.view({ id: vm.report.client.id })"
                 ng-bind="vm.report.client.name"
               )
+              .btn.btn-default.btn-xs.editable-floater(
+                ng-click="vm.assign()"
+              )
+                span.fa.fa-pencil
+          tr
+            th(data-translate="pkg.abuse.admin.report.view.overview.SERVER")
+            td.editable
+              a(
+                ng-if="vm.report.server"
+                ui-sref="app.hardware.server.view.manage({ id: vm.report.server.id })"
+                ng-bind="vm.report.server.name"
+              )
+              .btn.btn-default.btn-xs.editable-floater(
+                ng-click="vm.assign()"
+              )
+                span.fa.fa-pencil
 
     pkg-abuse-report-comments(
       report-id="vm.report.id"
@@ -62,7 +67,7 @@ div(style="margin-bottom: 10px")
         pre.fill-panel(ng-bind="vm.report.body")
 
     logs(
-      title="Abuse Report Logs"
+      heading="Abuse Report Logs"
       filter="vm.logs.filter"
       listen-to="vm.event"
       show-type="false"

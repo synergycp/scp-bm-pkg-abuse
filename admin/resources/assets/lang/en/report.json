@@ -24,6 +24,7 @@
   "modal": {
     "assign": {
       "TITLE": "Assign Abuse Report",
+      "BODY": "The following Abuse Reports will be updated:",
       "SUBMIT": "Assign",
       "CANCEL": "Cancel",
       "client": {

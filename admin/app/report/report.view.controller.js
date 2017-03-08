@@ -11,42 +11,54 @@
    *
    * @ngInject
    */
-  function ReportViewCtrl(RouteHelpers, $stateParams, _, EventEmitter) {
+  function ReportViewCtrl(RouteHelpers, $state, _, EventEmitter, PkgAbuseReportModal) {
     var vm = this;
-    var $api = RouteHelpers
-      .package('abuse')
+    var pkg = RouteHelpers.package('abuse');
+    var $api = pkg
       .api()
       .all('report')
-      .one(''+$stateParams.id)
+      .one(''+$state.params.id)
       ;
 
     vm.event = EventEmitter();
     vm.report = {
-      id: $stateParams.id,
+      id: $state.params.id,
     };
     vm.logs = {
       filter: {
         target_type: 'pkg.abuse.report',
-        target_id: $stateParams.id,
+        target_id: $state.params.id,
       },
       refresh: refreshLogs,
     };
     vm.toggleResolve = toggleResolve;
+    vm.assign = assign;
 
     activate();
 
     //////////
 
     function activate() {
-      $api.get()
+      refresh();
+    }
+
+    function refresh() {
+      return $api
+        .get()
         .then(storeCurrent)
-        ;
+      ;
     }
 
     function toggleResolve() {
-      return $api.patch({
+      var data = {
         is_resolved: !vm.report.date_resolved,
-      }).then(storeCurrent).then(refreshLogs);
+      };
+
+      return $api
+        .patch(data)
+        .then(storeCurrent)
+        .then(refreshLogs)
+        ;
     }
 
     function refreshLogs() {
@@ -55,6 +67,15 @@
 
     function storeCurrent(curr) {
       _.assign(vm.report, curr);
+
+      return vm.report;
+    }
+
+    function assign() {
+      return PkgAbuseReportModal
+        .assign([vm.report])
+        .then(refresh)
+        ;
     }
   }
 })();

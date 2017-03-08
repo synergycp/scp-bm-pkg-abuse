@@ -41,12 +41,15 @@ class EmailFetcher
     /**
      * @param string $box
      *
-     * @return MessageIterator
+     * @return MessageIterator|void
      */
     public function get($box = 'INBOX')
     {
-        return $this
-            ->connect()
+        if (!$connect = $this->connect()) {
+            return;
+        }
+
+        return $connect
             ->getMailbox($box)
             ->getMessages($this->search)
             ;
@@ -61,17 +64,21 @@ class EmailFetcher
             return $this->connection;
         }
 
-        $settings = app('Settings');
+        $settings = (array) app('Settings');
+
         // if any of the settings are empty then the Fetcher should do nothing.
-        if(empty($settings->pkg_abuse_auth_host) || empty($settings->pkg_abuse_auth_user) || empty($settings->pkg_abuse_auth_pass)) {
+        if (empty($settings['pkg.abuse.auth.host']) ||
+            empty($settings['pkg.abuse.auth.user']) ||
+            empty($settings['pkg.abuse.auth.pass'])
+        ) {
             return;
         }
 
-        $server = new Server($settings->pkg_abuse_auth_host);
+        $server = new Server($settings['pkg.abuse.auth.host']);
 
         return $this->connection = $server->authenticate(
-            $settings->pkg_abuse_auth_user,
-            $settings->pkg_abuse_auth_pass
+            $settings['pkg.abuse.auth.user'],
+            $settings['pkg.abuse.auth.pass']
         );
     }
 }
