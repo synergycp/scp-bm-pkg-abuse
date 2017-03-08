@@ -95,7 +95,7 @@ class EmailSynchronizer
     {
         $iterator = $this->getMessages();
 
-        while ($iterator->valid()) {
+        while ($iterator && $iterator->valid()) {
             $iterator->next();
             try {
                 $this->reportIpsIn(
@@ -163,7 +163,10 @@ class EmailSynchronizer
      */
     private function getMessages()
     {
-        $items = $this->emails->get();
+        if (!$items = $this->emails->get()) {
+            return;
+        }
+
         $forget = function ($msgNum) use ($items) {
             $items->offsetUnset($msgNum);
         };
