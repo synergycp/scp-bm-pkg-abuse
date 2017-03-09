@@ -12,8 +12,7 @@
         "phpspec/phpspec": "~2.1",
         "symfony/dom-crawler": "~3.0",
         "symfony/css-selector": "~3.0",
-        "mockery/mockery": "^0.9.4",
-        "synergycp/scp-package-testing": "~0.1"
+        "mockery/mockery": "^0.9.4"
     },
     "repositories": [],
     "autoload": {

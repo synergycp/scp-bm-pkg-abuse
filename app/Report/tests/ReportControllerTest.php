@@ -22,8 +22,8 @@ class ReportControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->server = $this->factory('abuse', Server::class)->create();
-        $this->client = $this->factory('abuse', Client::class)->create();
+        $this->server = $this->factory('testing', Server::class)->create();
+        $this->client = $this->factory('testing', Client::class)->create();
         $this->report = $this->factory('abuse', AbuseReport::class)->create(['client_id' => $this->client->id, 'server_id' => $this->server->id]);
         $this->apiKey = new Key\Key();
         $this->apiKey->owner()->associate($this->client);
