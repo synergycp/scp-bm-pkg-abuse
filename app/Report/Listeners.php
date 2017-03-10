@@ -32,4 +32,10 @@ return [
         Comment\Listeners\CommentUpdateParent::class,
         Comment\Listeners\CommentEmail::class,
     ],
+    Suspension\Events\ServerSuspend::class => [
+        Suspension\Listeners\SuspendedEmail::class,
+    ],
+    Suspension\Events\ServerSuspendWarning::class => [
+        Suspension\Listeners\SuspendWarningEmail::class,
+    ],
 ];
