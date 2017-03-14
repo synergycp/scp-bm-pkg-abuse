@@ -40,7 +40,7 @@ class SuspendWarningEmail extends Mail\EmailListener
     protected function send(Report $report)
     {
         $settings = app('Settings');
-        $autoSuspension = $settings->auto_suspension;
+        $autoSuspension = $settings->pkg_abuse_auto_suspension;
         $suspensionLastDate = Carbon::now()->subDays($autoSuspension);
 
         $days = $report->created_at->diffInDays($suspensionLastDate);
