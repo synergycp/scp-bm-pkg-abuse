@@ -2,22 +2,17 @@
 
 {block "alert-type"}danger{/block}
 
-{block "alert-message"}Abuse Report Suspended!{/block}
+{block "alert-message"}[ABUSE] Server Suspended!{/block}
 
 {block "body"}
     <tr>
         <td class="content-block">
-            Client - {$client.name},
+            {$client.name},
         </td>
     </tr>
     <tr>
         <td class="content-block">
-            Server - {if $server}, {$server.name|escape}{/if}.
-        </td>
-    </tr>
-    <tr>
-        <td class="content-block">
-            <b>Abuse Report Created Date</b> {$report.date}
+            {$server.name} has been suspended due to an outstanding Abuse Report from {$report.date} that went unanswered.
         </td>
     </tr>
 {/block}
