@@ -17,7 +17,7 @@ class CreateAbuseReportAutoSuspensionEmailTemplates extends Migration
             'abuse_report_suspended.tpl',
             __DIR__.'/stub/abuse_report_suspended.tpl',
             [
-                'subject' => 'Abuse Report Suspended',
+                'subject' => '[ABUSE] Server suspended',
             ]
         );
 
@@ -25,7 +25,7 @@ class CreateAbuseReportAutoSuspensionEmailTemplates extends Migration
             'abuse_report_suspend_warning.tpl',
             __DIR__.'/stub/abuse_report_suspend_warning.tpl',
             [
-                'subject' => 'Abuse Report Suspended Warning',
+                'subject' => '[ABUSE] Upcoming Suspension Warning',
             ]
         );
     }
