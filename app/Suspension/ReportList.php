@@ -48,8 +48,8 @@ class ReportList
         };
 
         Report\Report::with('server')
-                ->pendingClient()
-                ->get()
+            ->pendingClient()
+            ->get()
             ->groupBy('server_id')
             ->map($olderAbuseReport)
             ->filter($vipClientFilter)
