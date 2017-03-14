@@ -20,7 +20,7 @@ class ReportList
     public function get()
     {
         $settings = app('Settings');
-        $autoSuspension = $settings->auto_suspension;
+        $autoSuspension = $settings->pkg_abuse_auto_suspension;
         $suspensionLastDate = Carbon::now()->subDays($autoSuspension)->toDateString();
 
         $olderAbuseReport = function($reports) {
