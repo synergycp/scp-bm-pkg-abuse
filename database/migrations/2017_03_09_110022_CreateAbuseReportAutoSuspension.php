@@ -15,7 +15,7 @@ class CreateAbuseReportAutoSuspension extends Migration
     public function up()
     {
         $group = $this->addSettingGroup('Abuse Reports');
-        $this->addSetting($group, Setting::TYPE_TEXT, 'auto_suspension', [
+        $this->addSetting($group, Setting::TYPE_TEXT, 'pkg.abuse.auto_suspension', [
             'validator' => Setting::VALID_INT,
             'value' => '7',
         ]);
