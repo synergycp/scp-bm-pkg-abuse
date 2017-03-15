@@ -8,7 +8,7 @@
         input.form-control(
           type="text"
           ng-model="vm.search"
-          ng-model-options='{ debounce: 300 }'
+          ng-model-options="{ debounce: 300 }"
           ng-change="vm.searchChange()"
         )
         span.input-group-btn
@@ -41,7 +41,7 @@ br
 .row
   .col-md-6
     logs(
-      title="Report Logs"
+      heading="Report Logs"
       filter="vm.logs.filter"
       listen-to="vm.list"
     )

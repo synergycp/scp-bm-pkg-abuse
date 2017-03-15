@@ -25,6 +25,14 @@ h1(
               data-translate="pkg.abuse.client.report.view.overview.status.RESOLVED"
               data-translate-value-resolved="{{ vm.report.date_resolved | apiDate }}"
             )
+          tr
+            th(data-translate="pkg.abuse.client.report.view.overview.SERVER")
+            td
+              a(
+                ng-if="vm.report.server"
+                ui-sref="app.hardware.server.view.manage({ id: vm.report.server.id })"
+                ng-bind="vm.report.server.name"
+              )
 
     pkg-abuse-report-comments(
       report-id="vm.report.id"

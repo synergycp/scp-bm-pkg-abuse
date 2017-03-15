@@ -24,14 +24,11 @@
           server: ServerManage.getServer().id,
         }),
     };
-    Permission
-      .ifHas('pkg.abuse.report.read')
-      .then(context.list.load)
-    ;
+    context.list.load();
 
     return {
       templateUrl: RouteHelpers.trusted(
-        RouteHelpers.package('abuse').asset('admin/report/manage/manage.panel.html')
+        RouteHelpers.package('abuse').asset('client/report/manage/manage.panel.html')
       ),
       context: context,
     };

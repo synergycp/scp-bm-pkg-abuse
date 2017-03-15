@@ -8,6 +8,7 @@ use App\Entity\Entity;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Packages\Abuse\App\Report\Comment\CommentTransformer;
+use App\Server\ServerFilterService;
 
 class ReportTransformer
 extends Transformer
@@ -16,14 +17,22 @@ extends Transformer
      * @var CommentTransformer
      */
     protected $comment;
+    
+    /**
+     * @var ServerFilterService
+     */
+    protected $serverFilter;
 
     /**
      * @param CommentTransformer $comment
+     * @param ServerFilterService $serverFilter
      */
     public function boot(
-        CommentTransformer $comment
+        CommentTransformer $comment,
+        ServerFilterService $serverFilter
     ) {
         $this->comment = $comment;
+        $this->serverFilter = $serverFilter;
     }
 
     /**
@@ -62,16 +71,18 @@ extends Transformer
      * @return array
      * @throws \App\Api\Exceptions\ApiKeyNotFound
      */
+
     protected function itemPreload($items)
     {
         $preload = collect([
             'client',
-            'server',
             'lastComment.author',
             $this->viewerIsAdmin() ? 'entity' : null,
         ])->filter()->all();
 
-        return $items->load($preload);
+        return $items->load(['server' => function($query) {
+            $this->serverFilter->viewable($query->getQuery());
+        } ])->load($preload);
     }
 
     /**
@@ -170,4 +181,5 @@ extends Transformer
             'report' => $this->resource($item),
         ];
     }
+
 }

@@ -17,7 +17,8 @@
     $state,
     $uibModal,
     $stateParams,
-    RouteHelpers
+    RouteHelpers,
+    PkgAbuseReportList
   ) {
     var vm = this;
     var pkg = RouteHelpers.package('abuse');
@@ -111,18 +112,12 @@
       }
     }
 
-    function setupList(isArchive) {
-      var list = List(pkg.api().all('report'));
-
-      return list;
-    }
-
     function Tab(trans, filters) {
       var tab = this;
       filters = filters || {};
 
       tab.text = trans;
-      tab.list = setupList(filters.archive).filter(filters);
+      tab.list = PkgAbuseReportList(filters.archive).filter(filters);
       tab.list.on('change', function () {
         _(vm.tabs.items)
           .without(tab)
