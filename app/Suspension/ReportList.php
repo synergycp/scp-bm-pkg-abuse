@@ -26,6 +26,7 @@ class ReportList
         };
 
         $vipClientFilter = function(Report\Report $report) {
+
             if (!$server = $report->server) {
                 return false;
             }
@@ -58,6 +59,8 @@ class ReportList
             ->map($olderAbuseReport)
             ->filter($vipClientFilter)
             ->each($suspension)
+            ->count()
         ;
+
     }
 }

@@ -5,7 +5,6 @@ namespace Packages\Abuse\App\Report\Suspension\Listeners;
 use Packages\Abuse\App\Report\Suspension\Events;
 use Packages\Abuse\App\Report\Report;
 use App\Mail;
-use Carbon\Carbon;
 
 /**
  * Send out an Email when Server suspended.
@@ -37,6 +36,7 @@ class SuspendWarningEmail extends Mail\EmailListener
             'server' => $report->server->expose('name'),
             'report' => [
                 'id' => $report->id,
+                'date' => $report->created_at->toDateString()
             ],
             'days' => $days
         ];

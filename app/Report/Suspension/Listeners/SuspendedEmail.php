@@ -27,7 +27,6 @@ class SuspendedEmail extends Mail\EmailListener
      */
     protected function send(Report $report)
     {
-        dd($report->server);
         $client = $report->server->access->client;
         $context = [
             'client' => $client->expose('name'),

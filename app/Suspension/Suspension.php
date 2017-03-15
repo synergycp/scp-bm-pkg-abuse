@@ -4,6 +4,7 @@ namespace Packages\Abuse\App\Suspension;
 
 use Packages\Abuse\App\Report;
 use App\Client\Server\ClientServerAccessService;
+use Carbon\Carbon;
 
 class Suspension {
 
