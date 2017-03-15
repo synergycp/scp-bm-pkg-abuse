@@ -8,10 +8,11 @@
         list: '\^list',
       },
       bindings: {
-        showName: '=?',
-        showReserved: '=?',
-        showIpEntities: '=?',
-        showServers: '=?',
+        showDate: '=?',
+        showIp: '=?',
+        showServer: '=?',
+        showClient: '=?',
+        showUpdated: '=?',
         showFrom: '=?',
         showActions: '=?',
       },
@@ -20,7 +21,7 @@
       templateUrl: templateUrl,
     })
     .controller('PkgAbuseReportTableCtrl', PkgAbuseReportTableCtrl)
-    ;
+  ;
 
   /**
    * @ngInject
@@ -28,7 +29,7 @@
   function templateUrl(RouteHelpers) {
     return RouteHelpers
       .package('abuse')
-      .asset('client/report/list/list.table.html')
+      .trustedAsset('client/report/list/list.table.html')
       ;
   }
 
@@ -44,10 +45,10 @@
 
     function init() {
       _.defaults(table, {
-        showName: true,
-        showReserved: true,
-        showIpEntities: true,
-        showServers: true,
+        showDate: true,
+        showIp: true,
+        showServer: true,
+        showUpdated: true,
         showFrom: true,
         showActions: true,
       });
