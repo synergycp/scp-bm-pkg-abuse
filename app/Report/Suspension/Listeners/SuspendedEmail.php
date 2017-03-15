@@ -11,17 +11,6 @@ use App\Mail;
  */
 class SuspendedEmail extends Mail\EmailListener
 {
-
-    /**
-     * @param Mail\Mailer $mail
-     */
-    public function __construct(
-        Mail\Mailer $mail
-    ) {
-        parent::__construct($mail);
-
-    }
-
     /**
      * Handle the event.
      *

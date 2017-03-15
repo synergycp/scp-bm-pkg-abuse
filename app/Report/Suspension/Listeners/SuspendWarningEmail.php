@@ -12,17 +12,6 @@ use Carbon\Carbon;
  */
 class SuspendWarningEmail extends Mail\EmailListener
 {
-
-    /**
-     * @param Mail\Mailer $mail
-     */
-    public function __construct(
-        Mail\Mailer $mail
-    ) {
-        parent::__construct($mail);
-
-    }
-
     /**
      * Handle the event.
      *
@@ -31,19 +20,16 @@ class SuspendWarningEmail extends Mail\EmailListener
     public function handle(Events\ServerSuspendWarning $event)
     {
         $report = $event->report;
-        $this->send($report);
+        $maxReportDate = $event->maxReportDate;
+        $this->send($report, $maxReportDate);
     }
 
     /**
      * @param Report $report
      */
-    protected function send(Report $report)
+    protected function send(Report $report, $maxReportDate)
     {
-        $settings = app('Settings');
-        $autoSuspension = $settings->pkg_abuse_auto_suspension;
-        $suspensionLastDate = Carbon::now()->subDays($autoSuspension);
-
-        $days = $report->created_at->diffInDays($suspensionLastDate);
+        $days = $report->created_at->diffInDays($maxReportDate);
 
         $client = $report->server->access->client;
         $context = [

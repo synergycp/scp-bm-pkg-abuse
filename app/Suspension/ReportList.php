@@ -19,32 +19,36 @@ class ReportList
      */
     public function get()
     {
-        $settings = app('Settings');
-        $autoSuspension = $settings->pkg_abuse_auto_suspension;
-        $suspensionLastDate = Carbon::now()->subDays($autoSuspension)->toDateString();
+        $suspensionLastDate = $this->suspension->maxReportDate()->toDateString();
 
         $olderAbuseReport = function($reports) {
             return collect($reports)->where('created_at', collect($reports)->min('created_at'))->first();
         };
 
         $vipClientFilter = function(Report\Report $report) {
-            if ($report->server) {
-                if ($report->server->access) {
-                    return $report->server->access->client->billing_ignore_auto_suspend ? false : true;
-                }
+            if (!$server = $report->server) {
                 return false;
             }
-            return false;
+
+            if (!$access = $server->access) {
+                return false;
+            }
+
+            if ($access->is_suspended) {
+                return false;
+            }
+
+            return !$access->client->billing_ignore_auto_suspend;
         };
 
         $suspension = function(Report\Report $report) use ($suspensionLastDate) {
             if ($report->created_at->toDateString() <= $suspensionLastDate) {
                 // suspend & send suspended message
                 $this->suspension->suspendServer($report);
-            } else {
-                // send suspend warning message
-                $this->suspension->suspendWarning($report);
+                return;
             }
+            // send suspend warning message
+            $this->suspension->suspendWarning($report);
         };
 
         Report\Report::with('server')
