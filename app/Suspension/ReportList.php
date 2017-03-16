@@ -4,14 +4,18 @@ namespace Packages\Abuse\App\Suspension;
 
 use Packages\Abuse\App\Report;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use App\Server\ServerRepository;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ReportList
 {
     private $suspension;
 
-    public function __construct(Suspension $suspension)
+    public function __construct(Suspension $suspension, ServerRepository $server)
     {
         $this->suspension = $suspension;
+        $this->server = $server;
     }
 
     /**
@@ -21,46 +25,55 @@ class ReportList
     {
         $suspensionLastDate = $this->suspension->maxReportDate()->toDateString();
 
-        $olderAbuseReport = function($reports) {
-            return collect($reports)->where('created_at', collect($reports)->min('created_at'))->first();
+        $vipClientFilter = function($report) {
+
+            try {
+                $server = $this->server->findOrFail($report->server_id)->load('access.client');
+
+                if (!$access = $server->access) {
+                    return false;
+                }
+
+                if ($access->is_suspended) {
+                    return false;
+                }
+
+                return !$access->client->billing_ignore_auto_suspend;
+
+            } catch (NotFoundHttpException $exception) {
+                return false;
+            }
+
         };
 
-        $vipClientFilter = function(Report\Report $report) {
+        $suspension = function($report) use ($suspensionLastDate) {
 
-            if (!$server = $report->server) {
-                return false;
-            }
+            $server = $this->server->findOrFail($report->server_id)->load('access.client');
 
-            if (!$access = $server->access) {
-                return false;
-            }
-
-            if ($access->is_suspended) {
-                return false;
-            }
-
-            return !$access->client->billing_ignore_auto_suspend;
-        };
-
-        $suspension = function(Report\Report $report) use ($suspensionLastDate) {
             if ($report->created_at->toDateString() <= $suspensionLastDate) {
                 // suspend & send suspended message
-                $this->suspension->suspendServer($report);
+                $this->suspension->suspendServer($server, $report->server->created_at);
                 return;
             }
             // send suspend warning message
-            $this->suspension->suspendWarning($report);
+            $this->suspension->suspendWarning($server, $report->server->created_at);
         };
 
-        Report\Report::with('server')
+        $reportModel = new Report\Report();
+        Report\Report::whereNotNull('server_id')
             ->pendingClient()
-            ->get()
+            ->where('created_at', function($query) use ($reportModel) {
+                $query
+                    ->select( DB::raw('min(created_at)') )
+                    ->from(DB::raw($reportModel->getTable() . ' ar2'))
+                    ->whereRaw($reportModel->getTable() . '.server_id = ar2.server_id')
+                ;
+            })
             ->groupBy('server_id')
-            ->map($olderAbuseReport)
+            ->select('server_id', 'created_at')
+            ->get()
             ->filter($vipClientFilter)
             ->each($suspension)
-            ->count()
         ;
-
     }
 }

@@ -2,21 +2,22 @@
 
 namespace Packages\Abuse\App\Report\Suspension\Events;
 
-use Packages\Abuse\App\Report\Events\ReportEvent;
+use App\Server\Server;
 
-class ServerSuspendWarning extends ReportEvent
+class ServerSuspendWarning extends SuspensionEvent
 {
     /**
      * Max report date
      */
     public $maxReportDate;
 
+
     /**
      * Create a new event instance.
      */
-    public function __construct($report, $maxReportDate)
+    public function __construct(Server $server, $createdDate, $maxReportDate)
     {
         $this->maxReportDate = $maxReportDate;
-        return parent::__construct($report);
+        return parent::__construct($server, $createdDate);
     }
 }

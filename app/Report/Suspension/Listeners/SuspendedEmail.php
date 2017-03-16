@@ -3,7 +3,7 @@
 namespace Packages\Abuse\App\Report\Suspension\Listeners;
 
 use Packages\Abuse\App\Report\Suspension\Events;
-use Packages\Abuse\App\Report\Report;
+use App\Server\Server;
 use App\Mail;
 
 /**
@@ -18,22 +18,22 @@ class SuspendedEmail extends Mail\EmailListener
      */
     public function handle(Events\ServerSuspend $event)
     {
-        $report = $event->report;
-        $this->send($report);
+        $server = $event->server;
+        $createdDate = $event->createdDate;
+        $this->send($server, $createdDate);
     }
 
     /**
      * @param Report $report
      */
-    protected function send(Report $report)
+    protected function send(Server $server, $createdDate)
     {
-        $client = $report->server->access->client;
+        $client = $server->access->client;
         $context = [
             'client' => $client->expose('name'),
-            'server' => $report->server->expose('name'),
+            'server' => $server->expose('name'),
             'report' => [
-                'id' => $report->id,
-                'date' => $report->created_at->toDateString()
+                'date' => $createdDate->toDateString()
             ]
         ];
 

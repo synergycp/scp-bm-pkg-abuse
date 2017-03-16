@@ -3,7 +3,7 @@
 namespace Packages\Abuse\App\Report\Suspension\Listeners;
 
 use Packages\Abuse\App\Report\Suspension\Events;
-use Packages\Abuse\App\Report\Report;
+use App\Server\Server;
 use App\Mail;
 
 /**
@@ -18,25 +18,25 @@ class SuspendWarningEmail extends Mail\EmailListener
      */
     public function handle(Events\ServerSuspendWarning $event)
     {
-        $report = $event->report;
+        $server = $event->server;
         $maxReportDate = $event->maxReportDate;
-        $this->send($report, $maxReportDate);
+        $createdDate = $event->createdDate;
+        $this->send($server, $createdDate, $maxReportDate);
     }
 
     /**
-     * @param Report $report
+     * @param Server $server, Report created_at, pkg_abuse_auto_suspension
      */
-    protected function send(Report $report, $maxReportDate)
+    protected function send(Server $server, $createdDate, $maxReportDate)
     {
-        $days = $report->created_at->diffInDays($maxReportDate);
+        $days = $createdDate->diffInDays($maxReportDate);
 
-        $client = $report->server->access->client;
+        $client = $server->access->client;
         $context = [
             'client' => $client->expose('name'),
-            'server' => $report->server->expose('name'),
+            'server' => $server->expose('name'),
             'report' => [
-                'id' => $report->id,
-                'date' => $report->created_at->toDateString()
+                'date' => $createdDate->toDateString()
             ],
             'days' => $days
         ];

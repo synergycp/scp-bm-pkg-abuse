@@ -2,9 +2,10 @@
 
 namespace Packages\Abuse\App\Suspension;
 
-use Packages\Abuse\App\Report;
+use Packages\Abuse\App\Report\Suspension\Events;
 use App\Client\Server\ClientServerAccessService;
 use Carbon\Carbon;
+use App\Server\Server;
 
 class Suspension {
 
@@ -15,15 +16,15 @@ class Suspension {
         $this->access = $access;
     }
 
-    public function suspendServer(Report\Report $report)
+    public function suspendServer(Server $server, $created_at)
     {
-        $this->access->suspend($report->server->access);
-        event(new Report\Suspension\Events\ServerSuspend($report));
+        $this->access->suspend($server->access);
+        event(new Events\ServerSuspend($server, $created_at));
     }
 
-    public function suspendWarning(Report\Report $report)
+    public function suspendWarning(Server $server, $created_at)
     {
-        event(new Report\Suspension\Events\ServerSuspendWarning($report, $this->maxReportDate()));
+        event(new Events\ServerSuspendWarning($server, $created_at, $this->maxReportDate()));
     }
 
     public function maxReportDate()
