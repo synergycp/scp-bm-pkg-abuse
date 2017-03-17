@@ -6,7 +6,7 @@ use Packages\Abuse\App\Report\Suspension;
 use App\Support\Event;
 use App\Support\Database\SerializesModels;
 use App\Server\Server;
-
+use Carbon\Carbon;
 
 abstract class SuspensionEvent extends Event
 {
@@ -25,7 +25,7 @@ abstract class SuspensionEvent extends Event
     /**
      * Create a new event instance.
      */
-    public function __construct(Server $server, $createdDate)
+    public function __construct(Server $server, Carbon $createdDate)
     {
         $this->server = $server;
         $this->createdDate = $createdDate;

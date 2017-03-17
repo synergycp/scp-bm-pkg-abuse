@@ -25,42 +25,8 @@ class ReportList
     {
         $suspensionLastDate = $this->suspension->maxReportDate()->toDateString();
 
-        $vipClientFilter = function($report) {
-
-            try {
-                $server = $this->server->findOrFail($report->server_id)->load('access.client');
-
-                if (!$access = $server->access) {
-                    return false;
-                }
-
-                if ($access->is_suspended) {
-                    return false;
-                }
-
-                return !$access->client->billing_ignore_auto_suspend;
-
-            } catch (NotFoundHttpException $exception) {
-                return false;
-            }
-
-        };
-
-        $suspension = function($report) use ($suspensionLastDate) {
-
-            $server = $this->server->findOrFail($report->server_id)->load('access.client');
-
-            if ($report->created_at->toDateString() <= $suspensionLastDate) {
-                // suspend & send suspended message
-                $this->suspension->suspendServer($server, $report->server->created_at);
-                return;
-            }
-            // send suspend warning message
-            $this->suspension->suspendWarning($server, $report->server->created_at);
-        };
-
         $reportModel = new Report\Report();
-        Report\Report::whereNotNull('server_id')
+        $reports = Report\Report::whereNotNull('server_id')
             ->pendingClient()
             ->where('created_at', function($query) use ($reportModel) {
                 $query
@@ -72,6 +38,44 @@ class ReportList
             ->groupBy('server_id')
             ->select('server_id', 'created_at')
             ->get()
+        ;
+
+        $servers = $this->server->find($reports->pluck('server_id')->all())->keyBy('id');
+
+        $vipClientFilter = function($report) use ($servers) {
+
+            if (!isset($servers[$report->server_id])) {
+                return false;
+            }
+
+            $server = $servers[$report->server_id]->load('access.client');
+
+            if (!$access = $server->access) {
+                return false;
+            }
+
+            if ($access->is_suspended) {
+                return false;
+            }
+
+            return !$access->client->billing_ignore_auto_suspend;
+
+        };
+
+        $suspension = function($report) use ($suspensionLastDate, $servers) {
+
+            $server = $servers[$report->server_id]->load('access.client');
+
+            if ($report->created_at->toDateString() <= $suspensionLastDate) {
+                // suspend & send suspended message
+                $this->suspension->suspendServer($server, $report->created_at);
+                return;
+            }
+            // send suspend warning message
+            $this->suspension->suspendWarning($server, $report->created_at);
+        };
+
+        $reports
             ->filter($vipClientFilter)
             ->each($suspension)
         ;

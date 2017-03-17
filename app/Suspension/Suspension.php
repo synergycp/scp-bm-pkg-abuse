@@ -16,15 +16,15 @@ class Suspension {
         $this->access = $access;
     }
 
-    public function suspendServer(Server $server, $created_at)
+    public function suspendServer(Server $server, Carbon $createdAt)
     {
         $this->access->suspend($server->access);
-        event(new Events\ServerSuspend($server, $created_at));
+        event(new Events\ServerSuspend($server, $createdAt));
     }
 
-    public function suspendWarning(Server $server, $created_at)
+    public function suspendWarning(Server $server, Carbon $createdAt)
     {
-        event(new Events\ServerSuspendWarning($server, $created_at, $this->maxReportDate()));
+        event(new Events\ServerSuspendWarning($server, $createdAt));
     }
 
     public function maxReportDate()
