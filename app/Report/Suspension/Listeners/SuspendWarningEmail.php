@@ -6,6 +6,7 @@ use Packages\Abuse\App\Report\Suspension\Events;
 use App\Server\Server;
 use App\Mail;
 use Carbon\Carbon;
+use Packages\Abuse\App\Suspension\Suspension;
 
 /**
  * Send out an Email when Server suspended.
@@ -13,6 +14,22 @@ use Carbon\Carbon;
 class SuspendWarningEmail
     extends Mail\EmailListener
 {
+
+    private $suspension;
+
+    /**
+     * @param Mail\Mailer   $mail
+     * @param Suspension    $suspension
+     */
+    public function __construct(
+        Mail\Mailer $mail,
+        Suspension $suspension
+    ) {
+        parent::__construct($mail);
+
+        $this->suspension = $suspension;
+    }
+
     /**
      * Handle the event.
      *
@@ -30,8 +47,7 @@ class SuspendWarningEmail
      */
     protected function send(Server $server, Carbon $createdDate)
     {
-        $settings = app('Settings');
-        $date = Carbon::now()->subDays($settings->pkg_abuse_auto_suspension);
+        $date = $date = $this->suspension->maxReportDate();
         $days = $createdDate->diffInDays($date);
 
         $client = $server->access->client;

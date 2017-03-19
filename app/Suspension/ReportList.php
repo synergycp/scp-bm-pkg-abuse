@@ -40,7 +40,7 @@ class ReportList
             ->get()
         ;
 
-        $servers = $this->server->find($reports->pluck('server_id')->all())->keyBy('id');
+        $servers = $this->server->find($reports->pluck('server_id')->all())->load('access.client')->keyBy('id');
 
         $vipClientFilter = function($report) use ($servers) {
 
@@ -48,7 +48,7 @@ class ReportList
                 return false;
             }
 
-            $server = $servers[$report->server_id]->load('access.client');
+            $server = $servers[$report->server_id];
 
             if (!$access = $server->access) {
                 return false;
@@ -64,7 +64,7 @@ class ReportList
 
         $suspension = function($report) use ($suspensionLastDate, $servers) {
 
-            $server = $servers[$report->server_id]->load('access.client');
+            $server = $servers[$report->server_id];
 
             if ($report->created_at->toDateString() <= $suspensionLastDate) {
                 // suspend & send suspended message
