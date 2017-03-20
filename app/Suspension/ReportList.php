@@ -25,18 +25,10 @@ class ReportList
     {
         $suspensionLastDate = $this->suspension->maxReportDate()->toDateString();
 
-        $reportModel = new Report\Report();
         $reports = Report\Report::whereNotNull('server_id')
+            ->select('server_id', DB::raw('min(created_at) as created_at'))
             ->pendingClient()
-            ->where('created_at', function($query) use ($reportModel) {
-                $query
-                    ->select( DB::raw('min(created_at)') )
-                    ->from(DB::raw($reportModel->getTable() . ' ar2'))
-                    ->whereRaw($reportModel->getTable() . '.server_id = ar2.server_id')
-                ;
-            })
             ->groupBy('server_id')
-            ->select('server_id', 'created_at')
             ->get()
         ;
 

@@ -17,16 +17,8 @@ class SuspendWarningEmail
 
     private $suspension;
 
-    /**
-     * @param Mail\Mailer   $mail
-     * @param Suspension    $suspension
-     */
-    public function __construct(
-        Mail\Mailer $mail,
-        Suspension $suspension
-    ) {
-        parent::__construct($mail);
-
+    public function boot(Suspension $suspension)
+    {
         $this->suspension = $suspension;
     }
 
