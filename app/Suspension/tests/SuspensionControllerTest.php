@@ -11,126 +11,154 @@ use Packages\Abuse\App\Report\Report as AbuseReport;
 use Packages\Abuse\App\Suspension\Suspension;
 use App\Hub;
 use App\Group\Group;
+use Packages\Abuse\App\Report\Report;
 
-use \App\Support\Test\TestCase;
+use App\Server\ServerRepository;
+use Mockery;
+use Carbon\Carbon;
+use Packages\Abuse\App\Suspension\SuspensionSync;
+use Illuminate\Database\Query\Builder;
+use Packages\Abuse\App\Report\ReportRepository;
+
+use Packages\Testing\App\Test\TestCase;
 
 class SuspensionControllerTest
     extends TestCase
 {
-    protected $clientWarning;
-    protected $serverWarning;
-    protected $reportWarning;
-    protected $clientSuspend;
-    protected $serverSuspend;
-    protected $reportSuspend;
-    protected $clientServerWarning;
-    protected $clientServerSuspend;
+    protected $client;
+    protected $server;
+    protected $report;
+    protected $clientServer;
     protected $url = 'api/pkg/abuse/report';
     protected $apiKey;
     protected $suspension;
     protected $testCase;
 
-    protected $hubWarning;
-    protected $hubPortWarning;
-    protected $groupWarning;
-    protected $serverPortWarning;
+    protected $hub;
+    protected $hubPort;
+    protected $group;
+    protected $serverPort;
 
-    protected $hubSuspend;
-    protected $hubPortSuspend;
-    protected $groupSuspend;
-    protected $serverPortSuspend;
+    protected $suspensionSync;
 
-    public function boot(\Packages\Testing\App\Test\TestCase $testCase, Suspension $suspension)
+
+    public function boot(Suspension $suspension, SuspensionSync $suspensionSync)
     {
-        $this->testCase = $testCase;
         $this->suspension = $suspension;
+        $this->suspensionSync = $suspensionSync;
     }
     public function setUp()
     {
         parent::setUp();
 
-        // Warning generation
-        $this->serverWarning = $this->testCase->factory('testing', Server\Server::class)->create();
-        $this->clientWarning = $this->testCase->factory('testing', Client::class)->create();
-        $this->reportWarning = $this->testCase->factory('abuse', AbuseReport::class)->create(['pending_type' => 0, 'client_id' => $this->clientWarning->id, 'server_id' => $this->serverWarning->id, 'created_at' => $this->suspension->maxReportDate()->addDay()]);
-        $this->clientServerWarning = new ClientServer();
-        $this->clientServerWarning
+        $this->server = $this->factory('testing', Server\Server::class)->create();
+        $this->client = $this->factory('testing', Client::class)->create();
+        $this->clientServer = new ClientServer();
+        $this->clientServer
             ->client()
-            ->associate($this->clientWarning)
+            ->associate($this->client)
             ->server()
-            ->associate($this->serverWarning)
+            ->associate($this->server)
             ->save()
         ;
 
-        $this->hubWarning = $this->testCase->factory('testing', Hub\Hub::class)->create();
-        $this->hubPortWarning = $this->testCase->factory('testing', Hub\Port\Port::class)->create(['hub_id' => $this->hubWarning->id]);
-        $this->groupWarning = $this->testCase->factory('testing', Group::class)->create();
-        $this->hubWarning->groups()->attach($this->groupWarning);
-        $this->serverPortWarning = $this->testCase->factory('testing', Server\Port\Port::class)->create(['group_id' => $this->groupWarning->id, 'server_id' => $this->serverWarning->id, 'hub_port_id' => $this->hubPortWarning->id]);
+        $this->hub = $this->factory('testing', Hub\Hub::class)->create();
+        $this->hubPort = $this->factory('testing', Hub\Port\Port::class)->create(['hub_id' => $this->hub->id]);
+        $this->group = $this->factory('testing', Group::class)->create();
+        $this->hub->groups()->attach($this->group);
+        $this->serverPort = $this->factory('testing', Server\Port\Port::class)->create(['group_id' => $this->group->id, 'server_id' => $this->server->id, 'hub_port_id' => $this->hubPort->id]);
 
-        // Suspend generation
-        $this->serverSuspend = $this->testCase->factory('testing', Server\Server::class)->create();
-        $this->clientSuspend = $this->testCase->factory('testing', Client::class)->create();
-        $this->reportSuspend = $this->testCase->factory('abuse', AbuseReport::class)->create(['pending_type' => 0, 'client_id' => $this->clientSuspend->id, 'server_id' => $this->serverSuspend->id, 'created_at' => $this->suspension->maxReportDate()->subDay()]);
-        $this->clientServerSuspend = new ClientServer();
-        $this->clientServerSuspend
-            ->client()
-            ->associate($this->clientSuspend)
-            ->server()
-            ->associate($this->serverSuspend)
-            ->save()
-        ;
-
-        $this->hubSuspend = $this->testCase->factory('testing', Hub\Hub::class)->create();
-        $this->hubPortSuspend = $this->testCase->factory('testing', Hub\Port\Port::class)->create(['hub_id' => $this->hubSuspend->id]);
-        $this->groupSuspend = $this->testCase->factory('testing', Group::class)->create();
-        $this->hubSuspend->groups()->attach($this->groupSuspend);
-        $this->serverPortSuspend = $this->testCase->factory('testing', Server\Port\Port::class)->create(['group_id' => $this->groupSuspend->id, 'server_id' => $this->serverSuspend->id, 'hub_port_id' => $this->hubPortSuspend->id]);
-
-
-        \Artisan::call('abuse:suspension');
     }
 
     public function testSuspend()
     {
-        if ($this->clientServerSuspend->find($this->clientServerSuspend->id)->suspensions) {
-            $this->assertTrue(true);
-            return;
-        }
-        $this->assertTrue(true);
-
+        $this->reportCreate('subDay', $this->server->fresh());
+        $this->suspensionSync->sync();
+        $this->assertEquals(1, $this->clientServer->fresh()->suspensions);
     }
 
     public function testWarning()
     {
-        if (!$this->serverPortWarning->find($this->serverPortWarning->id)->suspensions) {
-            $this->assertTrue(true);
-            return;
-        }
-        $this->assertTrue(false);
+        $this->reportCreate('addDay', $this->server->fresh());
+        $this->suspensionSync->sync();
+        $this->assertEquals(0, $this->clientServer->fresh()->suspensions);
+    }
+
+    private function reportCreate($day='addDay', Server\Server $server)
+    {
+        $this->report = $this->factory('abuse', AbuseReport::class)->create(['pending_type' => 0, 'client_id' => $this->client->id, 'server_id' => $this->server->id, 'created_at' => $this->suspension->maxReportDate()->$day()]);
+        $maxReportDate = Carbon::now();
+        $suspension = Mockery::mock(Suspension::class);
+
+        $suspension
+            ->shouldReceive('maxReportDate')
+            ->andReturn($maxReportDate)
+        ;
+
+        $suspension
+            ->shouldReceive('suspendServer')
+            ->with($server, $this->report->created_at)
+            ->andReturn(true)
+        ;
+
+        $suspension
+            ->shouldReceive('suspendWarning')
+            ->with($server, $this->report->created_at)
+            ->andReturn(true)
+        ;
+
+        $reportItem = Mockery::mock(Report::class, ['server_id' => $server->id, 'created_at' => $this->report->created_at]);
+
+        $reports = Mockery::mock(ReportRepository::class);
+        $query = Mockery::mock(Builder::class);
+        $reports
+            ->shouldReceive('query')
+            ->andReturn($query)
+        ;
+
+        $reports
+            ->shouldReceive('whereNotNull')
+            ->andReturn($query)
+        ;
+
+        $reports
+            ->shouldReceive('select')
+            ->andReturn($query)
+        ;
+
+        $reports
+            ->shouldReceive('pendingClient')
+            ->andReturn($query)
+        ;
+
+        $reports
+            ->shouldReceive('groupBy')
+            ->andReturn($query)
+        ;
+
+        $reports
+            ->shouldReceive('get')
+            ->andReturn($reportItem)
+        ;
+
+        $serverRepository = Mockery::mock(ServerRepository::class);
+        $serverRepository
+            ->shouldReceive('find')
+            ->andReturn(collect($server))
+            ;
     }
 
     public function tearDown()
     {
-        $this->clientServerSuspend->delete();
-        $this->clientServerWarning->delete();
-        $this->reportSuspend->delete();
-        $this->reportWarning->delete();
-        $this->serverSuspend->delete();
-        $this->serverWarning->delete();
-        $this->clientSuspend->delete();
-        $this->clientWarning->delete();
-
-        $this->serverPortSuspend->delete();
-        $this->hubSuspend->groups()->detach($this->groupSuspend);
-        $this->serverPortSuspend->delete();
-        $this->hubPortSuspend->delete();
-        $this->groupSuspend->delete();
-
-        $this->serverPortWarning->delete();
-        $this->hubWarning->groups()->detach($this->groupWarning);
-        $this->serverPortWarning->delete();
-        $this->hubPortWarning->delete();
-        $this->groupWarning->delete();
+        Mockery::close();
+        $this->clientServer->delete();
+        $this->report->delete();
+        $this->server->delete();
+        $this->client->delete();
+        $this->serverPort->delete();
+        $this->hub->groups()->detach($this->group);
+        $this->serverPort->delete();
+        $this->hubPort->delete();
+        $this->group->delete();
     }
 }

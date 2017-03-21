@@ -9,16 +9,16 @@ class SuspensionServerCommand
     extends Command
 {
     /**
-     * @var Suspension\ReportList
+     * @var Suspension\SuspensionSync
      */
-    protected $report;
+    protected $suspension;
 
     /**
-     * @param Suspension\ReportList $report
+     * @param Suspension\SuspensionSync $suspension
      */
-    public function boot(Suspension\ReportList $report)
+    public function boot(Suspension\SuspensionSync $suspension)
     {
-        $this->report = $report;
+        $this->suspension = $suspension;
     }
 
     /**
@@ -38,6 +38,6 @@ class SuspensionServerCommand
     public function handle()
     {
         $this->info('Check servers...');
-        $this->report->get();
+        $this->suspension->sync();
     }
 }

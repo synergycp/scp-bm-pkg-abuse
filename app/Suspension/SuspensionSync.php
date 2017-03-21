@@ -2,30 +2,33 @@
 
 namespace Packages\Abuse\App\Suspension;
 
-use Packages\Abuse\App\Report;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Server\ServerRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Packages\Abuse\App\Report\ReportRepository;
 
-class ReportList
+class SuspensionSync
 {
     private $suspension;
 
-    public function __construct(Suspension $suspension, ServerRepository $server)
+    private $reportRepository;
+
+    public function __construct(Suspension $suspension, ServerRepository $server, ReportRepository $reportRepository)
     {
         $this->suspension = $suspension;
         $this->server = $server;
+        $this->reportRepository = $reportRepository;
     }
 
     /**
      *
      */
-    public function get()
+    public function sync()
     {
         $suspensionLastDate = $this->suspension->maxReportDate()->toDateString();
 
-        $reports = Report\Report::whereNotNull('server_id')
+        $reports = $this->reportRepository->whereNotNull('server_id')
             ->select('server_id', DB::raw('min(created_at) as created_at'))
             ->pendingClient()
             ->groupBy('server_id')
