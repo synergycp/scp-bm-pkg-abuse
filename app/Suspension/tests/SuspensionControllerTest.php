@@ -20,6 +20,8 @@ use Packages\Abuse\App\Suspension\SuspensionSync;
 use Illuminate\Database\Query\Builder;
 use Packages\Abuse\App\Report\ReportRepository;
 
+use App\Client\Server\ClientServerAccessService;
+
 use Packages\Testing\App\Test\TestCase;
 
 class SuspensionControllerTest
@@ -38,18 +40,28 @@ class SuspensionControllerTest
     protected $hubPort;
     protected $group;
     protected $serverPort;
-
+    protected $reports;
+    protected $query;
+    protected $clientServerAccess;
     protected $suspensionSync;
 
-
-    public function boot(Suspension $suspension, SuspensionSync $suspensionSync)
-    {
-        $this->suspension = $suspension;
-        $this->suspensionSync = $suspensionSync;
-    }
     public function setUp()
     {
         parent::setUp();
+
+        $this->query = Mockery::mock(Builder::class);
+        $this->reports = Mockery::mock(ReportRepository::class);
+        $this->clientServerAccess = Mockery::mock(ClientServerAccessService::class);
+
+        $this->suspension = new Suspension(
+            $this->clientServerAccess
+        );
+
+        $this->suspensionSync = new SuspensionSync(
+            $this->suspension,
+            app(ServerRepository::class),
+            $this->reports
+        );
 
         $this->server = $this->factory('testing', Server\Server::class)->create();
         $this->client = $this->factory('testing', Client::class)->create();
@@ -73,84 +85,84 @@ class SuspensionControllerTest
     public function testSuspend()
     {
         $this->reportCreate('subDay', $this->server->fresh());
+
+        $this->clientServerAccess
+            ->shouldReceive('suspend')
+            ->once()
+        ;
+
         $this->suspensionSync->sync();
-        $this->assertEquals(1, $this->clientServer->fresh()->suspensions);
     }
 
     public function testWarning()
     {
         $this->reportCreate('addDay', $this->server->fresh());
+
+        $this->clientServerAccess
+            ->shouldReceive('suspend')
+            ->never()
+        ;
+
         $this->suspensionSync->sync();
-        $this->assertEquals(0, $this->clientServer->fresh()->suspensions);
     }
 
     private function reportCreate($day='addDay', Server\Server $server)
     {
         $this->report = $this->factory('abuse', AbuseReport::class)->create(['pending_type' => 0, 'client_id' => $this->client->id, 'server_id' => $this->server->id, 'created_at' => $this->suspension->maxReportDate()->$day()]);
         $maxReportDate = Carbon::now();
-        $suspension = Mockery::mock(Suspension::class);
+        $this->suspension = Mockery::mock(Suspension::class);
 
-        $suspension
+        $this->suspension
             ->shouldReceive('maxReportDate')
             ->andReturn($maxReportDate)
         ;
 
-        $suspension
+        $this->suspension
             ->shouldReceive('suspendServer')
             ->with($server, $this->report->created_at)
             ->andReturn(true)
         ;
 
-        $suspension
+        $this->suspension
             ->shouldReceive('suspendWarning')
             ->with($server, $this->report->created_at)
             ->andReturn(true)
         ;
 
-        $reportItem = Mockery::mock(Report::class, ['server_id' => $server->id, 'created_at' => $this->report->created_at]);
-
-        $reports = Mockery::mock(ReportRepository::class);
-        $query = Mockery::mock(Builder::class);
-        $reports
-            ->shouldReceive('query')
-            ->andReturn($query)
-        ;
-
-        $reports
-            ->shouldReceive('whereNotNull')
-            ->andReturn($query)
-        ;
-
-        $reports
+        $this->query
             ->shouldReceive('select')
-            ->andReturn($query)
+            ->andReturn($this->query)
         ;
 
-        $reports
-            ->shouldReceive('pendingClient')
-            ->andReturn($query)
-        ;
-
-        $reports
+        $this->query
             ->shouldReceive('groupBy')
-            ->andReturn($query)
+            ->andReturn($this->query)
         ;
 
-        $reports
+        $this->query
             ->shouldReceive('get')
-            ->andReturn($reportItem)
+            ->andReturn(collect($this->report->fresh()))
         ;
 
-        $serverRepository = Mockery::mock(ServerRepository::class);
-        $serverRepository
-            ->shouldReceive('find')
-            ->andReturn(collect($server))
-            ;
+        $this->query
+            ->shouldReceive('pendingClient')
+            ->andReturn($this->query)
+        ;
+
+        $this->reports
+            ->shouldReceive('query')
+            ->andReturn($this->query)
+        ;
+
+        $this->reports
+            ->shouldReceive('whereNotNull')
+            ->andReturn($this->query)
+        ;
+
     }
 
     public function tearDown()
     {
-        Mockery::close();
         $this->clientServer->delete();
         $this->report->delete();
         $this->server->delete();
@@ -160,5 +172,7 @@ class SuspensionControllerTest
         $this->serverPort->delete();
         $this->hubPort->delete();
         $this->group->delete();
+
+        parent::tearDown();
     }
 }

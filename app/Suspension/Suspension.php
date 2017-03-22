@@ -30,6 +30,6 @@ class Suspension {
     public function maxReportDate()
     {
         $settings = app('Settings');
-        return Carbon::now()->subDays($settings->pkg_abuse_auto_suspension);
+        return isset($settings->pkg_abuse_auto_suspension) ? Carbon::now()->subDays($settings->pkg_abuse_auto_suspension) : Carbon::now()->subMonth();
     }
 }
