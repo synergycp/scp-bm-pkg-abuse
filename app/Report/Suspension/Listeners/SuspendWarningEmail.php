@@ -39,7 +39,7 @@ class SuspendWarningEmail
      */
     protected function send(Server $server, Carbon $createdDate)
     {
-        $date = $date = $this->suspension->maxReportDate();
+        $date = $this->suspension->maxReportDate();
         $days = $createdDate->diffInDays($date);
 
         $client = $server->access->client;
