@@ -29,16 +29,22 @@ class SuspensionSync
     public function sync()
     {
         $suspensionLastDate = $this->suspension->maxReportDate();
-
         $reports = $this->reportRepository->whereNotNull('server_id')
             ->select('server_id', DB::raw('min(created_at) as created_at'))
             ->pendingClient()
             ->groupBy('server_id')
             ->get()
         ;
-
-        $servers = $this->server->find($reports->pluck('server_id')->all())->load('access.client')->keyBy('id');
-
+        $serverIds = $reports
+            ->pluck('server_id')
+            ->all()
+            ;
+        $servers = $this
+            ->server
+            ->find($serverIds)
+            ->load('access.client')
+            ->keyBy('id')
+            ;
         $vipClientFilter = function($report) use ($servers) {
 
             if (!isset($servers[$report->server_id])) {
@@ -58,7 +64,6 @@ class SuspensionSync
             return !$access->client->billing_ignore_auto_suspend;
 
         };
-
         $suspension = function($report) use ($suspensionLastDate, $servers) {
 
             $server = $servers[$report->server_id];
