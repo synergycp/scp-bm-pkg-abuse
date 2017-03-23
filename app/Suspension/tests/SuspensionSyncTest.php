@@ -11,20 +11,18 @@ use Packages\Abuse\App\Report\Report as AbuseReport;
 use Packages\Abuse\App\Suspension\Suspension;
 use App\Hub;
 use App\Group\Group;
-use Packages\Abuse\App\Report\Report;
-
 use App\Server\ServerRepository;
 use Mockery;
 use Carbon\Carbon;
 use Packages\Abuse\App\Suspension\SuspensionSync;
 use Illuminate\Database\Query\Builder;
 use Packages\Abuse\App\Report\ReportRepository;
-
 use App\Client\Server\ClientServerAccessService;
-
 use Packages\Testing\App\Test\TestCase;
 
-class SuspensionControllerTest
+use Illuminate\Support\Facades\Log;
+
+class SuspensionSyncTest
     extends TestCase
 {
     protected $client;
@@ -52,16 +50,12 @@ class SuspensionControllerTest
         $this->query = Mockery::mock(Builder::class);
         $this->reports = Mockery::mock(ReportRepository::class);
         $this->clientServerAccess = Mockery::mock(ClientServerAccessService::class);
+        $this->suspension = Mockery::mock(Suspension::class);
 
-        $this->suspension = new Suspension(
-            $this->clientServerAccess
-        );
-
-        $this->suspensionSync = new SuspensionSync(
-            $this->suspension,
-            app(ServerRepository::class),
-            $this->reports
-        );
+        $this->suspension
+            ->shouldReceive('maxReportDate')
+            ->andReturn(Carbon::now())
+        ;
 
         $this->server = $this->factory('testing', Server\Server::class)->create();
         $this->client = $this->factory('testing', Client::class)->create();
@@ -84,50 +78,58 @@ class SuspensionControllerTest
 
     public function testSuspend()
     {
-        $this->reportCreate('subDay', $this->server->fresh());
+        $server = $this->server->fresh()->load('access.client');
+        $this->reportCreate('subDay');
 
-        $this->clientServerAccess
-            ->shouldReceive('suspend')
-            ->once()
+        $this->suspension
+            ->shouldReceive('suspendServer')->once()
+            ->with(\Mockery::mustBe($server), \Mockery::mustBe($this->report->created_at))
+            ->andReturn(true)
         ;
+
+        $this->suspension
+            ->shouldReceive('suspendWarning')->never()
+            ->andReturn(true)
+        ;
+
+        $this->suspensionSync = new SuspensionSync(
+            $this->suspension,
+            app(ServerRepository::class),
+            $this->reports
+        );
 
         $this->suspensionSync->sync();
     }
 
     public function testWarning()
     {
-        $this->reportCreate('addDay', $this->server->fresh());
+        $server = $this->server->fresh()->load('access.client');
 
-        $this->clientServerAccess
-            ->shouldReceive('suspend')
-            ->never()
-        ;
-
-        $this->suspensionSync->sync();
-    }
-
-    private function reportCreate($day='addDay', Server\Server $server)
-    {
-        $this->report = $this->factory('abuse', AbuseReport::class)->create(['pending_type' => 0, 'client_id' => $this->client->id, 'server_id' => $this->server->id, 'created_at' => $this->suspension->maxReportDate()->$day()]);
-        $maxReportDate = Carbon::now();
-        $this->suspension = Mockery::mock(Suspension::class);
-
-        $this->suspension
-            ->shouldReceive('maxReportDate')
-            ->andReturn($maxReportDate)
-        ;
+        $this->reportCreate('addDay');
 
         $this->suspension
             ->shouldReceive('suspendServer')
-            ->with($server, $this->report->created_at)
-            ->andReturn(true)
+            ->never()
         ;
 
         $this->suspension
             ->shouldReceive('suspendWarning')
-            ->with($server, $this->report->created_at)
-            ->andReturn(true)
+            ->once()
+            ->with(\Mockery::mustBe($server), \Mockery::mustBe($this->report->created_at))
         ;
+
+        $this->suspensionSync = new SuspensionSync(
+            $this->suspension,
+            app(ServerRepository::class),
+            $this->reports
+        );
+
+        $this->suspensionSync->sync();
+    }
+
+    private function reportCreate($day='addDay')
+    {
+        $this->report = $this->factory('abuse', AbuseReport::class)->create(['pending_type' => 0, 'client_id' => $this->client->id, 'server_id' => $this->server->id, 'created_at' => Carbon::now()->$day()]);
 
         $this->query
             ->shouldReceive('select')

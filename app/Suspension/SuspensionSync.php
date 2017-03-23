@@ -8,6 +8,8 @@ use App\Server\ServerRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Packages\Abuse\App\Report\ReportRepository;
 
+use Illuminate\Support\Facades\Log;
+
 class SuspensionSync
 {
     private $suspension;
@@ -26,7 +28,7 @@ class SuspensionSync
      */
     public function sync()
     {
-        $suspensionLastDate = $this->suspension->maxReportDate()->toDateString();
+        $suspensionLastDate = $this->suspension->maxReportDate();
 
         $reports = $this->reportRepository->whereNotNull('server_id')
             ->select('server_id', DB::raw('min(created_at) as created_at'))
@@ -61,7 +63,7 @@ class SuspensionSync
 
             $server = $servers[$report->server_id];
 
-            if ($report->created_at->toDateString() <= $suspensionLastDate) {
+            if ($suspensionLastDate->gt($report->created_at)) {
                 // suspend & send suspended message
                 $this->suspension->suspendServer($server, $report->created_at);
                 return;
