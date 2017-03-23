@@ -14,7 +14,6 @@ class UpdateAbuseReportsCreatedAt extends Migration
     public function up()
     {
         Report::query()
-            ->whereNull('created_at')
             ->update([
                 'created_at' => Carbon::now(),
             ])
