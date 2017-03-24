@@ -20,8 +20,6 @@ use Packages\Abuse\App\Report\ReportRepository;
 use App\Client\Server\ClientServerAccessService;
 use Packages\Testing\App\Test\TestCase;
 
-use Illuminate\Support\Facades\Log;
-
 class SuspensionSyncTest
     extends TestCase
 {
@@ -33,7 +31,6 @@ class SuspensionSyncTest
     protected $apiKey;
     protected $suspension;
     protected $testCase;
-
     protected $hub;
     protected $hubPort;
     protected $group;
@@ -42,6 +39,7 @@ class SuspensionSyncTest
     protected $query;
     protected $clientServerAccess;
     protected $suspensionSync;
+    protected $serverRepository;
 
     public function setUp()
     {
@@ -51,6 +49,13 @@ class SuspensionSyncTest
         $this->reports = Mockery::mock(ReportRepository::class);
         $this->clientServerAccess = Mockery::mock(ClientServerAccessService::class);
         $this->suspension = Mockery::mock(Suspension::class);
+        $this->serverRepository = Mockery::mock(ServerRepository::class);
+
+        $this->suspensionSync = new SuspensionSync(
+            $this->suspension,
+            $this->serverRepository,
+            $this->reports
+        );
 
         $this->suspension
             ->shouldReceive('maxReportDate')
@@ -58,15 +63,8 @@ class SuspensionSyncTest
         ;
 
         $this->server = $this->factory('testing', Server\Server::class)->create();
-        $this->client = $this->factory('testing', Client::class)->create();
+
         $this->clientServer = new ClientServer();
-        $this->clientServer
-            ->client()
-            ->associate($this->client)
-            ->server()
-            ->associate($this->server)
-            ->save()
-        ;
 
         $this->hub = $this->factory('testing', Hub\Hub::class)->create();
         $this->hubPort = $this->factory('testing', Hub\Port\Port::class)->create(['hub_id' => $this->hub->id]);
@@ -78,8 +76,9 @@ class SuspensionSyncTest
 
     public function testSuspend()
     {
+        $this->clientCreate();
         $server = $this->server->fresh()->load('access.client');
-        $this->reportCreate('subDay');
+        $this->reportCreate('subDay', $server);
 
         $this->suspension
             ->shouldReceive('suspendServer')->once()
@@ -92,20 +91,15 @@ class SuspensionSyncTest
             ->andReturn(true)
         ;
 
-        $this->suspensionSync = new SuspensionSync(
-            $this->suspension,
-            app(ServerRepository::class),
-            $this->reports
-        );
-
         $this->suspensionSync->sync();
     }
 
     public function testWarning()
     {
+        $this->clientCreate();
         $server = $this->server->fresh()->load('access.client');
 
-        $this->reportCreate('addDay');
+        $this->reportCreate('addDay', $server);
 
         $this->suspension
             ->shouldReceive('suspendServer')
@@ -118,16 +112,55 @@ class SuspensionSyncTest
             ->with(\Mockery::mustBe($server), \Mockery::mustBe($this->report->created_at))
         ;
 
-        $this->suspensionSync = new SuspensionSync(
-            $this->suspension,
-            app(ServerRepository::class),
-            $this->reports
-        );
+        $this->suspensionSync->sync();
+    }
+
+    public function testVipSuspend()
+    {
+       $this->vipClientSettings('subDay');
+    }
+
+    public function testVipWarning()
+    {
+        $this->vipClientSettings();
+    }
+
+    private function vipClientSettings($day='addDay')
+    {
+        $this->clientCreate(true);
+
+        $server = $this->server->fresh()->load('access.client');
+        $this->reportCreate($day, $server, true);
+
+        $this->suspension
+            ->shouldReceive('suspendServer')->never()
+        ;
+
+        $this->suspension
+            ->shouldReceive('suspendWarning')->never()
+        ;
 
         $this->suspensionSync->sync();
     }
 
-    private function reportCreate($day='addDay')
+    private function clientCreate($vip=false)
+    {
+        $clientSettings = empty($vip)
+            ? []
+            : ['billing_ignore_auto_suspend' => true]
+        ;
+
+        $this->client = $this->factory('testing', Client::class)->create($clientSettings);
+        $this->clientServer
+            ->client()
+            ->associate($this->client)
+            ->server()
+            ->associate($this->server)
+            ->save()
+        ;
+    }
+
+    private function reportCreate($day='addDay', Server\Server $server)
     {
         $this->report = $this->factory('abuse', AbuseReport::class)->create(['pending_type' => 0, 'client_id' => $this->client->id, 'server_id' => $this->server->id, 'created_at' => Carbon::now()->$day()]);
 
@@ -161,6 +194,21 @@ class SuspensionSyncTest
             ->andReturn($this->query)
         ;
 
+        $this->serverRepository
+            ->shouldReceive('find')
+            ->with([$server->id])
+            ->andReturn($this->query)
+        ;
+
+        $this->query
+            ->shouldReceive('load')
+            ->andReturn($this->query)
+        ;
+
+        $this->query
+            ->shouldReceive('keyBy')
+            ->andReturn(collect($server)->keyBy('id'))
+        ;
     }
 
     public function tearDown()

@@ -8,8 +8,6 @@ use App\Server\ServerRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Packages\Abuse\App\Report\ReportRepository;
 
-use Illuminate\Support\Facades\Log;
-
 class SuspensionSync
 {
     private $suspension;
