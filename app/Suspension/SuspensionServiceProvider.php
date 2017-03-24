@@ -28,7 +28,7 @@ class SuspensionServiceProvider
     protected function schedule(Schedule $schedule)
     {
         $schedule
-            ->command('abuse:suspension')
+            ->command('pkg:abuse:suspension')
             ->daily()
             ;
     }
