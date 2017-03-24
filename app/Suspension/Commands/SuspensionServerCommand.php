@@ -26,7 +26,7 @@ class SuspensionServerCommand
      *
      * @var string
      */
-    protected $name = 'abuse:suspension';
+    protected $name = 'pkg:abuse:suspension';
 
     /**
      * The console command description.
