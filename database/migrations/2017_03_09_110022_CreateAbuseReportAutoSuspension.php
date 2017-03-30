@@ -19,7 +19,6 @@ class CreateAbuseReportAutoSuspension extends Migration
             'validator' => Setting::VALID_INT,
             'value' => '7',
         ]);
-
     }
 
     /**
@@ -29,6 +28,6 @@ class CreateAbuseReportAutoSuspension extends Migration
      */
     public function down()
     {
-        $this->deleteSettingGroup('Abuse Reports');
+        $this->deleteSetting('pkg.abuse.auto_suspension');
     }
 }
