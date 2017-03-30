@@ -163,7 +163,7 @@ class ReportClientEmail
     private function report(Report $report)
     {
         return $report->expose('id') + [
-            'date' => $report->created_at->format(),
+            'date' => (string) $report->created_at,
         ];
     }
 }
