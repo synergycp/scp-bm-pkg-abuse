@@ -31,7 +31,8 @@ class SuspendedEmail
     }
 
     /**
-     * @param Report $report
+     * @param Server $server
+     * @param Carbon $createdDate
      */
     protected function send(Server $server, Carbon $createdDate)
     {
@@ -40,8 +41,8 @@ class SuspendedEmail
             'client' => $client->expose('name'),
             'server' => $server->expose('name'),
             'report' => [
-                'date' => $createdDate->toDateString()
-            ]
+                'date' => $createdDate->toDateString(),
+            ],
         ];
 
         $this

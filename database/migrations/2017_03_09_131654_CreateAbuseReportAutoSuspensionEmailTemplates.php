@@ -37,7 +37,7 @@ class CreateAbuseReportAutoSuspensionEmailTemplates extends Migration
      */
     public function down()
     {
-        $this->removeEmailTemplate('pkg/abuse/abuse_report_suspended_warning.tpl');
+        $this->removeEmailTemplate('pkg/abuse/abuse_report_suspend_warning.tpl');
         $this->removeEmailTemplate('pkg/abuse/abuse_report_suspended.tpl');
     }
 }
