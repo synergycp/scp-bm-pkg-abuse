@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations;
  * @property bool                 is_resolved
  * @property string               addr
  * @property string               body
+ * @property Carbon               date
  * @property Carbon               reported_at
  * @property Carbon               resolved_at
  * @property int                  pending_type
