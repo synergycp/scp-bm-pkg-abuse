@@ -2,7 +2,7 @@
 
 namespace Packages\Abuse\App\Suspension;
 
-use Packages\Abuse\App\Report\Suspension\Events;
+use Packages\Abuse\App\Suspension\Events;
 use App\Client\Server\ClientServerAccessService;
 use Carbon\Carbon;
 use App\Server\Server;

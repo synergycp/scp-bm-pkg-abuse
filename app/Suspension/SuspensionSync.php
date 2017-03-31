@@ -27,7 +27,8 @@ class SuspensionSync
     public function sync()
     {
         $suspensionLastDate = $this->suspension->maxReportDate();
-        $reports = $this->reportRepository->whereNotNull('server_id')
+        $reports = $this->reportRepository
+            ->whereNotNull('server_id')
             ->select('server_id', DB::raw('min(created_at) as created_at'))
             ->pendingClient()
             ->groupBy('server_id')
@@ -43,27 +44,31 @@ class SuspensionSync
             ->load('access.client')
             ->keyBy('id')
             ;
-        $vipClientFilter = function($report) use ($servers) {
-
-            if (!isset($servers[$report->server_id])) {
+        $vipClientFilter = function ($report) use ($servers) {
+            // Server deleted
+            if (!$server = array_get($servers, $report->server_id)) {
                 return false;
             }
 
-            $server = $servers[$report->server_id];
-
+            // If the server is not assigned to a client, there's no access to suspend.
             if (!$access = $server->access) {
                 return false;
             }
 
+            // No reason to suspend already suspended servers.
             if ($access->is_suspended) {
                 return false;
             }
 
-            return !$access->client->billing_ignore_auto_suspend;
+            // VIP clients do not get auto suspended.
+            if ($access->client->billing_ignore_auto_suspend) {
+                return false;
+            }
 
+            // Other clients do get auto suspended.
+            return true;
         };
-        $suspension = function($report) use ($suspensionLastDate, $servers) {
-
+        $suspension = function ($report) use ($suspensionLastDate, $servers) {
             $server = $servers[$report->server_id];
 
             if ($suspensionLastDate->gt($report->created_at)) {
@@ -71,6 +76,7 @@ class SuspensionSync
                 $this->suspension->suspendServer($server, $report->created_at);
                 return;
             }
+
             // send suspend warning message
             $this->suspension->suspendWarning($server, $report->created_at);
         };

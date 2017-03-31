@@ -16,6 +16,8 @@ class SuspensionServiceProvider
      */
     protected $commands = [
         Commands\SuspensionServerCommand::class,
+
+        SuspensionEventProvider::class,
     ];
 
     public function boot()

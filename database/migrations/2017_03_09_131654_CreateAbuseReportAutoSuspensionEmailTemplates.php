@@ -14,7 +14,7 @@ class CreateAbuseReportAutoSuspensionEmailTemplates extends Migration
     public function up()
     {
         $this->addEmailTemplate(
-            'abuse_report_suspended.tpl',
+            'pkg/abuse/abuse_report_suspended.tpl',
             __DIR__.'/stub/abuse_report_suspended.tpl',
             [
                 'subject' => '[ABUSE] Server suspended',
@@ -22,7 +22,7 @@ class CreateAbuseReportAutoSuspensionEmailTemplates extends Migration
         );
 
         $this->addEmailTemplate(
-            'abuse_report_suspend_warning.tpl',
+            'pkg/abuse/abuse_report_suspend_warning.tpl',
             __DIR__.'/stub/abuse_report_suspend_warning.tpl',
             [
                 'subject' => '[ABUSE] Upcoming Suspension Warning',
@@ -37,7 +37,7 @@ class CreateAbuseReportAutoSuspensionEmailTemplates extends Migration
      */
     public function down()
     {
-        $this->removeEmailTemplate('abuse_report_suspended_warning.tpl');
-        $this->removeEmailTemplate('abuse_report_suspended.tpl');
+        $this->removeEmailTemplate('pkg/abuse/abuse_report_suspended_warning.tpl');
+        $this->removeEmailTemplate('pkg/abuse/abuse_report_suspended.tpl');
     }
 }

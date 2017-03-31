@@ -1,8 +1,7 @@
 <?php
 
-namespace Packages\Abuse\App\Report\Suspension\Events;
+namespace Packages\Abuse\App\Suspension\Events;
 
-use Packages\Abuse\App\Report\Suspension;
 use App\Support\Event;
 use App\Support\Database\SerializesModels;
 use App\Server\Server;
@@ -19,11 +18,16 @@ abstract class SuspensionEvent extends Event
 
     /**
      * Created date
+     *
+     * @var Carbon
      */
     public $createdDate;
 
     /**
      * Create a new event instance.
+     *
+     * @param Server $server
+     * @param Carbon $createdDate
      */
     public function __construct(Server $server, Carbon $createdDate)
     {

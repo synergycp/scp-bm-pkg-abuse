@@ -1,6 +1,6 @@
 <?php
 
-namespace Packages\Abuse\App\Report\Suspension;
+namespace Packages\Abuse\App\Suspension;
 
 use App\Client\Client;
 use App\Client\Server\Models\ClientServer;

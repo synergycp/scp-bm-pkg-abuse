@@ -1,6 +1,6 @@
 <?php
 
-namespace Packages\Abuse\App\Report\Suspension\Events;
+namespace Packages\Abuse\App\Suspension\Events;
 
 class ServerSuspendWarning extends SuspensionEvent
 {
