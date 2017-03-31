@@ -2,7 +2,7 @@
 
 namespace Packages\Abuse\App\Suspension;
 
-use Illuminate\Foundation\Support\Providers\EventServiceProvider;
+use App\Support\EventServiceProvider;
 
 /**
  * Setup Abuse Suspension Event Listeners.

@@ -2,8 +2,7 @@
 
 namespace Packages\Abuse\App\Suspension;
 
-use Illuminate\Console\Scheduling\Schedule;
-use App\Support\ScheduleServiceProvider as ServiceProvider;
+use App\Support\ServiceProvider;
 
 /**
  * Global setup of Abuse Report Suspension.
@@ -11,27 +10,9 @@ use App\Support\ScheduleServiceProvider as ServiceProvider;
 class SuspensionServiceProvider
     extends ServiceProvider
 {
-    /**
-     * @var array
-     */
-    protected $commands = [
-        Commands\SuspensionServerCommand::class,
+    protected $providers = [
+        Commands\CommandServiceProvider::class,
 
         SuspensionEventProvider::class,
     ];
-
-    public function boot()
-    {
-        $this->commands($this->commands);
-
-        parent::boot();
-    }
-
-    protected function schedule(Schedule $schedule)
-    {
-        $schedule
-            ->command('pkg:abuse:suspension')
-            ->daily()
-            ;
-    }
 }

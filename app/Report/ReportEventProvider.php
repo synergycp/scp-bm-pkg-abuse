@@ -5,7 +5,7 @@ namespace Packages\Abuse\App\Report;
 use App\Client\Server\Events as AccessEvents;
 use App\Entity\Events as EntityEvents;
 use App\Log\EventLogger;
-use Illuminate\Foundation\Support\Providers\EventServiceProvider;
+use App\Support\EventServiceProvider;
 
 /**
  * Setup Abuse Report Event Listeners.
