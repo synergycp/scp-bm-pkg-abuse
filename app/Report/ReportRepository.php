@@ -3,6 +3,7 @@
 namespace Packages\Abuse\App\Report;
 
 use App\Database\ModelRepository;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Database logic for Abuse Reports.

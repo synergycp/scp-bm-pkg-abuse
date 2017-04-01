@@ -10,4 +10,5 @@ return [
     Email\EmailServiceProvider::class,
     Report\ReportServiceProvider::class,
     Module\ModuleServiceProvider::class,
+    Suspension\SuspensionServiceProvider::class,
 ];
