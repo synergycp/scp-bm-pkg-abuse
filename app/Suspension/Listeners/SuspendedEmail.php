@@ -2,10 +2,11 @@
 
 namespace Packages\Abuse\App\Suspension\Listeners;
 
-use Packages\Abuse\App\Suspension\Events;
-use App\Server\Server;
+use App\Client\Server\ClientServerAccessService;
 use App\Mail;
+use App\Server\Server;
 use Carbon\Carbon;
+use Packages\Abuse\App\Suspension\Events;
 
 /**
  * Send out an Email when Server suspended.
