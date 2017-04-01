@@ -82,7 +82,7 @@ class SuspensionSyncTest
 
         $this->suspension
             ->shouldReceive('suspendServer')->once()
-            ->with(\Mockery::mustBe($server), \Mockery::mustBe($this->report->created_at))
+            ->with(\Mockery::mustBe($server), \Mockery::mustBe($this->report->pending_at))
             ->andReturn(true)
         ;
 
@@ -109,7 +109,7 @@ class SuspensionSyncTest
         $this->suspension
             ->shouldReceive('suspendWarning')
             ->once()
-            ->with(\Mockery::mustBe($server), \Mockery::mustBe($this->report->created_at))
+            ->with(\Mockery::mustBe($server), \Mockery::mustBe($this->report->pending_at))
         ;
 
         $this->suspensionSync->sync();
@@ -162,7 +162,13 @@ class SuspensionSyncTest
 
     private function reportCreate($day='addDay', Server\Server $server)
     {
-        $this->report = $this->factory('abuse', AbuseReport::class)->create(['pending_type' => 0, 'client_id' => $this->client->id, 'server_id' => $this->server->id, 'created_at' => Carbon::now()->$day()]);
+        $this->report = $this->factory('abuse', AbuseReport::class)
+             ->create([
+                 'pending_type' => 0,
+                 'client_id' => $this->client->id,
+                 'server_id' => $this->server->id,
+                 'pending_at' => Carbon::now()->$day(),
+             ]);
 
         $this->query
             ->shouldReceive('select')

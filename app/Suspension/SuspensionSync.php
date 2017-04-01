@@ -48,13 +48,14 @@ class SuspensionSync
     public function sync()
     {
         $suspensionLastDate = $this->suspension->maxReportDate();
-        $reports = $this->reportRepository
+        $query = $this->reportRepository
+            ->query()
             ->whereNotNull('server_id')
-            ->select('server_id', DB::raw('min(created_at) as created_at'))
+            ->select('server_id', DB::raw('min(pending_at) as pending_at'))
             ->pendingClient()
             ->groupBy('server_id')
-            ->get()
         ;
+        $reports = $query->get();
         $serverIds = $reports
             ->pluck('server_id')
             ->all()
@@ -92,14 +93,14 @@ class SuspensionSync
         $suspension = function ($report) use ($suspensionLastDate, $servers) {
             $server = $servers[$report->server_id];
 
-            if ($suspensionLastDate->gt($report->created_at)) {
+            if ($suspensionLastDate->gt($report->pending_at)) {
                 // suspend & send suspended message
-                $this->suspension->suspendServer($server, $report->created_at);
+                $this->suspension->suspendServer($server, $report->pending_at);
                 return;
             }
 
             // send suspend warning message
-            $this->suspension->suspendWarning($server, $report->created_at);
+            $this->suspension->suspendWarning($server, $report->pending_at);
         };
 
         $reports

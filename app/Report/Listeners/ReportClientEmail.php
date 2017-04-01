@@ -46,29 +46,26 @@ class ReportClientEmail
     {
         $report = $event->report;
 
-        if (!$report->resolved_at) {
-            $sendEmail = function (Client\Client $client) use ($report) {
-                // TODO: way for Client to opt out of these emails.
-                $context = [
-                    'client' => $client->expose('name'),
-                    'server' => $this->server($report),
-                    'report' => $this->report($report),
-                    'urls' => [
-                        'view' => $this->sso->view($report, $client),
-                    ],
-                ];
+        if ($report->resolved_at) {
+            return;
+        }
 
-                $this
-                    ->create('abuse_report.tpl')
-                    ->setData($context)
-                    ->toUser($client)
-                    ->send()
-                ;
-            };
+        foreach ($this->clients($report) as $client) {
+            // TODO: way for Client to opt out of these emails.
+            $context = [
+                'client' => $client->expose('name'),
+                'server' => $this->server($report),
+                'report' => $this->report($report),
+                'urls' => [
+                    'view' => $this->sso->view($report, $client),
+                ],
+            ];
 
             $this
-                ->clients($report)
-                ->each($sendEmail)
+                ->create('abuse_report.tpl')
+                ->setData($context)
+                ->toUser($client)
+                ->send()
             ;
         }
     }
