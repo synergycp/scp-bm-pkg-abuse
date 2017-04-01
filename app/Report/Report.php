@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations;
  * @property Carbon               created_at
  * @property Carbon               updated_at
  * @property Carbon               resolved_at
+ * @property Carbon               pending_at
  * @property int                  server_id
  * @property int                  pending_type
  * @property Client               client
@@ -62,7 +63,7 @@ class Report
     ];
 
     protected $dates = [
-        'reported_at', 'resolved_at',
+        'reported_at', 'resolved_at', 'pending_at',
     ];
 
     /**
@@ -168,6 +169,16 @@ class Report
         $this->pending_type = static::PENDING_CLIENT;
 
         return $this;
+    }
+
+    /**
+     * @param int $value
+     */
+    public function setPendingTypeAttribute($value)
+    {
+        $this->pending_at = Carbon::now();
+
+        $this->attributes['pending_type'] = $value;
     }
 
     # Relationships
