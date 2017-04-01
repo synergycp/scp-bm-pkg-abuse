@@ -2,6 +2,7 @@
 
 namespace Packages\Abuse\App\Suspension\Listeners;
 
+use App\Client\Server\ClientServerAccessService;
 use App\Mail;
 use App\Server\Server;
 use Carbon\Carbon;
@@ -12,7 +13,7 @@ use Packages\Abuse\App\Suspension\Suspension;
  * Send out an Email when Server suspended.
  */
 class SuspendWarningEmail
-    extends Mail\EmailListener
+extends Mail\EmailListener
 {
     /**
      * @var string
@@ -24,8 +25,22 @@ class SuspendWarningEmail
      */
     private $suspension;
 
-    public function boot(Suspension $suspension)
-    {
+    /**
+     * @var ClientServerAccessService
+     */
+    private $access;
+
+    /**
+     * SuspendWarningEmail constructor.
+     *
+     * @param Suspension                $suspension
+     * @param ClientServerAccessService $access
+     */
+    public function __construct(
+        Suspension $suspension,
+        ClientServerAccessService $access
+    ) {
+        $this->access = $access;
         $this->suspension = $suspension;
     }
 
@@ -36,9 +51,10 @@ class SuspendWarningEmail
      */
     public function handle(Events\SuspensionEvent $event)
     {
-        $server = $event->server;
-        $createdDate = $event->createdDate;
-        $this->send($server, $createdDate);
+        $this->send(
+            $event->server,
+            $event->createdDate
+        );
     }
 
     /**
@@ -49,10 +65,7 @@ class SuspendWarningEmail
     {
         $date = $this->suspension->maxReportDate();
         $days = $createdDate->diffInDays($date);
-
-        $client = $server->access->client;
         $context = [
-            'client' => $client->expose('name'),
             'server' => $server->expose('name'),
             'report' => [
                 'date' => $createdDate->toDateString(),
@@ -60,11 +73,15 @@ class SuspendWarningEmail
             'days' => $days,
         ];
 
-        $this
-            ->create($this->template)
-            ->setData($context)
-            ->toUser($client)
-            ->send()
-        ;
+        foreach ($this->access->clients($server) as $client) {
+            $context['client'] = $client->expose('name');
+
+            $this
+                ->create($this->template)
+                ->setData($context)
+                ->toUser($client)
+                ->send()
+            ;
+        }
     }
 }

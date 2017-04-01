@@ -17,7 +17,10 @@ use Illuminate\Database\Eloquent\Relations;
  * @property string               body
  * @property Carbon               date
  * @property Carbon               reported_at
+ * @property Carbon               created_at
+ * @property Carbon               updated_at
  * @property Carbon               resolved_at
+ * @property int                  server_id
  * @property int                  pending_type
  * @property Client               client
  * @property Entity               entity

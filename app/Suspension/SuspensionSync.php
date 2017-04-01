@@ -10,14 +10,35 @@ use Packages\Abuse\App\Report\ReportRepository;
 
 class SuspensionSync
 {
+    /**
+     * @var ServerRepository
+     */
+    private $server;
+
+    /**
+     * @var Suspension
+     */
     private $suspension;
 
+    /**
+     * @var ReportRepository
+     */
     private $reportRepository;
 
-    public function __construct(Suspension $suspension, ServerRepository $server, ReportRepository $reportRepository)
-    {
-        $this->suspension = $suspension;
+    /**
+     * SuspensionSync constructor.
+     *
+     * @param Suspension       $suspension
+     * @param ServerRepository $server
+     * @param ReportRepository $reportRepository
+     */
+    public function __construct(
+        Suspension $suspension,
+        ServerRepository $server,
+        ReportRepository $reportRepository
+    ) {
         $this->server = $server;
+        $this->suspension = $suspension;
         $this->reportRepository = $reportRepository;
     }
 

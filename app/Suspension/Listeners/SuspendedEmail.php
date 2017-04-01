@@ -19,15 +19,32 @@ class SuspendedEmail
     private $template = 'pkg/abuse/abuse_report_suspended.tpl';
 
     /**
+     * @var ClientServerAccessService
+     */
+    private $access;
+
+    /**
+     * SuspendedEmail constructor.
+     *
+     * @param ClientServerAccessService $access
+     */
+    public function __construct(
+        ClientServerAccessService $access
+    ) {
+        $this->access = $access;
+    }
+
+    /**
      * Handle the event.
      *
-     * @param Events\ServerSuspend $event
+     * @param Events\SuspensionEvent $event
      */
-    public function handle(Events\ServerSuspend $event)
+    public function handle(Events\SuspensionEvent $event)
     {
-        $server = $event->server;
-        $createdDate = $event->createdDate;
-        $this->send($server, $createdDate);
+        $this->send(
+            $event->server,
+            $event->createdDate
+        );
     }
 
     /**
@@ -36,20 +53,22 @@ class SuspendedEmail
      */
     protected function send(Server $server, Carbon $createdDate)
     {
-        $client = $server->access->client;
         $context = [
-            'client' => $client->expose('name'),
             'server' => $server->expose('name'),
             'report' => [
                 'date' => $createdDate->toDateString(),
             ],
         ];
 
-        $this
-            ->create($this->template)
-            ->setData($context)
-            ->toUser($client)
-            ->send()
-        ;
+        foreach ($this->access->clients($server) as $client) {
+            $context['client'] = $client->expose('name');
+
+            $this
+                ->create($this->template)
+                ->setData($context)
+                ->toUser($client)
+                ->send()
+            ;
+        }
     }
 }

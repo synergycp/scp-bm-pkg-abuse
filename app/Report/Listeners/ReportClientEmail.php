@@ -8,45 +8,36 @@ use App\Mail;
 use Illuminate\Database\Eloquent\Builder;
 use Packages\Abuse\App\Report\Events\ReportClientReassigned;
 use Packages\Abuse\App\Report\Report;
-use Packages\Abuse\App\Report\ReportTransformer;
 
 class ReportClientEmail
     extends Mail\EmailListener
 {
-    /**
-     * @var ReportTransformer
-     */
-    protected $transform;
-
     /**
      * @var Sso\SsoUrlService
      */
     protected $sso;
 
     /**
-     * @var Client\ClientRepository
+     * @var Client\Server\ClientServerAccessService
      */
-    protected $clients;
+    private $access;
 
     /**
      * ReportClientEmail constructor.
      *
-     * @param Mail\Mailer             $mail
-     * @param Sso\SsoUrlService       $sso
-     * @param ReportTransformer       $transform
-     * @param Client\ClientRepository $clients
+     * @param Mail\Mailer                             $mail
+     * @param Sso\SsoUrlService                       $sso
+     * @param Client\Server\ClientServerAccessService $access
      */
     public function __construct(
         Mail\Mailer $mail,
         Sso\SsoUrlService $sso,
-        ReportTransformer $transform,
-        Client\ClientRepository $clients
+        Client\Server\ClientServerAccessService $access
     ) {
         parent::__construct($mail);
 
         $this->sso = $sso;
-        $this->clients = $clients;
-        $this->transform = $transform;
+        $this->access = $access;
     }
 
     /**
@@ -59,6 +50,7 @@ class ReportClientEmail
     public function handle(ReportClientReassigned $event)
     {
         $report = $event->report;
+
         if (!$report->resolved_at) {
             $sendEmail = function (Client\Client $client) use ($report) {
                 // TODO: way for Client to opt out of these emails.
@@ -79,51 +71,53 @@ class ReportClientEmail
                 ;
             };
 
-            $this->clients($report)
+            $this
+                ->clients($report)
                 ->each($sendEmail)
             ;
         }
-
     }
 
     /**
-     * Query for Clients that have access to the Report.
+     * @param  Report $report
+     *
+     * @return array|null
+     */
+    private function server(Report $report)
+    {
+        if (!$server = $report->server) {
+            return null;
+        }
+
+        return $server->expose('id', 'nickname', 'name');
+    }
+
+    /**
+     * @param  Report $report
+     *
+     * @return array
+     */
+    private function report(Report $report)
+    {
+        return $report->expose('id') + [
+                'date' => (string)$report->created_at,
+            ];
+    }
+
+    /**
+     * Get Clients that have access to the Report.
      *
      * @param Report $report
      *
-     * @return Builder
+     * @return Client\Client[]
      */
     public function clients(Report $report)
     {
-        return $this->clients
-            ->query()
-            ->select('clients.*')
-            ->groupBy('clients.id')
-            ->leftJoin('client_supers as super', 'super.grantee_id', '=', 'clients.id')
-            ->leftJoin('client_server as access', 'access.client_id', '=', 'clients.id')
-            ->leftJoin('client_server as access_super', 'access.client_id', '=', 'super.granter_id')
-            ->where(function (Builder $query) use ($report) {
-                if (!$report->server_id && !$report->client_id) {
-                    return $query->where(\DB::raw('1'), 2);
-                }
+        if (!$server = $report->server) {
+            return [$report->client];
+        }
 
-                if ($report->client_id) {
-                    // The user is or has been granted super access to the Client that the Report is assigned to.
-                    $query
-                        ->orWhere('clients.id', $report->client_id)
-                        ->orWhere('super.granter_id', $report->client_id)
-                    ;
-                }
-
-                if ($report->server_id) {
-                    // Or, the user is or is super of one of the Clients that the Server is assigned to.
-                    $query
-                        ->orWhere($this->matchingAccess('access', $report))
-                        ->orWhere($this->matchingAccess('access_super', $report))
-                    ;
-                }
-            })
-            ;
+        return $this->access->clients($report->server);
     }
 
     /**
@@ -141,29 +135,5 @@ class ReportClientEmail
                 $query->where("$table.created_at", '<', $report->resolved_at);
             }
         };
-    }
-
-    /**
-     * @param  Report $report
-     *
-     * @return array|null
-     */
-    private function server(Report $report)
-    {
-        $server = $report->server;
-
-        return $server ? $server->expose('id', 'nickname', 'name') : null;
-    }
-
-    /**
-     * @param  Report $report
-     *
-     * @return array
-     */
-    private function report(Report $report)
-    {
-        return $report->expose('id') + [
-            'date' => (string) $report->created_at,
-        ];
     }
 }
