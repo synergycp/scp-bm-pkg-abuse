@@ -36,7 +36,7 @@ extends Mail\EmailListener
      * @param Suspension                $suspension
      * @param ClientServerAccessService $access
      */
-    public function __construct(
+    public function boot(
         Suspension $suspension,
         ClientServerAccessService $access
     ) {

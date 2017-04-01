@@ -5,7 +5,6 @@ namespace Packages\Abuse\App\Report\Listeners;
 use App\Auth\Sso;
 use App\Client;
 use App\Mail;
-use Illuminate\Database\Eloquent\Builder;
 use Packages\Abuse\App\Report\Events\ReportClientReassigned;
 use Packages\Abuse\App\Report\Report;
 
@@ -25,17 +24,13 @@ class ReportClientEmail
     /**
      * ReportClientEmail constructor.
      *
-     * @param Mail\Mailer                             $mail
      * @param Sso\SsoUrlService                       $sso
      * @param Client\Server\ClientServerAccessService $access
      */
-    public function __construct(
-        Mail\Mailer $mail,
+    public function boot(
         Sso\SsoUrlService $sso,
         Client\Server\ClientServerAccessService $access
     ) {
-        parent::__construct($mail);
-
         $this->sso = $sso;
         $this->access = $access;
     }
@@ -118,22 +113,5 @@ class ReportClientEmail
         }
 
         return $this->access->clients($report->server);
-    }
-
-    /**
-     * @param string $table
-     * @param Report $report
-     *
-     * @return \Closure
-     */
-    protected function matchingAccess($table, Report $report)
-    {
-        return function (Builder $query) use ($table, $report) {
-            $query->where("$table.server_id", $report->server_id);
-
-            if ($report->resolved_at) {
-                $query->where("$table.created_at", '<', $report->resolved_at);
-            }
-        };
     }
 }

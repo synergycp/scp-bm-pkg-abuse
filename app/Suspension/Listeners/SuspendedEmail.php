@@ -28,7 +28,7 @@ class SuspendedEmail
      *
      * @param ClientServerAccessService $access
      */
-    public function __construct(
+    public function boot(
         ClientServerAccessService $access
     ) {
         $this->access = $access;
