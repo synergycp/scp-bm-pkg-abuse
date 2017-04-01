@@ -2,19 +2,17 @@
 
 namespace Packages\Abuse\App\Email;
 
-use App\Ip\IpService;
+use App\Entity\LookupService;
 use App\Ip\IpAddressRangeContract;
+use App\Ip\IpService;
 use App\Log;
 use App\Mail\Imap\MessageIterator;
-use Packages\Abuse\App\Report\ReportService;
-use Packages\Abuse\App\Report\Events;
-use Illuminate\Support\Collection;
-use Ddeboer\Imap\Message;
 use Ddeboer\Imap\Exception\MessageDoesNotExistException;
+use Ddeboer\Imap\Message;
 use Ddeboer\Transcoder\Exception\UndetectableEncodingException;
-use App\Entity\LookupService;
-use Carbon\Carbon;
-
+use Illuminate\Support\Collection;
+use Packages\Abuse\App\Report\Events;
+use Packages\Abuse\App\Report\ReportService;
 
 class EmailSynchronizer
 {
@@ -57,6 +55,11 @@ class EmailSynchronizer
      */
     protected $lookup;
 
+    /**
+     * @var Email
+     */
+    private $email;
+
     public function __construct(Email $email)
     {
         $this->email = $email;
@@ -81,6 +84,7 @@ class EmailSynchronizer
      * @param Log\Factory   $log
      * @param EmailFetcher  $emails
      * @param ReportService $report
+     * @param LookupService $lookup
      */
     public function boot(
         IpService $ips,
@@ -95,7 +99,9 @@ class EmailSynchronizer
         $this->emails = $emails;
         $this->lookup = $lookup;
 
-        $this->filterAfterLastSeen();
+        $this->emails->after(
+            $this->report->minDate($this->email)
+        );
     }
 
     /**
@@ -116,74 +122,6 @@ class EmailSynchronizer
             } catch (\Exception $exc) {
                 $this->logException($exc);
             }
-        }
-    }
-
-    private function logException(\Exception $exc)
-    {
-        $this->log
-            ->create('Abuse error while saving report')
-            ->setException($exc)
-            ->save()
-            ;
-    }
-
-    /**
-     * @param Message $mail
-     */
-    private function reportIpsIn(Message $mail)
-    {
-        $mail->keepUnseen();
-
-        $from = (string) $mail->getFrom();
-
-        if ($this->ignoreFrom->contains($from)) {
-            return;
-        }
-
-        $ips = $this->findIpsIn($mail);
-
-        $report = function (IpAddressRangeContract $addr) use ($mail) {
-            $this->report($addr, $mail);
-        };
-        $shouldReport = function (IpAddressRangeContract $addr) {
-            $start = $addr->start();
-
-            // Ranged addresses should always be reported.
-            if ((string) $start != (string) $addr->end()) {
-                return true;
-            }
-
-            // If the IP is a hard-coded ignored IP, don't report it.
-            if ($this->ignoreIps->contains((string) $start)) {
-                return false;
-            }
-
-            return true;
-        };
-
-        $findEnteties = function(IpAddressRangeContract $addr) {
-            if ($this->lookup->addr($addr)) {
-                return true;
-            }
-            return false;
-        };
-
-        $onlyIpAdress = function(IpAddressRangeContract $addr) {
-            return (string) $addr;
-        };
-
-        $ipWithEnteties = $ips->filter($findEnteties)->map($onlyIpAdress);
-
-
-        $shouldEnteties = function(IpAddressRangeContract $addr) use ($ipWithEnteties) {
-            if ($ipWithEnteties->count()) {
-                return $ipWithEnteties->contains((string) $addr) ? true : false; 
-            } else return true;
-        };
-        
-        if ($ips->filter($shouldReport)->filter($shouldEnteties)->each($report)->count()) {
-            $this->whenIpFound($mail);
         }
     }
 
@@ -208,36 +146,78 @@ class EmailSynchronizer
             ->distinct('msg_num')
             ->pluck('msg_num')
             ->each($forget)
-            ;
+        ;
 
         return $items;
     }
 
     /**
-     * Generate and save an Report for the given address.
-     *
-     * @param IpAddressRangeContract $addr
-     * @param Message                $mail
+     * @param Message $mail
      */
-    private function report(IpAddressRangeContract $addr, Message $mail)
+    private function reportIpsIn(Message $mail)
     {
-        $report = $this->report->makeWithEntity($addr, $this->lookup->addr($addr));
-        $report->from = (string) $mail->getFrom();
-        $report->body = $mail->getBodyText();
-        $report->msg_id = $mail->getId();
-        $report->msg_num = $mail->getNumber();
-        $report->subject = $mail->getSubject();
-        $report->reported_at = $mail->getDate();
+        $mail->keepUnseen();
 
-        $report->save();
+        $from = (string)$mail->getFrom();
 
-        event(new Events\ReportCreated($report));
+        if ($this->ignoreFrom->contains($from)) {
+            return;
+        }
+
+        $ips = $this->findIpsIn($mail);
+        $report = function (IpAddressRangeContract $addr) use ($mail) {
+            $this->report($addr, $mail);
+        };
+        $shouldReport = function (IpAddressRangeContract $addr) {
+            $start = (string) $addr->start();
+            $end = (string) $addr->end();
+
+            // Ranged addresses should always be reported.
+            if ($start != $end) {
+                return true;
+            }
+
+            // If the IP is a hard-coded ignored IP, don't report it.
+            if ($this->ignoreIps->contains($start)) {
+                return false;
+            }
+
+            return true;
+        };
+        $hasEntity = function (IpAddressRangeContract $addr) {
+            return (bool)$this->lookup->addr($addr);
+        };
+        $getAddress = function (IpAddressRangeContract $addr) {
+            return (string)$addr;
+        };
+        $ipsWithEntities = $ips
+            ->filter($hasEntity)
+            ->map($getAddress)
+        ;
+        $shouldEntities = function (IpAddressRangeContract $addr) use ($ipsWithEntities) {
+            if ($ipsWithEntities->count()) {
+                return $ipsWithEntities->contrains(
+                    (string) $addr
+                );
+            }
+
+            return true;
+        };
+        $reportedIps = $ips
+            ->filter($shouldReport)
+            ->filter($shouldEntities)
+            ->each($report)
+        ;
+
+        if ($reportedIps->count()) {
+            $this->whenIpFound($mail);
+        }
     }
 
     /**
      * Find All IP Addresses in the given Mail object.
      *
-     * @param Mail $mail
+     * @param Message $mail
      *
      * @return Collection
      */
@@ -259,19 +239,41 @@ class EmailSynchronizer
         return $this->ips->find($search);
     }
 
+    /**
+     * Generate and save an Report for the given address.
+     *
+     * @param IpAddressRangeContract $addr
+     * @param Message                $mail
+     */
+    private function report(IpAddressRangeContract $addr, Message $mail)
+    {
+        $report = $this->report->makeWithEntity($addr, $this->lookup->addr($addr));
+        $report->from = (string)$mail->getFrom();
+        $report->body = $mail->getBodyText();
+        $report->msg_id = $mail->getId();
+        $report->msg_num = $mail->getNumber();
+        $report->subject = $mail->getSubject();
+        $report->reported_at = $mail->getDate();
+
+        $report->save();
+
+        event(new Events\ReportCreated($report));
+    }
+
     private function whenIpFound(Message $mail)
     {
         // Mark as read.
-        $mail->keepUnseen(false)->getContent(false);
+        $mail->keepUnseen(false)
+             ->getContent(false)
+        ;
     }
 
-    private function filterAfterLastSeen()
+    private function logException(\Exception $exc)
     {
-        // TODO: latest based on $this->email
-        $latestReport = $this->report->latest();
-
-        if ($latestReport) {
-            $this->emails->after($latestReport->date->subSeconds(1)->toDateString() < 0 ? Carbon::minValue() : $latestReport->date->subSeconds(1));
-        }
+        $this->log
+            ->create('Abuse error while saving report')
+            ->setException($exc)
+            ->save()
+        ;
     }
 }

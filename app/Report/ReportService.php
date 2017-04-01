@@ -10,6 +10,7 @@ use App\Ip\IpAddressRangeContract;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
+use Packages\Abuse\App\Email\Email;
 
 /**
  * Business logic for Abuse Reports.
@@ -123,6 +124,36 @@ class ReportService
     }
 
     /**
+     * @param Email $email
+     *
+     * @return Carbon
+     */
+    public function minDate(Email $email)
+    {
+        $settings = (array) app('Settings');
+        $mins = [];
+        $mins[] = $this->now->subDays(
+            array_get($settings, 'pkg.abuse.report.threshold', 7)
+        );
+
+        // TODO: latest based on $email
+        if ($latest = $this->latest()) {
+            $mins[] = $latest
+                ->date
+                ->subSeconds(1)
+            ;
+        }
+
+        $minimum = function (Carbon $carry, Carbon $date) {
+            return $carry->min($date);
+        };
+
+        return collect($mins)
+            ->reduce($minimum, array_pop($mins))
+            ;
+    }
+
+    /**
      * @param Report      $report
      * @param Entity|null $entity
      */
@@ -184,6 +215,7 @@ class ReportService
          // Generate the report.
         $report = $this->reports->make([
             'addr' => (string) $addr,
+            // This is the default value, but can be overridden.
             'reported_at' => $this->now,
         ])->setPendingAdmin();
 

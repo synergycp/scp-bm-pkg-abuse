@@ -28,6 +28,8 @@ extends ServiceProvider
 
     /**
      * Boot the Report Service Feature.
+     *
+     * @param ClassMap $classMap
      */
     public function boot(ClassMap $classMap)
     {

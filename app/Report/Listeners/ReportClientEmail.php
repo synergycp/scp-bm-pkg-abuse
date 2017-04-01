@@ -5,48 +5,34 @@ namespace Packages\Abuse\App\Report\Listeners;
 use App\Auth\Sso;
 use App\Client;
 use App\Mail;
-use Illuminate\Database\Eloquent\Builder;
 use Packages\Abuse\App\Report\Events\ReportClientReassigned;
 use Packages\Abuse\App\Report\Report;
-use Packages\Abuse\App\Report\ReportTransformer;
 
 class ReportClientEmail
     extends Mail\EmailListener
 {
-    /**
-     * @var ReportTransformer
-     */
-    protected $transform;
-
     /**
      * @var Sso\SsoUrlService
      */
     protected $sso;
 
     /**
-     * @var Client\ClientRepository
+     * @var Client\Server\ClientServerAccessService
      */
-    protected $clients;
+    private $access;
 
     /**
      * ReportClientEmail constructor.
      *
-     * @param Mail\Mailer             $mail
-     * @param Sso\SsoUrlService       $sso
-     * @param ReportTransformer       $transform
-     * @param Client\ClientRepository $clients
+     * @param Sso\SsoUrlService                       $sso
+     * @param Client\Server\ClientServerAccessService $access
      */
-    public function __construct(
-        Mail\Mailer $mail,
+    public function boot(
         Sso\SsoUrlService $sso,
-        ReportTransformer $transform,
-        Client\ClientRepository $clients
+        Client\Server\ClientServerAccessService $access
     ) {
-        parent::__construct($mail);
-
         $this->sso = $sso;
-        $this->clients = $clients;
-        $this->transform = $transform;
+        $this->access = $access;
     }
 
     /**
@@ -59,88 +45,29 @@ class ReportClientEmail
     public function handle(ReportClientReassigned $event)
     {
         $report = $event->report;
-        if (!$report->resolved_at) {
-            $sendEmail = function (Client\Client $client) use ($report) {
-                // TODO: way for Client to opt out of these emails.
-                $context = [
-                    'client' => $client->expose('name'),
-                    'server' => $this->server($report),
-                    'report' => $this->report($report),
-                    'urls' => [
-                        'view' => $this->sso->view($report, $client),
-                    ],
-                ];
 
-                $this
-                    ->create('abuse_report.tpl')
-                    ->setData($context)
-                    ->toUser($client)
-                    ->send()
-                ;
-            };
-
-            $this->clients($report)
-                ->each($sendEmail)
-            ;
+        if ($report->resolved_at) {
+            return;
         }
 
-    }
+        foreach ($this->clients($report) as $client) {
+            // TODO: way for Client to opt out of these emails.
+            $context = [
+                'client' => $client->expose('name'),
+                'server' => $this->server($report),
+                'report' => $this->report($report),
+                'urls' => [
+                    'view' => $this->sso->view($report, $client),
+                ],
+            ];
 
-    /**
-     * Query for Clients that have access to the Report.
-     *
-     * @param Report $report
-     *
-     * @return Builder
-     */
-    public function clients(Report $report)
-    {
-        return $this->clients
-            ->query()
-            ->select('clients.*')
-            ->groupBy('clients.id')
-            ->leftJoin('client_supers as super', 'super.grantee_id', '=', 'clients.id')
-            ->leftJoin('client_server as access', 'access.client_id', '=', 'clients.id')
-            ->leftJoin('client_server as access_super', 'access.client_id', '=', 'super.granter_id')
-            ->where(function (Builder $query) use ($report) {
-                if (!$report->server_id && !$report->client_id) {
-                    return $query->where(\DB::raw('1'), 2);
-                }
-
-                if ($report->client_id) {
-                    // The user is or has been granted super access to the Client that the Report is assigned to.
-                    $query
-                        ->orWhere('clients.id', $report->client_id)
-                        ->orWhere('super.granter_id', $report->client_id)
-                    ;
-                }
-
-                if ($report->server_id) {
-                    // Or, the user is or is super of one of the Clients that the Server is assigned to.
-                    $query
-                        ->orWhere($this->matchingAccess('access', $report))
-                        ->orWhere($this->matchingAccess('access_super', $report))
-                    ;
-                }
-            })
+            $this
+                ->create('abuse_report.tpl')
+                ->setData($context)
+                ->toUser($client)
+                ->send()
             ;
-    }
-
-    /**
-     * @param string $table
-     * @param Report $report
-     *
-     * @return \Closure
-     */
-    protected function matchingAccess($table, Report $report)
-    {
-        return function (Builder $query) use ($table, $report) {
-            $query->where("$table.server_id", $report->server_id);
-
-            if ($report->resolved_at) {
-                $query->where("$table.created_at", '<', $report->resolved_at);
-            }
-        };
+        }
     }
 
     /**
@@ -150,9 +77,11 @@ class ReportClientEmail
      */
     private function server(Report $report)
     {
-        $server = $report->server;
+        if (!$server = $report->server) {
+            return null;
+        }
 
-        return $server ? $server->expose('id', 'nickname', 'name') : null;
+        return $server->expose('id', 'nickname', 'name');
     }
 
     /**
@@ -163,7 +92,23 @@ class ReportClientEmail
     private function report(Report $report)
     {
         return $report->expose('id') + [
-            'date' => $this->transform->dateForViewer($report->created_at),
-        ];
+                'date' => (string)$report->created_at,
+            ];
+    }
+
+    /**
+     * Get Clients that have access to the Report.
+     *
+     * @param Report $report
+     *
+     * @return Client\Client[]
+     */
+    public function clients(Report $report)
+    {
+        if (!$server = $report->server) {
+            return [$report->client];
+        }
+
+        return $this->access->clients($report->server);
     }
 }
