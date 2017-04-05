@@ -64,7 +64,7 @@ extends Mail\EmailListener
     protected function send(Server $server, Carbon $createdDate)
     {
         $date = $this->suspension->maxReportDate();
-        $days = $createdDate->diffInDays($date);
+        $days = $createdDate->diffInDays($date) + 1;
         $context = [
             'server' => $server->expose('name'),
             'report' => [
