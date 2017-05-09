@@ -1,0 +1,23 @@
+{
+  "report": {
+    "threshold": {
+      "LABEL": "Maximum Age of Reports",
+      "PLACEHOLDER": "During import, reports older than this many days will be ignored."
+    }
+  },
+  "auth": {
+    "host": {
+      "LABEL": "IMAP Host"
+    },
+    "user": {
+      "LABEL": "IMAP User"
+    },
+    "pass": {
+      "LABEL": "IMAP Password"
+    }
+  },
+  "auto_suspension": {
+    "LABEL": "Auto Suspension",
+    "PLACEHOLDER": "If a report is not responded to by the client within this many days, the server will be suspended (unless it is a VIP client)."
+  }
+}
