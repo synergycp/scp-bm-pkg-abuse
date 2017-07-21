@@ -63,13 +63,13 @@ class EmailSynchronizer
     public function __construct(Email $email)
     {
         $this->email = $email;
-        $this->ignoreFrom = collect([
+        $this->ignoreFrom = collection([
             'abuse@ladedicated.com',
             'abuse@losangelesdedicated.net',
             'admin@losangelesdedicated.net',
         ]);
         // TODO: accept ranges
-        $this->ignoreIps = collect([
+        $this->ignoreIps = collection([
             '127.0.0.1',
             '127.0.0.190',
             '127.0.0.192',
@@ -142,7 +142,7 @@ class EmailSynchronizer
 
         // remove already seen items.
         $this->report
-            ->matching(collect($items->keys()))
+            ->matching(collection($items->keys()))
             ->distinct('msg_num')
             ->pluck('msg_num')
             ->each($forget)
@@ -196,7 +196,7 @@ class EmailSynchronizer
         ;
         $shouldEntities = function (IpAddressRangeContract $addr) use ($ipsWithEntities) {
             if ($ipsWithEntities->count()) {
-                return $ipsWithEntities->contrains(
+                return $ipsWithEntities->contains(
                     (string) $addr
                 );
             }

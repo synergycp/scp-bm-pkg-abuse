@@ -74,7 +74,7 @@ extends Transformer
 
     protected function itemPreload($items)
     {
-        $preload = collect([
+        $preload = collection([
             'client',
             'lastComment.author',
             $this->viewerIsAdmin() ? 'entity' : null,

@@ -15,7 +15,7 @@ class ReportControllerTest extends TestCase
     protected $server;
     protected $report;
     protected $clientServer;
-    protected $url = 'api/pkg/abuse/report';
+    protected $url = 'pkg/abuse/report';
     protected $apiKey;
 
     public function setUp()

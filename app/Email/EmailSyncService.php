@@ -15,6 +15,6 @@ class EmailSyncService
             $emailSync->start();
         };
 
-        collect([new Email()])->each($sync);
+        collection([new Email()])->each($sync);
     }
 }

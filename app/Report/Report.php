@@ -277,7 +277,7 @@ class Report
             };
 
             $matchAllSearchCols = function (Builder $query) use (&$searchCol) {
-                return collect($this->searchCols)->reduce($searchCol, $query);
+                return collection($this->searchCols)->reduce($searchCol, $query);
             };
 
             return $query->where($matchAllSearchCols);

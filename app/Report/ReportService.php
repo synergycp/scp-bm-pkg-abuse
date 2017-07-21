@@ -148,7 +148,7 @@ class ReportService
             return $carry->min($date);
         };
 
-        return collect($mins)
+        return collection($mins)
             ->reduce($minimum, array_pop($mins))
             ;
     }

@@ -27,7 +27,7 @@ class SuspensionSyncTest
     protected $server;
     protected $report;
     protected $clientServer;
-    protected $url = 'api/pkg/abuse/report';
+    protected $url = 'pkg/abuse/report';
     protected $apiKey;
     protected $suspension;
     protected $testCase;
@@ -182,7 +182,7 @@ class SuspensionSyncTest
 
         $this->query
             ->shouldReceive('get')
-            ->andReturn(collect($this->report->fresh()))
+            ->andReturn(collection($this->report->fresh()))
         ;
 
         $this->query
@@ -213,7 +213,7 @@ class SuspensionSyncTest
 
         $this->query
             ->shouldReceive('keyBy')
-            ->andReturn(collect($server)->keyBy('id'))
+            ->andReturn(collection($server)->keyBy('id'))
         ;
     }
 
