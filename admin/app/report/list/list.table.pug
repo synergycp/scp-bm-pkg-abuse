@@ -22,7 +22,7 @@ table(panel-table)
     list-row-checkable="row"
   )
     td.checkbox-col
-      list-check-item(checked="row.checked")
+      list-check-item(checked="table.list.list.checkedIds[row.id]")
     td(ng-if="table.showDate")
       span(date="row.date")
     td(ng-if="table.showIp")
