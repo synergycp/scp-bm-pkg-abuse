@@ -64,9 +64,7 @@ class EmailSynchronizer
     {
         $this->email = $email;
         $this->ignoreFrom = collection([
-            'abuse@ladedicated.com',
-            'abuse@losangelesdedicated.net',
-            'admin@losangelesdedicated.net',
+            app('Settings')->{'pkg.abuse.auth.user'},
         ]);
         // TODO: accept ranges
         $this->ignoreIps = collection([
