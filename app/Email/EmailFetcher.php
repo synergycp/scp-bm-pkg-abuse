@@ -3,10 +3,10 @@
 namespace Packages\Abuse\App\Email;
 
 use Ddeboer\Imap\SearchExpression;
-use Ddeboer\Imap\Search\Date\After;
-use App\Mail\Imap\Server;
-use App\Mail\Imap\Connection;
-use App\Mail\Imap\MessageIterator;
+use Ddeboer\Imap\Search\Date\Since;
+use Ddeboer\Imap\Server;
+use Ddeboer\Imap\Connection;
+use Ddeboer\Imap\MessageIterator;
 use Carbon\Carbon;
 
 class EmailFetcher
@@ -33,7 +33,7 @@ class EmailFetcher
      */
     public function after(Carbon $date)
     {
-        $this->search->addCondition(new After($date));
+        $this->search->addCondition(new Since($date));
 
         return $this;
     }

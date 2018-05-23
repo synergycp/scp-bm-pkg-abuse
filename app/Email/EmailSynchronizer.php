@@ -6,9 +6,11 @@ use App\Entity\LookupService;
 use App\Ip\IpAddressRangeContract;
 use App\Ip\IpService;
 use App\Log;
-use App\Mail\Imap\MessageIterator;
+use App\Support\Resolver;
+use Ddeboer\Imap;
 use Ddeboer\Imap\Exception\MessageDoesNotExistException;
 use Ddeboer\Imap\Message;
+use Ddeboer\Imap\MessageInterface;
 use Ddeboer\Transcoder\Exception\UndetectableEncodingException;
 use Illuminate\Support\Collection;
 use Packages\Abuse\App\Report\Events;
@@ -16,7 +18,7 @@ use Packages\Abuse\App\Report\ReportService;
 
 class EmailSynchronizer
 {
-    use \App\Support\Resolver;
+    use Resolver;
 
     /**
      * Find and generate IP address objects.
@@ -107,16 +109,22 @@ class EmailSynchronizer
      */
     public function start()
     {
-        $iterator = $this->getMessages();
+        $iterator = $this->emails->get();
 
         while ($iterator && $iterator->valid()) {
+            $message = $iterator->current();
+            $messageNumber = $message->getNumber();
             $iterator->next();
-            try {
-                $this->reportIpsIn(
-                    $iterator->current()
-                );
-            } catch (MessageDoesNotExistException $exc) {
+
+            // remove already seen items.
+            if ($this->report->messageNumberExists($messageNumber)) {
                 continue;
+            }
+
+            try {
+                $this->reportIpsIn($message);
+            } catch (MessageDoesNotExistException $exc) {
+                // Silently ignore
             } catch (\Exception $exc) {
                 $this->logException($exc);
             }
@@ -124,39 +132,11 @@ class EmailSynchronizer
     }
 
     /**
-     * Filter the Messages.
-     *
-     * @return MessageIterator <Message>
-     */
-    private function getMessages()
-    {
-        if (!$items = $this->emails->get()) {
-            return;
-        }
-
-        $forget = function ($msgNum) use ($items) {
-            $items->offsetUnset($msgNum);
-        };
-
-        // remove already seen items.
-        $this->report
-            ->matching(collection($items->keys()))
-            ->distinct('msg_num')
-            ->pluck('msg_num')
-            ->each($forget)
-        ;
-
-        return $items;
-    }
-
-    /**
      * @param Message $mail
      */
     private function reportIpsIn(Message $mail)
     {
-        $mail->keepUnseen();
-
-        $from = (string)$mail->getFrom();
+        $from = $mail->getFrom()->getFullAddress();
 
         if ($this->ignoreFrom->contains($from)) {
             return;
@@ -234,7 +214,12 @@ class EmailSynchronizer
             $body,
         ];
 
-        return $this->ips->find($search);
+        return $this->ips
+            ->find($search)
+            ->map(function ($addr) {
+                // Ignore ranges:
+                return $addr->start();
+            });
     }
 
     /**
@@ -246,7 +231,7 @@ class EmailSynchronizer
     private function report(IpAddressRangeContract $addr, Message $mail)
     {
         $report = $this->report->makeWithEntity($addr, $this->lookup->addr($addr));
-        $report->from = (string)$mail->getFrom();
+        $report->from = $mail->getFrom()->getFullAddress();
         $report->body = $mail->getBodyText();
         $report->msg_id = $mail->getId();
         $report->msg_num = $mail->getNumber();
@@ -261,9 +246,7 @@ class EmailSynchronizer
     private function whenIpFound(Message $mail)
     {
         // Mark as read.
-        $mail->keepUnseen(false)
-             ->getContent(false)
-        ;
+        $mail->markAsSeen();
     }
 
     private function logException(\Exception $exc)

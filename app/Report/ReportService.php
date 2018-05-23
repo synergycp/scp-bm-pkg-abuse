@@ -116,6 +116,16 @@ class ReportService
     }
 
     /**
+     * @param $key
+     *
+     * @return bool
+     */
+    public function messageNumberExists($key)
+    {
+        return $this->matching(collect([$key]))->count() > 0;
+    }
+
+    /**
      * @return Report|null
      */
     public function latest()
