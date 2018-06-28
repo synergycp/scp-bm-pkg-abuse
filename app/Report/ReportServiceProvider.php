@@ -3,13 +3,14 @@
 namespace Packages\Abuse\App\Report;
 
 use App\Support\ClassMap;
-use Illuminate\Support\ServiceProvider;
+use App\Support\ScheduleServiceProvider as ServiceProvider;
+use Illuminate\Console\Scheduling\Schedule;
 
 /**
  * Provide the Report Feature to the Application.
  */
 class ReportServiceProvider
-extends ServiceProvider
+    extends ServiceProvider
 {
     /**
      * @var array
@@ -17,6 +18,13 @@ extends ServiceProvider
     protected $providers = [
         ReportEventProvider::class,
         ReportRoutesProvider::class,
+    ];
+
+    /**
+     * @var array
+     */
+    protected $commands = [
+        Commands\DeleteOldAbuseReportsCommand::class,
     ];
 
     public function register()
@@ -31,11 +39,18 @@ extends ServiceProvider
      *
      * @param ClassMap $classMap
      */
-    public function boot(ClassMap $classMap)
+    public function boot(ClassMap $classMap = null)
     {
         $classMap->map(
             'pkg.abuse.report',
             Report::class
         );
+
+        parent::boot();
+    }
+
+    protected function schedule(Schedule $schedule)
+    {
+        $schedule->command('abuse:report:expire')->daily();
     }
 }

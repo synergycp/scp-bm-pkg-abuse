@@ -232,7 +232,7 @@ class EmailSynchronizer
     {
         $report = $this->report->makeWithEntity($addr, $this->lookup->addr($addr));
         $report->from = $mail->getFrom()->getFullAddress();
-        $report->body = $mail->getBodyText();
+        $report->body = $mail->getBodyText() ?: '';
         $report->msg_id = $mail->getId();
         $report->msg_num = $mail->getNumber();
         $report->subject = $mail->getSubject();

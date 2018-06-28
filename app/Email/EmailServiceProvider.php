@@ -18,13 +18,6 @@ extends ServiceProvider
         Commands\SyncAbuseEmailsCommand::class,
     ];
 
-    public function boot()
-    {
-        $this->commands($this->commands);
-
-        parent::boot();
-    }
-
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('abuse:sync-email')->everyFiveMinutes();
