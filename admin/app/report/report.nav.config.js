@@ -51,7 +51,7 @@
     }
 
     function load() {
-      return $reports
+      /*return $reports
         .getList({
           per_page: 1,
           pending_admin: true,
@@ -59,7 +59,7 @@
         .then(function(items) {
           PkgAbuseReportNav.alert = items.meta.total;
           PkgAbuseReportNav.group.syncAlerts();
-        });
+        });*/
     }
   }
 })();
