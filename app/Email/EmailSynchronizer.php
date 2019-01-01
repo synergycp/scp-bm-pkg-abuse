@@ -7,6 +7,7 @@ use App\Ip\IpAddressRangeContract;
 use App\Ip\IpService;
 use App\Log;
 use App\Support\Resolver;
+use function base64_encode;
 use Ddeboer\Imap;
 use Ddeboer\Imap\Exception\MessageDoesNotExistException;
 use Ddeboer\Imap\Message;
@@ -126,7 +127,7 @@ class EmailSynchronizer
             } catch (MessageDoesNotExistException $exc) {
                 // Silently ignore
             } catch (\Exception $exc) {
-                $this->logException($exc);
+                $this->logException($exc, $message);
             }
         }
     }
@@ -249,10 +250,11 @@ class EmailSynchronizer
         $mail->markAsSeen();
     }
 
-    private function logException(\Exception $exc)
+    private function logException(\Exception $exc, Message $mail)
     {
         $this->log
             ->create('Abuse error while saving report')
+            ->setData(['mail' => base64_encode(substr($mail->getRawMessage(), 1000))])
             ->setException($exc)
             ->save()
         ;
