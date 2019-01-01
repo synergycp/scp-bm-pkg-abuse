@@ -141,10 +141,11 @@ class ReportService
     public function minDate(Email $email)
     {
         $settings = (array) app('Settings');
-        $mins = [];
-        $mins[] = $this->now->subDays(
-            array_get($settings, 'pkg.abuse.report.threshold', 7)
-        );
+        $mins = [
+            $this->now->subDays(
+                array_get($settings, 'pkg.abuse.report.threshold', 7)
+            ),
+        ];
 
         // TODO: latest based on $email
         if ($latest = $this->latest()) {
@@ -155,7 +156,7 @@ class ReportService
         }
 
         $minimum = function (Carbon $carry, Carbon $date) {
-            return $carry->min($date);
+            return $carry->max($date);
         };
 
         return collection($mins)
