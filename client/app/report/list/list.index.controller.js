@@ -14,14 +14,27 @@
     _,
     $q,
     List,
+    $scope,
     $state,
     $uibModal,
     $stateParams,
+    Loader,
     RouteHelpers,
     PkgAbuseReportList
   ) {
     var vm = this;
     var pkg = RouteHelpers.package('abuse');
+
+    var contactAPI = pkg.api().all('contact');
+
+    vm.contact = {
+      loader: Loader(),
+      input: {
+        email: '',
+        enabled: true,
+      },
+      submit: submitContact,
+    };
 
     vm.search = $stateParams.search || '';
     vm.tabs = {
@@ -58,34 +71,31 @@
       function hasResults(tab) {
         return tab.list.pages.total;
       }
+
+      loadContact();
+
+      $scope.$on('$destroy', onDestroy);
+    }
+
+    function loadContact() {
+      return contactAPI.get('').then(function (result) {
+        _.overwrite(vm.contact.input, result.response);
+      });
+    }
+
+    function submitContact() {
+      return vm.contact.loader.during(
+        contactAPI.post(vm.contact.input)
+      );
+    }
+
+    function onDestroy() {
+      vm.list.clearPaginationAndSortFromUrl();
     }
 
     function changeTab(active) {
       $stateParams.tab = vm.tabs.active = active;
       $state.go('app.pkg.abuse.report.list', $stateParams);
-    }
-
-    function assignClientServerModal(items) {
-      var modal = $uibModal.open({
-        templateUrl: RouteHelpers.trusted(
-          pkg.asset('client/report/modal/modal.assign.html')
-        ),
-        controller: 'PkgAbuseReportModalAssignCtrl',
-        bindToController: true,
-        controllerAs: 'modal',
-        resolve: {
-          items: function () {
-            return items;
-          }
-        }
-      });
-
-      return modal.result.then(function (result) {
-        return vm.tabs.items[$stateParams.tab].list.patch({
-          client_id: result.client ? result.client.id : null,
-          server_id: result.server ? result.server.id : null,
-        }, items);
-      });
     }
 
     function onSearchChange() {

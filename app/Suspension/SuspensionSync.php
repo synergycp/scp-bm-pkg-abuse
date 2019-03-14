@@ -48,6 +48,11 @@ class SuspensionSync
     public function sync()
     {
         $suspensionLastDate = $this->suspension->maxReportDate();
+
+        if ($suspensionLastDate === null) {
+            return;
+        }
+
         $query = $this->reportRepository
             ->query()
             ->whereNotNull('server_id')

@@ -2,6 +2,7 @@
 
 namespace Packages\Abuse\App\Suspension;
 
+use App\Setting\SettingService;
 use Packages\Abuse\App\Suspension\Events;
 use App\Client\Server\ClientServerAccessService;
 use Carbon\Carbon;
@@ -20,10 +21,16 @@ class Suspension
      */
     private $event;
 
-    public function __construct(ClientServerAccessService $access, Dispatcher $event)
+    /**
+     * @var SettingService
+     */
+    private $setting;
+
+    public function __construct(ClientServerAccessService $access, Dispatcher $event, SettingService $setting)
     {
         $this->access = $access;
         $this->event = $event;
+        $this->setting = $setting;
     }
 
     public function suspendServer(Server $server, Carbon $createdAt)
@@ -41,10 +48,16 @@ class Suspension
         );
     }
 
+    /**
+     * @return Carbon|null
+     */
     public function maxReportDate()
     {
-        $settings = app('Settings');
-        $days = array_get((array) $settings, 'pkg.abuse.auto_suspension', 15);
+        $days = $this->setting->getValue('pkg.abuse.auto_suspension');
+
+        if ($days === '0' || $days === null || $days === "") {
+            return null;
+        }
         
         return Carbon::now()
             ->subDays($days)

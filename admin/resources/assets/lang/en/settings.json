@@ -18,6 +18,6 @@
   },
   "auto_suspension": {
     "LABEL": "Auto Suspension",
-    "PLACEHOLDER": "If a report is not responded to by the client within this many days, the server will be suspended (unless it is a VIP client)."
+    "PLACEHOLDER": "If a report is not responded to by the client within this many days, the server will be suspended (unless it is a VIP client). Leave empty to disable auto suspension."
   }
 }

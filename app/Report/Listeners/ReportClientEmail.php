@@ -5,17 +5,13 @@ namespace Packages\Abuse\App\Report\Listeners;
 use App\Auth\Sso;
 use App\Client;
 use App\Mail;
+use Packages\Abuse\App\Contact\ClientAbuseContact;
 use Packages\Abuse\App\Report\Events\ReportClientReassigned;
 use Packages\Abuse\App\Report\Report;
 
 class ReportClientEmail
     extends Mail\EmailListener
 {
-    /**
-     * @var Sso\SsoUrlService
-     */
-    protected $sso;
-
     /**
      * @var Client\Server\ClientServerAccessService
      */
@@ -24,14 +20,11 @@ class ReportClientEmail
     /**
      * ReportClientEmail constructor.
      *
-     * @param Sso\SsoUrlService                       $sso
      * @param Client\Server\ClientServerAccessService $access
      */
     public function boot(
-        Sso\SsoUrlService $sso,
         Client\Server\ClientServerAccessService $access
     ) {
-        $this->sso = $sso;
         $this->access = $access;
     }
 
@@ -41,6 +34,7 @@ class ReportClientEmail
      * @param  ReportClientReassigned $event
      *
      * @return void
+     * @throws \Throwable
      */
     public function handle(ReportClientReassigned $event)
     {
@@ -50,21 +44,21 @@ class ReportClientEmail
             return;
         }
 
+
         foreach ($this->clients($report) as $client) {
-            // TODO: way for Client to opt out of these emails.
             $context = [
                 'client' => $client->expose('name'),
                 'server' => $this->server($report),
                 'report' => $this->report($report),
                 'urls' => [
-                    'view' => $this->sso->view($report, $client),
+                    'view' => url('/'),
                 ],
             ];
 
             $this
                 ->create('abuse_report.tpl')
                 ->setData($context)
-                ->toUser($client)
+                ->toUser(new ClientAbuseContact($client))
                 ->send()
             ;
         }

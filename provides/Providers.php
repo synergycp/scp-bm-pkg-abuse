@@ -7,6 +7,7 @@ namespace Packages\Abuse\App;
  */
 
 return [
+    Contact\ContactServiceProvider::class,
     Email\EmailServiceProvider::class,
     Report\ReportServiceProvider::class,
     Module\ModuleServiceProvider::class,

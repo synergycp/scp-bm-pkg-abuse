@@ -1,3 +1,7 @@
+include /node_modules/scp-ng-gulp/resources/pug/mixins/list
+include /node_modules/scp-ng-gulp/resources/pug/mixins/form
+include /node_modules/scp-ng-gulp/resources/pug/mixins/panel
+
 .alert.alert-success(ng-if="!vm.tabs.couldHaveResults")
   span(translate="pkg.abuse.client.report.list.NONE")
 
@@ -32,5 +36,27 @@
         )
           pkg-abuse-report-table
           list-footer
-        .alert.alert-success(ng-if="!list.pages.total")
+        .alert.alert-success.mb0(ng-if="!list.pages.total")
           span(translate="{{ tab.text }}.EMPTY")
+br
+.row
+  .col-md-6
+    form(ng-submit="vm.contact.submit()")
+      +panel("{{ 'pkg.abuse.client.report.contact.create.ADD' | translate }}")
+        .relative
+          .loader(ng-class="vm.contact.loader.class")
+          .panel-body.form-horizontal
+            +field("pkg.abuse.client.report.contact.create.email.LABEL")(
+              placeholder="{{ 'pkg.abuse.client.report.contact.create.email.PLACEHOLDER' | translate }}"
+              ng-model="vm.contact.input.email"
+            )
+            +label()
+              +checkbox("pkg.abuse.client.report.contact.create.enabled.LABEL")(
+                ng-model="vm.contact.input.enabled"
+              )
+          .panel-footer.clearfix
+            .pull-right
+              input.btn.btn-info(
+                type="submit"
+                value="{{ 'pkg.abuse.client.report.contact.create.ADD' | translate }}"
+              )

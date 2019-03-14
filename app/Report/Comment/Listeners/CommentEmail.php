@@ -2,10 +2,10 @@
 
 namespace Packages\Abuse\App\Report\Comment\Listeners;
 
+use Packages\Abuse\App\Contact\ClientAbuseContact;
 use Packages\Abuse\App\Report\Comment\Events;
 use Packages\Abuse\App\Report\Comment\Comment;
 use App\Mail;
-use App\Auth\Sso;
 
 /**
  * Send out an Email when a Comment is created on a Report.
@@ -13,24 +13,6 @@ use App\Auth\Sso;
 class CommentEmail
 extends Mail\EmailListener
 {
-    /**
-     * @var Sso\SsoUrlService
-     */
-    protected $sso;
-
-    /**
-     * @param Mail\Mailer       $mail
-     * @param Sso\SsoUrlService $sso
-     */
-    public function __construct(
-        Mail\Mailer $mail,
-        Sso\SsoUrlService $sso
-    ) {
-        parent::__construct($mail);
-
-        $this->sso = $sso;
-    }
-
     /**
      * Handle the event.
      *
@@ -58,6 +40,8 @@ extends Mail\EmailListener
 
     /**
      * @param Comment $comment
+     *
+     * @throws \Throwable
      */
     protected function toClient(Comment $comment)
     {
@@ -67,14 +51,14 @@ extends Mail\EmailListener
             'report' => $comment->report->expose('id'),
             'comment' => $comment->expose('body'),
             'urls' => [
-                'view' => $this->sso->view($comment->report, $client),
+                'view' => url('/'),
             ],
         ];
 
         $this
             ->create('abuse_report_comment.tpl')
             ->setData($context)
-            ->toUser($client)
+            ->toUser(with(new ClientAbuseContact($client))->setIgnoreOptOut(true))
             ->send()
             ;
     }

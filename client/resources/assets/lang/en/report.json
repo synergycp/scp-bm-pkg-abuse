@@ -1,4 +1,16 @@
 {
+  "contact": {
+    "create": {
+      "ADD": "Set Abuse Contact",
+      "email": {
+        "LABEL": "Email",
+        "PLACEHOLDER": "Leave blank for account email."
+      },
+      "enabled": {
+        "LABEL": "Receive Abuse report notifications via email"
+      }
+    }
+  },
   "list": {
     "TITLE": "Abuse Reports",
     "NONE": "There have been no reports of abuse on your servers yet.",
