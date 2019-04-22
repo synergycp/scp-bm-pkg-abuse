@@ -11,7 +11,6 @@ class ReportController extends Api\Controller
 {
     use Api\Traits\ShowResource;
     use Api\Traits\ListResource;
-    use Api\Traits\DeleteResource;
     use Api\Traits\UpdateResource;
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Packages\Abuse\App\Report;
 
+use App\Client\Events\ClientDeleted;
 use App\Client\Server\Events as AccessEvents;
 use App\Entity\Events as EntityEvents;
 use App\Log\EventLogger;
@@ -11,7 +12,7 @@ use App\Support\EventServiceProvider;
  * Setup Abuse Report Event Listeners.
  */
 class ReportEventProvider
-extends EventServiceProvider
+    extends EventServiceProvider
 {
     protected $listen = [
         AccessEvents\ClientServerCreated::class => [
@@ -42,6 +43,10 @@ extends EventServiceProvider
             EventLogger::class,
             Comment\Listeners\CommentUpdateParent::class,
             Comment\Listeners\CommentEmail::class,
+        ],
+
+        ClientDeleted::class => [
+            Listeners\ClientDeleteReports::class,
         ],
     ];
 }
