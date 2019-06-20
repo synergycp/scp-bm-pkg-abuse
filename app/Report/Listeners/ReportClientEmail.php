@@ -5,6 +5,7 @@ namespace Packages\Abuse\App\Report\Listeners;
 use App\Auth\Sso;
 use App\Client;
 use App\Mail;
+use App\Url\UrlService;
 use Packages\Abuse\App\Contact\ClientAbuseContact;
 use Packages\Abuse\App\Report\Events\ReportClientReassigned;
 use Packages\Abuse\App\Report\Report;
@@ -18,14 +19,20 @@ class ReportClientEmail
     private $access;
 
     /**
+     * @var UrlService
+     */
+    private $url;
+
+    /**
      * ReportClientEmail constructor.
      *
      * @param Client\Server\ClientServerAccessService $access
+     * @param UrlService                              $url
      */
-    public function boot(
-        Client\Server\ClientServerAccessService $access
-    ) {
+    public function boot(Client\Server\ClientServerAccessService $access, UrlService $url)
+    {
         $this->access = $access;
+        $this->url = $url;
     }
 
     /**
@@ -51,7 +58,11 @@ class ReportClientEmail
                 'server' => $this->server($report),
                 'report' => $this->report($report),
                 'urls' => [
-                    'view' => url('/'),
+                    'view' => sprintf(
+                        '%s/pkg/abuse/report/%d',
+                        $this->url->base(get_class($client)),
+                        $report->getKey()
+                    ),
                 ],
             ];
 
@@ -85,7 +96,7 @@ class ReportClientEmail
      */
     private function report(Report $report)
     {
-        return $report->expose('id') + [
+        return $report->expose('id', 'addr', 'body') + [
                 'date' => (string)$report->created_at,
             ];
     }
