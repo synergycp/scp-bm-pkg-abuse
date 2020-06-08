@@ -6,6 +6,7 @@ use App\Client\Events\ClientDeleted;
 use App\Client\Server\Events as AccessEvents;
 use App\Entity\Events as EntityEvents;
 use App\Log\EventLogger;
+use App\Server\Events\ServerDeleted;
 use App\Support\EventServiceProvider;
 
 /**
@@ -46,7 +47,11 @@ class ReportEventProvider
         ],
 
         ClientDeleted::class => [
-            Listeners\ClientDeleteReports::class,
+          Listeners\ClientUnlinkReports::class,
+        ],
+
+        ServerDeleted::class => [
+          Listeners\ServerUnlinkReports::class,
         ],
     ];
 }

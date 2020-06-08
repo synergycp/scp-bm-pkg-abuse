@@ -3,14 +3,12 @@
 namespace Packages\Abuse\App\Report\Listeners;
 
 use App\Client\Events\ClientEvent;
-use Packages\Abuse\App\Report\Comment\Comment;
-use Packages\Abuse\App\Report\Report;
 use Packages\Abuse\App\Report\ReportRepository;
 
 /**
- * When a client is deleted, delete the abuse reports pertaining to their account.
+ * When a client is deleted, unlink the abuse reports pertaining to their account.
  */
-class ClientDeleteReports
+class ClientUnlinkReports
 {
     /**
      * @var ReportRepository
