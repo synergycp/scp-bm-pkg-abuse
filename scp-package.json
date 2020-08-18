@@ -3,11 +3,11 @@
     "slug": "abuse",
     "name": "Abuse Reports",
     "description": "The Abuse package retrieves abuse reports via IMAP from an email account and distributes the reports to the appropriate server tenants based on server IP. It adds a frontend to SynergyCP that allows Clients and Administrators to see and comment on reports.",
-    "semver": "1.0.1",
+    "semver": "1.0.2",
     "download_url": "https://api.packages.synergycp.com/package/synergycp/abuse/download.tar.gz",
-    "release_date_unix": 1591645558,
+    "release_date_unix": 1597728707,
     "changelog": [
-      "Allow deleting servers that have linked abuse reports"
+      "Setting option for enabling/disabling sending of emails for abuse reports"
     ]
   }
 }

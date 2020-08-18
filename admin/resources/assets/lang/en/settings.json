@@ -16,6 +16,12 @@
       "LABEL": "IMAP Password"
     }
   },
+  "email": {
+    "enabled": {
+      "LABEL": "Send abuse emails",
+      "PLACEHOLDER": "When this is enabled, SynergyCP will send an email to clients every time an abuse report is assigned to one of their servers (including through auto-detection via IP). The email that is sent can be edited from System > Emails > abuse_report.tpl."
+    }
+  },
   "auto_suspension": {
     "LABEL": "Auto Suspension",
     "PLACEHOLDER": "If a report is not responded to by the client within this many days, the server will be suspended (unless it is a VIP client). Leave empty to disable auto suspension."
