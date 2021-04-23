@@ -1,5 +1,4 @@
 var gulp = require('scp-ng-gulp')(require('gulp'));
-var _ = require('lodash');
 
 gulp.require('settings').dir = __dirname;
 
@@ -13,28 +12,6 @@ var js = {
   src: PATH.SCRIPTS,
   app: 'app.js',
 };
-var scss = {
-  img: 'assets/img/',
-  src: 'app/',
-};
-var appStyles = {
-  src: [scss.src + '**/*.scss'],
-  dest: PATH.PUBLIC,
-  base: scss.src,
-  image: scss.image,
-};
-
-/*
-// CSS
-var styles = gulp.require('styles');
-gulp.task('styles', [
-  'styles:app',
-  'styles:app:rtl',
-]);
-gulp.task('styles:app', styles.add(appStyles));
-gulp.task('styles:app:rtl', styles.rtl(appStyles));
-*/
-gulp.task('styles', gulp.noop);
 
 var scripts = gulp.require('scripts');
 gulp.task('scripts', scripts.app({
@@ -58,13 +35,9 @@ gulp.task('copy', copy({
   base: 'resources',
 }));
 
-var production = gulp.require('production');
-gulp.task('prod', production());
-
-gulp.task('default', [
+gulp.task('default', gulp.parallel([
   'copy',
-  'styles',
   'templates',
   'scripts',
-]);
-gulp.task('build', ['default']);
+]));
+gulp.task('build', gulp.series(['default']));

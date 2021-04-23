@@ -14,6 +14,7 @@ class AbuseReportChangeUnique extends Migration
     {
         Schema::table('abuse_reports', function (Blueprint $table) {
             $table->dropUnique('abuse_reports_msg_id_unique');
+            
             $table->unique(['msg_id', 'addr']);
         });
     }

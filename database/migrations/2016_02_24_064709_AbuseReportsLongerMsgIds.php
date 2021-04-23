@@ -12,9 +12,11 @@ class AbuseReportsLongerMsgIds extends Migration
      */
     public function up()
     {
-        Schema::table('abuse_reports', function (Blueprint $table) {
-            $table->dropUnique('abuse_reports_msg_id_addr_unique');
-        });
+        try {
+          Schema::table('abuse_reports', function (Blueprint $table) {
+              $table->dropUnique('abuse_reports_msg_id_addr_unique');
+            });
+        } catch (\Exception $e) {}
 
         Schema::table('abuse_reports', function (Blueprint $table) {
             $table->string('msg_id', 1000)->change();
