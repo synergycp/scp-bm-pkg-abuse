@@ -3,11 +3,11 @@
     "slug": "abuse",
     "name": "Abuse Reports",
     "description": "The Abuse package retrieves abuse reports via IMAP from an email account and distributes the reports to the appropriate server tenants based on server IP. It adds a frontend to SynergyCP that allows Clients and Administrators to see and comment on reports.",
-    "semver": "1.1.0",
+    "semver": "1.2.0",
     "download_url": "https://api.packages.synergycp.com/package/synergycp/abuse/download.tar.gz",
-    "release_date_unix": 1653321735,
+    "release_date_unix": 1718225394,
     "changelog": [
-      "Disable IMAP SSL certificate validation since Google has self-signed certificate"
+      "Support for Laravel 6"
     ]
   }
 }
