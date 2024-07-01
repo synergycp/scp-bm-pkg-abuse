@@ -21,7 +21,7 @@
             "Packages\\Abuse\\App\\": "app"
         },
         "files": [
-            "Packages\\Abuse\\App\\Helpers\\scp.php"
+            "app/Helpers/scp.php"
         ]
     },
     "autoload-dev": {
