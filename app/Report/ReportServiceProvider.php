@@ -39,7 +39,7 @@ class ReportServiceProvider
      *
      * @param ClassMap $classMap
      */
-    public function boot()
+    public function boot() :void
     {
         (new ClassMap)->map(
             'pkg.abuse.report',
