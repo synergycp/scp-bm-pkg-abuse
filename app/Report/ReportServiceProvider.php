@@ -39,9 +39,9 @@ class ReportServiceProvider
      *
      * @param ClassMap $classMap
      */
-    public function boot(ClassMap $classMap = null)
+    public function boot()
     {
-        $classMap->map(
+        (new ClassMap)->map(
             'pkg.abuse.report',
             Report::class
         );
