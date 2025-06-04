@@ -7,7 +7,7 @@
     "download_url": "https://api.packages.synergycp.com/package/synergycp/abuse/download.tar.gz",
     "release_date_unix": 1718225394,
     "changelog": [
-      "Support for Laravel 6"
+      "Depedencies updated"
     ]
   }
 }
