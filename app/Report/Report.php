@@ -62,8 +62,10 @@ class Report
         'subject', 'body', 'reported_at', 'addr',
     ];
 
-    protected $dates = [
-        'reported_at', 'resolved_at', 'pending_at',
+    protected $casts = [
+        'reported_at' => 'datetime',
+        'resolved_at' => 'datetime',
+        'pending_at' => 'datetime',
     ];
 
     /**
