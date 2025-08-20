@@ -52,25 +52,26 @@ class SuspensionSync
         if ($suspensionLastDate === null) {
             return;
         }
-
         $query = $this->reportRepository
             ->query()
             ->whereNotNull('server_id')
             ->select('server_id', DB::raw('min(pending_at) as pending_at'))
             ->pendingClient()
-            ->groupBy('server_id')
-        ;
+            ->groupBy('server_id');
         $reports = $query->get();
+        if ($reports->isEmpty()) {
+            return;
+        }
         $serverIds = $reports
             ->pluck('server_id')
-            ->all()
-            ;
+            ->all();
         $servers = $this
             ->server
-            ->find($serverIds)
+            ->query()
+            ->whereIn('id', $serverIds)
+            ->get()
             ->load('access.client')
-            ->keyBy('id')
-            ;
+            ->keyBy('id');
         $vipClientFilter = function ($report) use ($servers) {
             // Server deleted
             if (!$server = array_get($servers, $report->server_id)) {
