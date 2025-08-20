@@ -70,7 +70,7 @@ extends Controller
      */
     protected function user()
     {
-        $this->auth->only('client');
+        $this->auth->only(['client']);
 
         return $this->auth->user();
     }
