@@ -1,0 +1,71 @@
+name: Build and Deploy Package
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+env:
+  CLOUDFLARE_ACCOUNT_ID: 93693293a9d60b19beab51668ad629f5
+  R2_BUCKET: api-packages
+  PACKAGE_PATH: package/synergycp/abuse
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build admin frontend
+        working-directory: admin
+        run: |
+          npm install
+          npx gulp build
+
+      - name: Build client frontend
+        working-directory: client
+        run: |
+          npm install
+          npx gulp build
+
+      - name: Generate index.json
+        run: |
+          jq '.data | .release_date_unix = (now | floor)' scp-package.json > index.json
+          cat index.json
+
+      - name: Create package tarball
+        run: |
+          tar -czvf download.tar.gz \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='vendor' \
+            --exclude='.idea' \
+            --exclude='download.tar.gz' \
+            --exclude='index.json' \
+            --exclude='CLAUDE.md' \
+            --exclude='admin/node_modules' \
+            --exclude='client/node_modules' \
+            .
+
+      - name: Upload index.json to R2
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+          command: r2 object put ${{ env.R2_BUCKET }}/${{ env.PACKAGE_PATH }}/index.json --file=index.json --content-type=application/json
+
+      - name: Upload tarball to R2
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+          command: r2 object put ${{ env.R2_BUCKET }}/${{ env.PACKAGE_PATH }}/download.tar.gz --file=download.tar.gz --content-type=application/gzip
