@@ -43,7 +43,9 @@ jobs:
 
       - name: Create package tarball
         run: |
+          SLUG=$(jq -r '.data.slug' scp-package.json)
           tar -czvf /tmp/download.tar.gz \
+            --transform "s,^\.,$SLUG," \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='node_modules' \
