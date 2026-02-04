@@ -7,7 +7,6 @@ on:
   workflow_dispatch:
 
 env:
-  CLOUDFLARE_ACCOUNT_ID: 93693293a9d60b19beab51668ad629f5
   R2_BUCKET: distribution
   PACKAGE_PATH: packages/synergycp/abuse
   D1_DATABASE: packages-api
@@ -80,7 +79,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          AWS_ENDPOINT_URL: https://${{ env.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+          AWS_ENDPOINT_URL: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
         run: |
           aws s3 cp download.tar.gz s3://${{ env.R2_BUCKET }}/${{ env.PACKAGE_PATH }}/download.tar.gz --content-type application/gzip
 
