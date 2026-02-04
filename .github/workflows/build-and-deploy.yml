@@ -69,3 +69,17 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
           command: r2 object put ${{ env.R2_BUCKET }}/${{ env.PACKAGE_PATH }}/download.tar.gz --file=download.tar.gz --content-type=application/gzip
+
+      - name: Notify Slack on success
+        if: success()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"✅ *scp-bm-pkg-abuse* deployed successfully\nCommit: `${{ github.sha }}`\nBranch: `${{ github.ref_name }}`\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"}' \
+            ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify Slack on failure
+        if: failure()
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"❌ *scp-bm-pkg-abuse* deployment failed\nCommit: `${{ github.sha }}`\nBranch: `${{ github.ref_name }}`\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"}' \
+            ${{ secrets.SLACK_WEBHOOK_URL }}
