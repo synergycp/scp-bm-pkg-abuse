@@ -6,7 +6,7 @@ use App\Http\Requests\RestRequest;
 
 class ReportPatchRequest extends RestRequest
 {
-    public function rules()
+    public function rules(): array
     {
         return [
         ];
