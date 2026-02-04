@@ -43,18 +43,18 @@ jobs:
 
       - name: Create package tarball
         run: |
-          tar -czvf download.tar.gz \
+          tar -czvf /tmp/download.tar.gz \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='node_modules' \
             --exclude='vendor' \
             --exclude='.idea' \
-            --exclude='download.tar.gz' \
-            --exclude='index.json' \
             --exclude='CLAUDE.md' \
+            --exclude='index.json' \
             --exclude='admin/node_modules' \
             --exclude='client/node_modules' \
             .
+          mv /tmp/download.tar.gz download.tar.gz
 
       - name: Upload index.json to R2
         uses: cloudflare/wrangler-action@v3
