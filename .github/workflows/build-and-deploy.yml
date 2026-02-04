@@ -56,19 +56,14 @@ jobs:
             .
           mv /tmp/download.tar.gz download.tar.gz
 
-      - name: Upload index.json to R2
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
-          command: r2 object put ${{ env.R2_BUCKET }}/${{ env.PACKAGE_PATH }}/index.json --file=index.json --content-type=application/json
-
-      - name: Upload tarball to R2
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
-          command: r2 object put ${{ env.R2_BUCKET }}/${{ env.PACKAGE_PATH }}/download.tar.gz --file=download.tar.gz --content-type=application/gzip
+      - name: Upload to R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_ENDPOINT_URL: https://${{ env.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+        run: |
+          aws s3 cp index.json s3://${{ env.R2_BUCKET }}/${{ env.PACKAGE_PATH }}/index.json --content-type application/json
+          aws s3 cp download.tar.gz s3://${{ env.R2_BUCKET }}/${{ env.PACKAGE_PATH }}/download.tar.gz --content-type application/gzip
 
       - name: Notify Slack on success
         if: success() && secrets.SLACK_WEBHOOK_URL != ''
