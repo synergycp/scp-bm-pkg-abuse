@@ -8,8 +8,9 @@ on:
 
 env:
   CLOUDFLARE_ACCOUNT_ID: 93693293a9d60b19beab51668ad629f5
-  R2_BUCKET: api-packages
-  PACKAGE_PATH: package/synergycp/abuse
+  R2_BUCKET: distribution
+  PACKAGE_PATH: packages/synergycp/abuse
+  D1_DATABASE: packages-api
 
 jobs:
   build-and-deploy:
@@ -58,13 +59,29 @@ jobs:
             .
           mv /tmp/download.tar.gz download.tar.gz
 
+      - name: Write to D1 database
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          SLUG=$(jq -r '.slug' index.json)
+          NAME=$(jq -r '.name' index.json)
+          SEMVER=$(jq -r '.semver' index.json)
+          DESCRIPTION=$(jq -r '.description' index.json)
+          DOWNLOAD_URL=$(jq -r '.download_url' index.json)
+          RELEASE_DATE_UNIX=$(jq -r '.release_date_unix' index.json)
+          CHANGELOG=$(jq -c '.changelog' index.json)
+
+          npx wrangler d1 execute ${{ env.D1_DATABASE }} --remote --command "
+            INSERT OR REPLACE INTO packages (slug, name, semver, description, download_url, release_date_unix, changelog)
+            VALUES ('$SLUG', '$NAME', '$SEMVER', '$DESCRIPTION', '$DOWNLOAD_URL', $RELEASE_DATE_UNIX, '$CHANGELOG')
+          "
+
       - name: Upload to R2
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           AWS_ENDPOINT_URL: https://${{ env.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
         run: |
-          aws s3 cp index.json s3://${{ env.R2_BUCKET }}/${{ env.PACKAGE_PATH }}/index.json --content-type application/json
           aws s3 cp download.tar.gz s3://${{ env.R2_BUCKET }}/${{ env.PACKAGE_PATH }}/download.tar.gz --content-type application/gzip
 
       - name: Purge Cloudflare cache
@@ -72,7 +89,7 @@ jobs:
           curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
             -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_CACHE_TOKEN }}" \
             -H "Content-Type: application/json" \
-            --data '{"files":["https://api.packages.synergycp.com/${{ env.PACKAGE_PATH }}/index.json","https://api.packages.synergycp.com/${{ env.PACKAGE_PATH }}/download.tar.gz"]}'
+            --data '{"files":["https://distribution.synergycp.com/${{ env.PACKAGE_PATH }}/download.tar.gz"]}'
 
       - name: Notify Slack on success
         if: success()
