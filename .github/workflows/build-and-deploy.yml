@@ -67,6 +67,13 @@ jobs:
           aws s3 cp index.json s3://${{ env.R2_BUCKET }}/${{ env.PACKAGE_PATH }}/index.json --content-type application/json
           aws s3 cp download.tar.gz s3://${{ env.R2_BUCKET }}/${{ env.PACKAGE_PATH }}/download.tar.gz --content-type application/gzip
 
+      - name: Purge Cloudflare cache
+        run: |
+          curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_CACHE_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{"files":["https://api.packages.synergycp.com/${{ env.PACKAGE_PATH }}/index.json","https://api.packages.synergycp.com/${{ env.PACKAGE_PATH }}/download.tar.gz"]}'
+
       - name: Notify Slack on success
         if: success()
         env:
