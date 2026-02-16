@@ -13,16 +13,16 @@ class AbuseReport extends Migration
     public function up()
     {
         Schema::create('abuse_reports', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
 
             $table->string('subject', 200);
             $table->string('msg_id', 200);
             $table->string('addr', 50);
             $table->text('body');
 
-            $table->integer('entity_id')->unsigned()->nullable();
+            $table->unsignedInteger('entity_id')->nullable();
             $table->foreign('entity_id')->references('id')->on('entities');
-            $table->integer('client_id')->unsigned()->nullable();
+            $table->unsignedInteger('client_id')->nullable();
             $table->foreign('client_id')->references('id')->on('clients');
 
             $table->timestamp('reported_at')->nullable();
@@ -41,6 +41,6 @@ class AbuseReport extends Migration
      */
     public function down()
     {
-        Schema::drop('abuse_reports');
+        Schema::dropIfExists('abuse_reports');
     }
 }

@@ -13,7 +13,7 @@ class AbuseReportServer extends Migration
     public function up()
     {
         Schema::table('abuse_reports', function (Blueprint $table) {
-            $table->integer('server_id')->unsigned()->nullable();
+            $table->unsignedInteger('server_id')->nullable();
             $table->foreign('server_id')->references('id')->on('servers');
         });
     }

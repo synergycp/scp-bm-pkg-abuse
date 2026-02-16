@@ -4,6 +4,7 @@ namespace Packages\Abuse\App\Report\Listeners;
 
 use App\Client;
 use App\Mail;
+use Illuminate\Support\Arr;
 use App\Url\UrlService;
 use Packages\Abuse\App\Contact\ClientAbuseContact;
 use Packages\Abuse\App\Report\Events\ReportClientReassigned;
@@ -42,7 +43,7 @@ class ReportClientEmail
    */
   public function handle(ReportClientReassigned $event) {
     $settings = (array) app('Settings');
-    if (!array_get($settings, 'pkg.abuse.email.enabled')) {
+    if (!Arr::get($settings, 'pkg.abuse.email.enabled')) {
       return;
     }
 

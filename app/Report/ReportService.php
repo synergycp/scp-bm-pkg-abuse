@@ -7,6 +7,7 @@ use App\Entity\Entity;
 use App\Server\Server;
 use App\Entity\LookupService;
 use App\Ip\IpAddressRangeContract;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
@@ -143,7 +144,7 @@ class ReportService
         $settings = (array) app('Settings');
         $mins = [
             $this->now->subDays(
-                array_get($settings, 'pkg.abuse.report.threshold', 7)
+                Arr::get($settings, 'pkg.abuse.report.threshold', 7)
             ),
         ];
 

@@ -19,7 +19,7 @@ extends Migration
         Report::query()->delete();
 
         Schema::table('abuse_reports', function (Blueprint $table) {
-            $table->integer('msg_num')->unsigned();
+            $table->unsignedInteger('msg_num');
             $table->unique(['msg_num', 'addr']);
 
             $table->string('from', 400);

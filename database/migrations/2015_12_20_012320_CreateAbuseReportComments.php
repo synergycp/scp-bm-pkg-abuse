@@ -13,12 +13,12 @@ class CreateAbuseReportComments extends Migration
     public function up()
     {
         Schema::create('abuse_report_comments', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
 
             $table->string('author_type');
-            $table->integer('author_id')->unsigned();
+            $table->unsignedInteger('author_id');
 
-            $table->integer('abuse_report_id')->unsigned();
+            $table->unsignedInteger('abuse_report_id');
             $table->foreign('abuse_report_id')->references('id')->on('abuse_reports');
 
             $table->text('body');
@@ -33,6 +33,6 @@ class CreateAbuseReportComments extends Migration
      */
     public function down()
     {
-        Schema::drop('abuse_report_comments');
+        Schema::dropIfExists('abuse_report_comments');
     }
 }

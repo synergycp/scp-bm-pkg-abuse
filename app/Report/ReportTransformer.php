@@ -6,6 +6,7 @@ use App\Api\Transformer;
 use App\Client\Client;
 use App\Entity\Entity;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Packages\Abuse\App\Report\Comment\CommentTransformer;
 use App\Server\ServerFilterService;
@@ -99,7 +100,7 @@ extends Transformer
 
         $body = str_replace("=\r\n", '', $item->body);
         $body = strip_tags($body);
-        $body = str_limit($body, 100);
+        $body = Str::limit($body, 100);
 
         return [
             'from' => 'Original Email',

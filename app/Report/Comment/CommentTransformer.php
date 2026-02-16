@@ -4,6 +4,7 @@ namespace Packages\Abuse\App\Report\Comment;
 
 use App\Api\Transformer;
 use Illuminate\Database\Eloquent;
+use Illuminate\Support\Str;
 
 /**
  * Transform Abuse Report Comments for the API.
@@ -73,7 +74,7 @@ extends Transformer
     {
         return [
             'from' => $this->author($item)['name'],
-            'body' => str_limit($item->body, 100),
+            'body' => Str::limit($item->body, 100),
         ];
     }
 }

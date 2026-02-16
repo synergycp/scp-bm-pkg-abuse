@@ -36,14 +36,14 @@ class Suspension
     public function suspendServer(Server $server, Carbon $createdAt)
     {
         $this->access->suspend($server->access, 'Abuse');
-        $this->event->fire(
+        $this->event->dispatch(
             new Events\ServerSuspend($server, $createdAt)
         );
     }
 
     public function suspendWarning(Server $server, Carbon $createdAt)
     {
-        $this->event->fire(
+        $this->event->dispatch(
             new Events\ServerSuspendWarning($server, $createdAt)
         );
     }

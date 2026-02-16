@@ -3,6 +3,7 @@
 namespace Packages\Abuse\App\Suspension;
 
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use App\Server\ServerRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -74,7 +75,7 @@ class SuspensionSync
             ->keyBy('id');
         $vipClientFilter = function ($report) use ($servers) {
             // Server deleted
-            if (!$server = array_get($servers, $report->server_id)) {
+            if (!$server = Arr::get($servers, $report->server_id)) {
                 return false;
             }
 
