@@ -66,7 +66,7 @@ extends Mail\EmailListener
         $date = $this->suspension->maxReportDate();
         $days = round(abs($createdDate->diffInDays($date)) + 1, 2);
         $context = [
-            'server' => $server->expose('name'),
+            'server' => $server->expose('id', 'name'),
             'report' => [
                 'date' => $createdDate->toDateString(),
             ],

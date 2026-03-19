@@ -3,11 +3,11 @@
     "slug": "abuse",
     "name": "Abuse Reports",
     "description": "The Abuse package retrieves abuse reports via IMAP from an email account and distributes the reports to the appropriate server tenants based on server IP. It adds a frontend to SynergyCP that allows Clients and Administrators to see and comment on reports.",
-    "semver": "2.1.1",
+    "semver": "2.1.2",
     "download_url": "https://distribution.synergycp.com/packages/synergycp/abuse/download.tar.gz",
-    "release_date_unix": 1773882287,
+    "release_date_unix": 1773882686,
     "changelog": [
-      "Fix negative days and excessive decimal places in suspension warning emails"
+      "Add server ID to suspension warning and suspended email templates"
     ]
   }
 }

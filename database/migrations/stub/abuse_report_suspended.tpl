@@ -12,7 +12,7 @@
     </tr>
     <tr>
         <td class="content-block">
-            {$server.name} has been suspended due to an outstanding Abuse Report from {$report.date} that went unanswered.
+            {$server.name} &lt;srv{$server.id}&gt; has been suspended due to an outstanding Abuse Report from {$report.date} that went unanswered.
         </td>
     </tr>
 {/block}
