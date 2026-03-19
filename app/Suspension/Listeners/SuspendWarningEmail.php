@@ -5,6 +5,7 @@ namespace Packages\Abuse\App\Suspension\Listeners;
 use App\Client\Server\ClientServerAccessService;
 use App\Mail;
 use App\Server\Server;
+use App\Url\UrlService;
 use Carbon\Carbon;
 use Packages\Abuse\App\Suspension\Events;
 use Packages\Abuse\App\Suspension\Suspension;
@@ -31,17 +32,25 @@ extends Mail\EmailListener
     private $access;
 
     /**
+     * @var UrlService
+     */
+    private $url;
+
+    /**
      * SuspendWarningEmail constructor.
      *
      * @param Suspension                $suspension
      * @param ClientServerAccessService $access
+     * @param UrlService                $url
      */
     public function boot(
         Suspension $suspension,
-        ClientServerAccessService $access
+        ClientServerAccessService $access,
+        UrlService $url
     ) {
         $this->access = $access;
         $this->suspension = $suspension;
+        $this->url = $url;
     }
 
     /**
@@ -75,6 +84,9 @@ extends Mail\EmailListener
 
         foreach ($this->access->clients($server) as $client) {
             $context['client'] = $client->expose('name');
+            $context['urls'] = [
+                'view' => $this->url->base(get_class($client)) . '/pkg/abuse/report?tab=0',
+            ];
 
             $this
                 ->create($this->template)
