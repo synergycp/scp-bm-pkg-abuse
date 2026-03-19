@@ -55,7 +55,7 @@ class SuspendedEmail
     protected function send(Server $server, Carbon $createdDate)
     {
         $context = [
-            'server' => $server->expose('id', 'name'),
+            'server' => $server->expose('srv_id', 'name'),
             'report' => [
                 'date' => $createdDate->toDateString(),
             ],
