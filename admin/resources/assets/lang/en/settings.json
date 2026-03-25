@@ -14,6 +14,10 @@
     },
     "pass": {
       "LABEL": "IMAP Password"
+    },
+    "archive_folder": {
+      "LABEL": "Archive Folder",
+      "PLACEHOLDER": "IMAP folder to move processed emails to. Leave empty to auto-detect: Gmail and Google Workspace use [Gmail]/All Mail, other providers use Archived."
     }
   },
   "email": {

@@ -9,6 +9,9 @@ The Abuse package retrieves abuse reports via IMAP from an email account and dis
 
 ## Changelog
 
+### v2.2.2
+- Add archive folder setting label and auto-detect description to admin UI
+
 ### v2.2.1
 - Auto-detect archive folder: Gmail/Google Workspace uses `[Gmail]/All Mail`, others default to `Archived`, overridable via setting
 
