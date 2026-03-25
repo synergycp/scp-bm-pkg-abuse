@@ -9,6 +9,9 @@ The Abuse package retrieves abuse reports via IMAP from an email account and dis
 
 ## Changelog
 
+### v2.1.8
+- Fix IpService pass-by-reference error in attachment IP extraction
+
 ### v2.1.7
 - Fix email sync to always look back full threshold period instead of narrowing to latest report date
 

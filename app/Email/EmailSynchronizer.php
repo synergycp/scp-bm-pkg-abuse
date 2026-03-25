@@ -331,8 +331,9 @@ class EmailSynchronizer
         foreach ($attachments as $attachment) {
             $ip = $this->extractIpFromXarfJson($attachment);
             if ($ip) {
+                $search = [$ip];
                 return $this->ips
-                    ->find([$ip])
+                    ->find($search)
                     ->map(function ($addr) {
                         return $addr->start();
                     });
@@ -343,8 +344,9 @@ class EmailSynchronizer
         foreach ($attachments as $attachment) {
             $ip = $this->extractIpFromXml($attachment);
             if ($ip) {
+                $search = [$ip];
                 return $this->ips
-                    ->find([$ip])
+                    ->find($search)
                     ->map(function ($addr) {
                         return $addr->start();
                     });
