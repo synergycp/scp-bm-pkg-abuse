@@ -196,12 +196,22 @@ class EmailSynchronizer
     /**
      * Find All IP Addresses in the given Mail object.
      *
+     * Checks attachments first (XARF JSON, then XML) for a source IP.
+     * Falls back to scraping the subject and body if no attachment IPs found.
+     *
      * @param Message $mail
      *
      * @return Collection
      */
     private function findIpsIn(Message $mail)
     {
+        // Try extracting IPs from attachments first.
+        $attachmentIps = $this->findIpsInAttachments($mail);
+        if ($attachmentIps->count()) {
+            return $attachmentIps;
+        }
+
+        // Fall back to scraping subject + body.
         $body = null;
 
         try {
@@ -221,6 +231,149 @@ class EmailSynchronizer
                 // Ignore ranges:
                 return $addr->start();
             });
+    }
+
+    /**
+     * Try to extract source IPs from email attachments.
+     *
+     * Priority: XARF JSON attachments first, then XML attachments.
+     *
+     * @param Message $mail
+     *
+     * @return Collection
+     */
+    private function findIpsInAttachments(Message $mail)
+    {
+        try {
+            $attachments = $mail->getAttachments();
+        } catch (\Exception $exc) {
+            return collection();
+        }
+
+        if (empty($attachments)) {
+            return collection();
+        }
+
+        // 1. Check for XARF JSON attachments.
+        foreach ($attachments as $attachment) {
+            $ip = $this->extractIpFromXarfJson($attachment);
+            if ($ip) {
+                return $this->ips
+                    ->find([$ip])
+                    ->map(function ($addr) {
+                        return $addr->start();
+                    });
+            }
+        }
+
+        // 2. Check for XML attachments.
+        foreach ($attachments as $attachment) {
+            $ip = $this->extractIpFromXml($attachment);
+            if ($ip) {
+                return $this->ips
+                    ->find([$ip])
+                    ->map(function ($addr) {
+                        return $addr->start();
+                    });
+            }
+        }
+
+        return collection();
+    }
+
+    /**
+     * Extract source IP from an XARF JSON attachment.
+     *
+     * @param mixed $attachment
+     *
+     * @return string|null
+     */
+    private function extractIpFromXarfJson($attachment)
+    {
+        $filename = $attachment->getFilename();
+        if (!$filename) {
+            return null;
+        }
+
+        $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+        if ($extension !== 'json') {
+            return null;
+        }
+
+        try {
+            $content = $attachment->getDecodedContent();
+            $data = json_decode($content, true);
+
+            if (!is_array($data)) {
+                return null;
+            }
+
+            // XARF JSON uses "Source-IP" or "source-ip" for the reported IP.
+            foreach (['Source-IP', 'source-ip', 'Source_IP', 'source_ip', 'SourceIP', 'sourceip'] as $key) {
+                if (!empty($data[$key]) && filter_var($data[$key], FILTER_VALIDATE_IP)) {
+                    return $data[$key];
+                }
+            }
+
+            // Also check nested under "Report" key (some XARF formats).
+            if (isset($data['Report']) && is_array($data['Report'])) {
+                foreach (['Source-IP', 'source-ip', 'Source_IP', 'source_ip', 'SourceIP', 'sourceip'] as $key) {
+                    if (!empty($data['Report'][$key]) && filter_var($data['Report'][$key], FILTER_VALIDATE_IP)) {
+                        return $data['Report'][$key];
+                    }
+                }
+            }
+        } catch (\Exception $exc) {
+            // If we can't parse the attachment, skip it.
+        }
+
+        return null;
+    }
+
+    /**
+     * Extract source IP from an XML attachment.
+     *
+     * @param mixed $attachment
+     *
+     * @return string|null
+     */
+    private function extractIpFromXml($attachment)
+    {
+        $filename = $attachment->getFilename();
+        if (!$filename) {
+            return null;
+        }
+
+        $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+        if ($extension !== 'xml') {
+            return null;
+        }
+
+        try {
+            $content = $attachment->getDecodedContent();
+
+            // Search for common source IP patterns in XML.
+            // Matches tags like <Source-IP>, <SourceIP>, <source_ip>, <ip-source>, etc.
+            $patterns = [
+                '/<Source-?IP[^>]*>\s*([^<]+)\s*<\//i',
+                '/<source_ip[^>]*>\s*([^<]+)\s*<\//i',
+                '/<Source[^>]*>\s*([^<]+)\s*<\//i',
+                '/<ip[^>]*>\s*([^<]+)\s*<\//i',
+            ];
+
+            foreach ($patterns as $pattern) {
+                if (preg_match($pattern, $content, $matches)) {
+                    $ip = trim($matches[1]);
+                    if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                        return $ip;
+                    }
+                }
+            }
+        } catch (\Exception $exc) {
+            // If we can't parse the attachment, skip it.
+        }
+
+        return null;
     }
 
     /**
