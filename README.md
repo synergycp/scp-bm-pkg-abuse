@@ -9,6 +9,9 @@ The Abuse package retrieves abuse reports via IMAP from an email account and dis
 
 ## Changelog
 
+### v2.1.7
+- Fix email sync to always look back full threshold period instead of narrowing to latest report date
+
 ### v2.1.6
 - Add detailed logging to abuse email sync (start/complete, email counts, IP extraction source, report creation, errors)
 

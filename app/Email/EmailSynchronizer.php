@@ -110,8 +110,11 @@ class EmailSynchronizer
      */
     public function start()
     {
+        $minDate = $this->report->minDate($this->email);
+
         $this->log
             ->create('Abuse email sync started')
+            ->setData(['looking_back_to' => $minDate->toDateTimeString()])
             ->save();
 
         $iterator = $this->emails->get();
