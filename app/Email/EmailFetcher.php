@@ -55,32 +55,29 @@ class EmailFetcher {
       return $this->connection;
     }
 
-    $settings = (array) app('Settings');
+    $s = app('Settings');
+
+    $host = (string) ($s->{'pkg.abuse.auth.host'} ?? '');
+    $user = (string) ($s->{'pkg.abuse.auth.user'} ?? '');
+    $pass = (string) ($s->{'pkg.abuse.auth.pass'} ?? '');
 
     // if any of the settings are empty then the Fetcher should do nothing.
-    if (
-      empty($settings['pkg.abuse.auth.host']) ||
-      empty($settings['pkg.abuse.auth.user']) ||
-      empty($settings['pkg.abuse.auth.pass'])
-    ) {
+    if (empty($host) || empty($user) || empty($pass)) {
       return;
     }
 
-    $server = new Server(
-      $settings['pkg.abuse.auth.host'],
-      '993',
-      '/imap/ssl/novalidate-cert'
-    );
+    $server = new Server($host, '993', '/imap/ssl/novalidate-cert');
 
-    $this->connection = $server->authenticate(
-      $settings['pkg.abuse.auth.user'],
-      $settings['pkg.abuse.auth.pass']
-    );
+    $this->connection = $server->authenticate($user, $pass);
 
-    $this->archiveFolder = $this->resolveArchiveFolder(
-      $settings['pkg.abuse.auth.archive_folder'] ?? '',
-      $settings['pkg.abuse.auth.host'] ?? ''
-    );
+    $archiveSetting = '';
+    try {
+      $archiveSetting = (string) ($s->{'pkg.abuse.auth.archive_folder'} ?? '');
+    } catch (\Throwable $exc) {
+      // Setting value is null — treat as empty for auto-detection.
+    }
+
+    $this->archiveFolder = $this->resolveArchiveFolder($archiveSetting, $host);
 
     return $this->connection;
   }
