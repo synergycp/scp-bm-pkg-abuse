@@ -9,6 +9,9 @@ The Abuse package retrieves abuse reports via IMAP from an email account and dis
 
 ## Changelog
 
+### v2.2.4
+- Fix null archive folder setting crashing admin settings page (migration converts null to empty string)
+
 ### v2.2.3
 - Fix crash when archive folder setting is cleared (null value triggers Setting accessor TypeError)
 
