@@ -9,6 +9,9 @@ The Abuse package retrieves abuse reports via IMAP from an email account and dis
 
 ## Changelog
 
+### v2.2.6
+- Fix migration to use correct settings table column name (`name`)
+
 ### v2.2.5
 - Fix migration to detect settings table column name dynamically
 
