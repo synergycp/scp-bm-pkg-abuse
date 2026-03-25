@@ -9,6 +9,9 @@ The Abuse package retrieves abuse reports via IMAP from an email account and dis
 
 ## Changelog
 
+### v2.2.1
+- Auto-detect archive folder: Gmail/Google Workspace uses `[Gmail]/All Mail`, others default to `Archived`, overridable via setting
+
 ### v2.2.0
 - Archive processed emails to configurable IMAP folder (default `[Gmail]/All Mail`) instead of relying on seen flags or date filtering
 - New setting: `pkg.abuse.auth.archive_folder`

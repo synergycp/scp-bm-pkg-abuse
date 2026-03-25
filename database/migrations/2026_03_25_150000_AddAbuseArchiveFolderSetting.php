@@ -17,7 +17,7 @@ class AddAbuseArchiveFolderSetting extends Migration
             $group,
             Setting::TYPE_TEXT,
             'pkg.abuse.auth.archive_folder',
-            ['value' => '[Gmail]/All Mail']
+            ['value' => '']
         );
     }
 
