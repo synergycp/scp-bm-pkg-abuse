@@ -9,6 +9,9 @@ The Abuse package retrieves abuse reports via IMAP from an email account and dis
 
 ## Changelog
 
+### v2.1.10
+- Skip already-processed emails by marking all as seen and fetching only unseen from IMAP
+
 ### v2.1.9
 - Handle duplicate report race conditions and deduplicate extracted IPs
 

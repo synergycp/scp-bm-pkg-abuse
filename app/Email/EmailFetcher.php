@@ -4,6 +4,7 @@ namespace Packages\Abuse\App\Email;
 
 use Ddeboer\Imap\SearchExpression;
 use Ddeboer\Imap\Search\Date\Since;
+use Ddeboer\Imap\Search\Flag\Unseen;
 use Ddeboer\Imap\Server;
 use Ddeboer\Imap\Connection;
 use Ddeboer\Imap\MessageIterator;
@@ -22,6 +23,7 @@ class EmailFetcher {
 
   public function __construct() {
     $this->search = new SearchExpression();
+    $this->search->addCondition(new Unseen());
   }
 
   /**

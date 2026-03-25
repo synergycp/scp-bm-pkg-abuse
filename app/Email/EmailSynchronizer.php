@@ -146,6 +146,7 @@ class EmailSynchronizer
 
             try {
                 $this->reportIpsIn($message);
+                $message->markAsSeen();
                 $processed++;
             } catch (MessageDoesNotExistException $exc) {
                 // Silently ignore
@@ -234,9 +235,6 @@ class EmailSynchronizer
             ->each($report)
         ;
 
-        if ($reportedIps->count()) {
-            $this->whenIpFound($mail);
-        }
     }
 
     /**
@@ -501,12 +499,6 @@ class EmailSynchronizer
             ->save();
 
         event(new Events\ReportCreated($report));
-    }
-
-    private function whenIpFound(Message $mail)
-    {
-        // Mark as read.
-        $mail->markAsSeen();
     }
 
     private function logException(\Exception $exc, Message $mail)
