@@ -9,6 +9,9 @@ The Abuse package retrieves abuse reports via IMAP from an email account and dis
 
 ## Changelog
 
+### v2.1.5
+- Extract source IP from XARF JSON and XML email attachments before scraping body
+
 ### v2.1.4
 - Add View Report button URL to suspension warning and suspended emails
 
