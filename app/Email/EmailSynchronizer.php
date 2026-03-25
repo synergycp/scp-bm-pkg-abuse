@@ -110,26 +110,56 @@ class EmailSynchronizer
      */
     public function start()
     {
+        $this->log
+            ->create('Abuse email sync started')
+            ->save();
+
         $iterator = $this->emails->get();
 
-        while ($iterator && $iterator->valid()) {
+        if (!$iterator) {
+            $this->log
+                ->create('Abuse email sync: could not connect to mailbox')
+                ->save();
+            return;
+        }
+
+        $total = 0;
+        $skipped = 0;
+        $processed = 0;
+        $errors = 0;
+
+        while ($iterator->valid()) {
             $message = $iterator->current();
             $messageNumber = $message->getNumber();
             $iterator->next();
+            $total++;
 
             // remove already seen items.
             if ($this->report->messageNumberExists($messageNumber)) {
+                $skipped++;
                 continue;
             }
 
             try {
                 $this->reportIpsIn($message);
+                $processed++;
             } catch (MessageDoesNotExistException $exc) {
                 // Silently ignore
             } catch (\Exception $exc) {
+                $errors++;
                 $this->logException($exc, $message);
             }
         }
+
+        $this->log
+            ->create('Abuse email sync completed')
+            ->setData([
+                'total_emails' => $total,
+                'skipped_already_seen' => $skipped,
+                'processed' => $processed,
+                'errors' => $errors,
+            ])
+            ->save();
     }
 
     /**
@@ -140,10 +170,22 @@ class EmailSynchronizer
         $from = $mail->getFrom()->getFullAddress();
 
         if ($this->ignoreFrom->contains($from)) {
+            $this->log
+                ->create('Abuse email sync: skipped email from ignored sender')
+                ->setData(['from' => $from, 'subject' => $mail->getSubject()])
+                ->save();
             return;
         }
 
         $ips = $this->findIpsIn($mail);
+
+        if ($ips->isEmpty()) {
+            $this->log
+                ->create('Abuse email sync: no IPs found in email')
+                ->setData(['from' => $from, 'subject' => $mail->getSubject()])
+                ->save();
+        }
+
         $report = function (IpAddressRangeContract $addr) use ($mail) {
             $this->report($addr, $mail);
         };
@@ -208,6 +250,15 @@ class EmailSynchronizer
         // Try extracting IPs from attachments first.
         $attachmentIps = $this->findIpsInAttachments($mail);
         if ($attachmentIps->count()) {
+            $this->log
+                ->create('Abuse email sync: extracted IPs from attachment')
+                ->setData([
+                    'source' => 'attachment',
+                    'ip_count' => $attachmentIps->count(),
+                    'ips' => $attachmentIps->map(function ($addr) { return (string) $addr; })->values()->all(),
+                    'subject' => $mail->getSubject(),
+                ])
+                ->save();
             return $attachmentIps;
         }
 
@@ -225,12 +276,26 @@ class EmailSynchronizer
             $body,
         ];
 
-        return $this->ips
+        $ips = $this->ips
             ->find($search)
             ->map(function ($addr) {
                 // Ignore ranges:
                 return $addr->start();
             });
+
+        if ($ips->count()) {
+            $this->log
+                ->create('Abuse email sync: extracted IPs from email body')
+                ->setData([
+                    'source' => 'body',
+                    'ip_count' => $ips->count(),
+                    'ips' => $ips->map(function ($addr) { return (string) $addr; })->values()->all(),
+                    'subject' => $mail->getSubject(),
+                ])
+                ->save();
+        }
+
+        return $ips;
     }
 
     /**
@@ -247,6 +312,11 @@ class EmailSynchronizer
         try {
             $attachments = $mail->getAttachments();
         } catch (\Exception $exc) {
+            $this->log
+                ->create('Abuse email sync: failed to read attachments')
+                ->setData(['subject' => $mail->getSubject()])
+                ->setException($exc)
+                ->save();
             return collection();
         }
 
@@ -324,7 +394,11 @@ class EmailSynchronizer
                 }
             }
         } catch (\Exception $exc) {
-            // If we can't parse the attachment, skip it.
+            $this->log
+                ->create('Abuse email sync: failed to parse XARF JSON attachment')
+                ->setData(['filename' => $filename])
+                ->setException($exc)
+                ->save();
         }
 
         return null;
@@ -370,7 +444,11 @@ class EmailSynchronizer
                 }
             }
         } catch (\Exception $exc) {
-            // If we can't parse the attachment, skip it.
+            $this->log
+                ->create('Abuse email sync: failed to parse XML attachment')
+                ->setData(['filename' => $filename])
+                ->setException($exc)
+                ->save();
         }
 
         return null;
@@ -393,6 +471,16 @@ class EmailSynchronizer
         $report->reported_at = $mail->getDate();
 
         $report->save();
+
+        $this->log
+            ->create('Abuse email sync: report created')
+            ->setData([
+                'ip' => (string) $addr,
+                'from' => $report->from,
+                'subject' => $report->subject,
+                'msg_num' => $report->msg_num,
+            ])
+            ->save();
 
         event(new Events\ReportCreated($report));
     }
