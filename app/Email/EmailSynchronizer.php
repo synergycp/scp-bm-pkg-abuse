@@ -8,11 +8,9 @@ use App\Ip\IpService;
 use App\Log;
 use App\Support\Resolver;
 use function base64_encode;
-use Ddeboer\Imap;
 use Ddeboer\Imap\Exception\MessageDoesNotExistException;
 use Illuminate\Database\QueryException;
 use Ddeboer\Imap\Message;
-use Ddeboer\Imap\MessageInterface;
 use Ddeboer\Transcoder\Exception\UndetectableEncodingException;
 use Illuminate\Support\Collection;
 use Packages\Abuse\App\Report\Events;
@@ -100,10 +98,6 @@ class EmailSynchronizer
         $this->report = $report;
         $this->emails = $emails;
         $this->lookup = $lookup;
-
-        $this->emails->after(
-            $this->report->minDate($this->email)
-        );
     }
 
     /**
@@ -111,11 +105,8 @@ class EmailSynchronizer
      */
     public function start()
     {
-        $minDate = $this->report->minDate($this->email);
-
         $this->log
             ->create('Abuse email sync started')
-            ->setData(['looking_back_to' => $minDate->toDateTimeString()])
             ->save();
 
         $iterator = $this->emails->get();
@@ -128,25 +119,17 @@ class EmailSynchronizer
         }
 
         $total = 0;
-        $skipped = 0;
         $processed = 0;
         $errors = 0;
 
         while ($iterator->valid()) {
             $message = $iterator->current();
-            $messageNumber = $message->getNumber();
             $iterator->next();
             $total++;
 
-            // remove already seen items.
-            if ($this->report->messageNumberExists($messageNumber)) {
-                $skipped++;
-                continue;
-            }
-
             try {
                 $this->reportIpsIn($message);
-                $message->markAsSeen();
+                $this->emails->archive($message);
                 $processed++;
             } catch (MessageDoesNotExistException $exc) {
                 // Silently ignore
@@ -160,7 +143,6 @@ class EmailSynchronizer
             ->create('Abuse email sync completed')
             ->setData([
                 'total_emails' => $total,
-                'skipped_already_seen' => $skipped,
                 'processed' => $processed,
                 'errors' => $errors,
             ])

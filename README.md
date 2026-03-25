@@ -9,6 +9,10 @@ The Abuse package retrieves abuse reports via IMAP from an email account and dis
 
 ## Changelog
 
+### v2.2.0
+- Archive processed emails to configurable IMAP folder (default `[Gmail]/All Mail`) instead of relying on seen flags or date filtering
+- New setting: `pkg.abuse.auth.archive_folder`
+
 ### v2.1.10
 - Skip already-processed emails by marking all as seen and fetching only unseen from IMAP
 

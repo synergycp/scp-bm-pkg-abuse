@@ -3,39 +3,21 @@
 namespace Packages\Abuse\App\Email;
 
 use Ddeboer\Imap\SearchExpression;
-use Ddeboer\Imap\Search\Date\Since;
-use Ddeboer\Imap\Search\Flag\Unseen;
 use Ddeboer\Imap\Server;
 use Ddeboer\Imap\Connection;
 use Ddeboer\Imap\MessageIterator;
-use Carbon\Carbon;
+use Ddeboer\Imap\MessageInterface;
 
 class EmailFetcher {
-  /**
-   * @var SearchExpression
-   */
-  protected $search;
-
   /**
    * @var Connection|null
    */
   protected $connection;
 
-  public function __construct() {
-    $this->search = new SearchExpression();
-    $this->search->addCondition(new Unseen());
-  }
-
   /**
-   * @param Carbon $date
-   *
-   * @return $this
+   * @var string
    */
-  public function after(Carbon $date) {
-    $this->search->addCondition(new Since($date));
-
-    return $this;
-  }
+  protected $archiveFolder;
 
   /**
    * @param string $box
@@ -47,7 +29,22 @@ class EmailFetcher {
       return;
     }
 
-    return $connect->getMailbox($box)->getMessages($this->search);
+    return $connect->getMailbox($box)->getMessages(new SearchExpression());
+  }
+
+  /**
+   * Move a message from the inbox to the archive folder.
+   *
+   * @param MessageInterface $message
+   */
+  public function archive(MessageInterface $message) {
+    $connect = $this->connect();
+    if (!$connect || !$this->archiveFolder) {
+      return;
+    }
+
+    $archiveBox = $connect->getMailbox($this->archiveFolder);
+    $message->move($archiveBox);
   }
 
   /**
@@ -68,6 +65,8 @@ class EmailFetcher {
     ) {
       return;
     }
+
+    $this->archiveFolder = $settings['pkg.abuse.auth.archive_folder'] ?? '[Gmail]/All Mail';
 
     $server = new Server(
       $settings['pkg.abuse.auth.host'],
