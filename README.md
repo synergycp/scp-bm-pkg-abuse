@@ -9,6 +9,9 @@ The Abuse package retrieves abuse reports via IMAP from an email account and dis
 
 ## Changelog
 
+### v2.2.7
+- Prevent null value crash when clearing archive folder setting in admin UI
+
 ### v2.2.6
 - Fix migration to use correct settings table column name (`name`)
 
