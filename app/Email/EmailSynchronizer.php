@@ -10,6 +10,7 @@ use App\Support\Resolver;
 use function base64_encode;
 use Ddeboer\Imap;
 use Ddeboer\Imap\Exception\MessageDoesNotExistException;
+use Illuminate\Database\QueryException;
 use Ddeboer\Imap\Message;
 use Ddeboer\Imap\MessageInterface;
 use Ddeboer\Transcoder\Exception\UndetectableEncodingException;
@@ -284,7 +285,11 @@ class EmailSynchronizer
             ->map(function ($addr) {
                 // Ignore ranges:
                 return $addr->start();
-            });
+            })
+            ->unique(function ($addr) {
+                return (string) $addr;
+            })
+            ->values();
 
         if ($ips->count()) {
             $this->log
@@ -475,7 +480,15 @@ class EmailSynchronizer
         $report->subject = $mail->getSubject();
         $report->reported_at = $mail->getDate();
 
-        $report->save();
+        try {
+            $report->save();
+        } catch (QueryException $exc) {
+            // Skip duplicate reports (already processed in a previous sync).
+            if ($exc->errorInfo[1] === 1062) {
+                return;
+            }
+            throw $exc;
+        }
 
         $this->log
             ->create('Abuse email sync: report created')
