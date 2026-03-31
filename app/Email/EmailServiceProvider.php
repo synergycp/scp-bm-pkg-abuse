@@ -20,6 +20,17 @@ extends ServiceProvider
 
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('abuse:sync-email')->everyFiveMinutes();
+        $minutes = 5;
+        try {
+            $minutes = (int) (app('Settings')->{'pkg.abuse.sync_frequency'} ?? 5);
+        } catch (\Throwable $e) {
+            // Fall back to default if setting is unavailable.
+        }
+
+        if ($minutes < 1) {
+            $minutes = 5;
+        }
+
+        $schedule->command('abuse:sync-email')->cron("*/{$minutes} * * * *");
     }
 }
