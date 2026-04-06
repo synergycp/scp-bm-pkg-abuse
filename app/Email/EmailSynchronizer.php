@@ -247,17 +247,9 @@ class EmailSynchronizer
         }
 
         // Fall back to scraping subject + body.
-        $body = null;
-
-        try {
-            $body = $mail->getBodyText();
-        } catch (UndetectableEncodingException $exc) {
-            // TODO:
-        }
-
         $search = [
             $mail->getSubject(),
-            $body,
+            $this->getBodyContent($mail),
         ];
 
         $ips = $this->ips
@@ -454,7 +446,7 @@ class EmailSynchronizer
     {
         $report = $this->report->makeWithEntity($addr, $this->lookup->addr($addr));
         $report->from = $mail->getFrom()->getFullAddress();
-        $report->body = $mail->getBodyText() ?: '';
+        $report->body = $this->getBodyContent($mail);
         $report->msg_id = $mail->getId();
         $report->msg_num = $mail->getNumber();
         $report->subject = $mail->getSubject();
@@ -481,6 +473,37 @@ class EmailSynchronizer
             ->save();
 
         event(new Events\ReportCreated($report));
+    }
+
+    /**
+     * Get the email body text, falling back to HTML body with tags stripped
+     * if no text/plain part exists.
+     *
+     * @param Message $mail
+     *
+     * @return string
+     */
+    private function getBodyContent(Message $mail)
+    {
+        try {
+            $text = $mail->getBodyText();
+            if ($text) {
+                return $text;
+            }
+        } catch (UndetectableEncodingException $exc) {
+            // Fall through to try HTML.
+        }
+
+        try {
+            $html = $mail->getBodyHtml();
+            if ($html) {
+                return strip_tags($html);
+            }
+        } catch (UndetectableEncodingException $exc) {
+            // Unable to decode either part.
+        }
+
+        return '';
     }
 
     private function logException(\Exception $exc, Message $mail)

@@ -9,6 +9,9 @@ The Abuse package retrieves abuse reports via IMAP from an email account and dis
 
 ## Changelog
 
+### v2.2.10
+- Fix empty report body for HTML-only abuse emails by falling back to HTML content with tags stripped
+
 ### v2.2.7
 - Prevent null value crash when clearing archive folder setting in admin UI
 
